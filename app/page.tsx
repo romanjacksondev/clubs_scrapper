@@ -57,11 +57,39 @@ export default function Home() {
     setSelectedClubId(id);
   };
 
+  const [scraping, setScraping] = useState(false);
+  const [scrapeError, setScrapeError] = useState("");
+
+  const handleScrape = async () => {
+    if (!selectedLeagueId || !selectedClubId) return;
+    setScraping(true);
+    setScrapeError("");
+    const league = leagues.find(l => l.id === selectedLeagueId)?.name;
+    const club = clubs.find(c => c.id === selectedClubId)?.name;
+    try {
+      const res = await fetch("/api/scrape", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ league, club })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data.products || []);
+      } else {
+        const err = await res.json();
+        setScrapeError(err.error || "Scraping failed");
+      }
+    } catch (e) {
+      setScrapeError("Scraping failed");
+    } finally {
+      setScraping(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen">
       <main className="flex-1 flex flex-col p-12 bg-white">
         <h1 className="text-4xl font-bold mb-8">Clubs Scrapper</h1>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
             <label className="block text-sm font-medium mb-2">Select League</label>
@@ -78,7 +106,6 @@ export default function Home() {
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-2">Select Club</label>
             <select
@@ -96,7 +123,14 @@ export default function Home() {
             </select>
           </div>
         </div>
-
+        <button
+          className="mb-8 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed w-fit"
+          onClick={handleScrape}
+          disabled={!selectedLeagueId || !selectedClubId || scraping}
+        >
+          {scraping ? "Scraping..." : "Scrape Products"}
+        </button>
+        {scrapeError && <div className="text-red-600 mb-4">{scrapeError}</div>}
         {selectedClubId && (
           <div className="overflow-x-auto">
             <h2 className="text-2xl font-semibold mb-4">Products</h2>
@@ -110,8 +144,8 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map(product => (
-                    <tr key={product.id} className="hover:bg-gray-50">
+                  {filteredProducts.map((product, idx) => (
+                    <tr key={product.id || `${product.name}-${idx}`} className="hover:bg-gray-50">
                       <td className="border border-gray-300 px-4 py-2">{product.name}</td>
                       <td className="border border-gray-300 px-4 py-2">${product.price.toFixed(2)}</td>
                       <td className="border border-gray-300 px-4 py-2">
