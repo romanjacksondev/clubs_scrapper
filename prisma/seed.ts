@@ -34,7 +34,7 @@ async function main() {
     { name: 'Aston Villa', officialSiteUrl: 'https://www.avfc.co.uk', officialStoreUrl: 'https://shop.avfc.co.uk', leagueId: leagueRecords[0].id },
     { name: 'Bournemouth', officialSiteUrl: 'https://www.afcb.co.uk', officialStoreUrl: 'https://shop.afcb.co.uk', leagueId: leagueRecords[0].id },
     { name: 'Brentford', officialSiteUrl: 'https://www.brentfordfc.com', officialStoreUrl: 'https://shop.brentfordfc.com', leagueId: leagueRecords[0].id },
-    { name: 'Brighton & Hove Albion', officialSiteUrl: 'https://www.brightonandhovealbion.com', officialStoreUrl: 'https://shop.brightonandhovealbion.com', leagueId: leagueRecords[0].id },
+    { name: 'Brighton', officialSiteUrl: 'https://www.brightonandhovealbion.com', officialStoreUrl: 'https://shop.brightonandhovealbion.com', leagueId: leagueRecords[0].id },
     { name: 'Burnley', officialSiteUrl: 'https://www.burnleyfootballclub.com', officialStoreUrl: 'https://shop.burnleyfootballclub.com', leagueId: leagueRecords[0].id },
     { name: 'Chelsea', officialSiteUrl: 'https://www.chelseafc.com', officialStoreUrl: 'https://shop.chelseafc.com', leagueId: leagueRecords[0].id },
     { name: 'Crystal Palace', officialSiteUrl: 'https://www.cpfc.co.uk', officialStoreUrl: 'https://shop.cpfc.co.uk', leagueId: leagueRecords[0].id },
@@ -49,7 +49,7 @@ async function main() {
     { name: 'Sheffield United', officialSiteUrl: 'https://www.sufc.co.uk', officialStoreUrl: 'https://shop.sufc.co.uk', leagueId: leagueRecords[0].id },
     { name: 'Tottenham Hotspur', officialSiteUrl: 'https://www.tottenhamhotspur.com', officialStoreUrl: 'https://shop.tottenhamhotspur.com', leagueId: leagueRecords[0].id },
     { name: 'West Ham United', officialSiteUrl: 'https://www.whufc.com', officialStoreUrl: 'https://shop.whufc.com', leagueId: leagueRecords[0].id },
-    { name: 'Wolverhampton Wanderers', officialSiteUrl: 'https://www.wolves.co.uk', officialStoreUrl: 'https://shop.wolves.co.uk', leagueId: leagueRecords[0].id },
+    { name: 'Wolves', officialSiteUrl: 'https://www.wolves.co.uk', officialStoreUrl: 'https://shop.wolves.co.uk', leagueId: leagueRecords[0].id },
     // La Liga (Spain)
     { name: 'Real Madrid', officialSiteUrl: 'https://www.realmadrid.com', officialStoreUrl: 'https://shop.realmadrid.com', leagueId: leagueRecords[1].id },
     { name: 'Barcelona', officialSiteUrl: 'https://www.fcbarcelona.com', officialStoreUrl: 'https://store.fcbarcelona.com', leagueId: leagueRecords[1].id },

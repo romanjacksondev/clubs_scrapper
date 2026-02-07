@@ -1,14 +1,20 @@
-"use client"
-import { useState, useEffect } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
 async function fetchLeagues() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/leagues`, { cache: "no-store" });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/leagues`,
+    { cache: 'no-store' },
+  );
   if (!res.ok) return [];
   return res.json();
 }
 
 async function fetchClubs() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/clubs`, { cache: "no-store" });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/clubs`,
+    { cache: 'no-store' },
+  );
   if (!res.ok) return [];
   return res.json();
 }
@@ -41,7 +47,7 @@ export default function Home() {
   }, [selectedClubId]);
 
   const filteredClubs = selectedLeagueId
-    ? clubs.filter(club => club.leagueId === selectedLeagueId)
+    ? clubs.filter((club) => club.leagueId === selectedLeagueId)
     : [];
 
   const filteredProducts = products;
@@ -58,29 +64,34 @@ export default function Home() {
   };
 
   const [scraping, setScraping] = useState(false);
-  const [scrapeError, setScrapeError] = useState("");
+  const [scrapeError, setScrapeError] = useState('');
 
   const handleScrape = async () => {
     if (!selectedLeagueId || !selectedClubId) return;
     setScraping(true);
-    setScrapeError("");
-    const league = leagues.find(l => l.id === selectedLeagueId)?.name;
-    const club = clubs.find(c => c.id === selectedClubId)?.name;
+    setScrapeError('');
+    const league = leagues.find((l) => l.id === selectedLeagueId)?.name;
+    const club = clubs.find((c) => c.id === selectedClubId)?.name;
     try {
-      const res = await fetch("/api/scrape", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ league, club })
+      // const res = await fetch("/api/cron", {
+      //   method: "GET",
+      //   headers: { "Content-Type": "application/json" }
+      // });
+
+      const res = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ league, club }),
       });
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || []);
       } else {
         const err = await res.json();
-        setScrapeError(err.error || "Scraping failed");
+        setScrapeError(err.error || 'Scraping failed');
       }
     } catch (e) {
-      setScrapeError("Scraping failed");
+      setScrapeError('Scraping failed');
     } finally {
       setScraping(false);
     }
@@ -94,12 +105,12 @@ export default function Home() {
           <div>
             <label className="block text-sm font-medium mb-2">Select League</label>
             <select
-              value={selectedLeagueId || ""}
+              value={selectedLeagueId || ''}
               onChange={handleLeagueChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">-- Choose a League --</option>
-              {leagues.map(league => (
+              {leagues.map((league) => (
                 <option key={league.id} value={league.id}>
                   {league.name}
                 </option>
@@ -109,13 +120,13 @@ export default function Home() {
           <div>
             <label className="block text-sm font-medium mb-2">Select Club</label>
             <select
-              value={selectedClubId || ""}
+              value={selectedClubId || ''}
               onChange={handleClubChange}
               disabled={!selectedLeagueId}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
             >
               <option value="">-- Choose a Club --</option>
-              {filteredClubs.map(club => (
+              {filteredClubs.map((club) => (
                 <option key={club.id} value={club.id}>
                   {club.name}
                 </option>
@@ -128,7 +139,7 @@ export default function Home() {
           onClick={handleScrape}
           disabled={!selectedLeagueId || !selectedClubId || scraping}
         >
-          {scraping ? "Scraping..." : "Scrape Products"}
+          {scraping ? 'Scraping...' : 'Scrape Products'}
         </button>
         {scrapeError && <div className="text-red-600 mb-4">{scrapeError}</div>}
         {selectedClubId && (
@@ -147,9 +158,16 @@ export default function Home() {
                   {filteredProducts.map((product, idx) => (
                     <tr key={product.id || `${product.name}-${idx}`} className="hover:bg-gray-50">
                       <td className="border border-gray-300 px-4 py-2">{product.name}</td>
-                      <td className="border border-gray-300 px-4 py-2">${product.price.toFixed(2)}</td>
                       <td className="border border-gray-300 px-4 py-2">
-                        <a href={product.productUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        ${product.price.toFixed(2)}
+                      </td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        <a
+                          href={product.productUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
                           View Product
                         </a>
                       </td>
