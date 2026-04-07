@@ -2,19 +2,13 @@
 import { useEffect, useState } from 'react';
 
 async function fetchLeagues() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/leagues`,
-    { cache: 'no-store' },
-  );
+  const res = await fetch('/api/leagues', { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
 
 async function fetchClubs() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/clubs`,
-    { cache: 'no-store' },
-  );
+  const res = await fetch('/api/clubs', { cache: 'no-store' });
   if (!res.ok) return [];
   return res.json();
 }
