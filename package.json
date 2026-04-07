@@ -17,6 +17,8 @@
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.24",
     "cheerio": "^1.2.0",
+    "flowbite": "^4.0.1",
+    "flowbite-react": "^0.12.17",
     "next": "16.1.6",
     "pg": "^8.18.0",
     "postcss": "^8.5.6",
