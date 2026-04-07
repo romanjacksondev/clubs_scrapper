@@ -5,7 +5,7 @@ const scrapeBurnley = async function () {
   let browser;
   try {
     browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -30,7 +30,7 @@ const scrapeBurnley = async function () {
     let products = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((el) => {
           // Name from .product-list__title inside .product-list__desc-text
           const name = el
@@ -66,7 +66,7 @@ const scrapeBurnley = async function () {
       const html = await page.content();
       const cheerio = require('cheerio');
       const $ = cheerio.load(html);
-      $('.product-list__product-wrapper').each((i, el) => {
+      $('.product-list__product-wrapper').each((i: any, el: any) => {
         const name = $(el).find('.product-list__desc-text .product-list__title').text().trim();
         let priceText = $(el).find('.product-list__nowprice .price-gbp').first().text().trim();
         if (!priceText) {

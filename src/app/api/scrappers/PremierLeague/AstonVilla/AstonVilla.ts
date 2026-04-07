@@ -1,12 +1,11 @@
-import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 export default async function scrapeAstonVilla() {
-  const aa = 'adasd';
   const url =
     'https://shop3.avfc.co.uk/en/aston-villa-football-kits/t-31876437+d-3405109404+z-96-4265943694';
   let browser;
   try {
-    browser = await puppeteer.launch({ headless: 'new' });
+    browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -21,7 +20,7 @@ export default async function scrapeAstonVilla() {
     }
     const html = await page.content();
     const $ = cheerio.load(html);
-    const products = [];
+    const products: { name: string; productUrl: string; price: number; currency: string }[] = [];
     $('.ds-card').each((i, el) => {
       const anchor = $(el).find('.ds-card-media a').first();
       const details = $(el).find('.ds-card-details');

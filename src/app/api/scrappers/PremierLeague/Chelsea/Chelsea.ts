@@ -6,7 +6,7 @@ const scrapeChelsea = async function () {
   let browser;
   try {
     browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -31,7 +31,7 @@ const scrapeChelsea = async function () {
     let products = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((card) => {
           // Name from .ds-card-title
           const name = card.querySelector('.ds-card-title')?.textContent.trim();
@@ -57,7 +57,7 @@ const scrapeChelsea = async function () {
       const html = await page.content();
       const cheerio = require('cheerio');
       const $ = cheerio.load(html);
-      $('.ds-card').each((i, el) => {
+      $('.ds-card').each((i: any, el: any) => {
         const name = $(el).find('.ds-card-title').text().trim();
         let priceText = $(el).find('.money-value').first().text().trim();
         const price = priceText ? parseFloat(priceText.replace(/[^0-9.]/g, '')) : null;

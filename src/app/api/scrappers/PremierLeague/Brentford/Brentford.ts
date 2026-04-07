@@ -5,7 +5,7 @@ const scrapeBrentford = async function () {
   let browser;
   try {
     browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -17,7 +17,7 @@ const scrapeBrentford = async function () {
     // Wait for products to load
     await page.waitForSelector('.cell.product-list__product', { timeout: 20000 });
     const products = await page.evaluate(() => {
-      const items = [];
+      const items: { name: string; productUrl: string; price: number; currency: string }[] = [];
       document.querySelectorAll('.cell.product-list__product').forEach((el) => {
         // Name from .product-list__title inside .product-list__desc-text
         const name = el

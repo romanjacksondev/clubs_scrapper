@@ -1,12 +1,12 @@
-import puppeteer from 'puppeteer';
 import * as cheerio from 'cheerio';
+import puppeteer from 'puppeteer';
 
 const scrapeCrystalPalace = async function () {
   const url = 'https://shop.cpfc.co.uk/kit/all-kit/';
   let browser;
   try {
     browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();
@@ -31,7 +31,7 @@ const scrapeCrystalPalace = async function () {
     let products = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((el) => {
           // Name from .product-list__title inside .product-list__desc-text
           const name = el
