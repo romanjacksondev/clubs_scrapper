@@ -1,8 +1,8 @@
-import path from 'path';
+import * as cheerio from 'cheerio';
 import fs from 'fs';
+import path from 'path';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import * as cheerio from 'cheerio';
 puppeteer.use(StealthPlugin());
 
 const scrapeLiverpool = async () => {
@@ -13,7 +13,7 @@ const scrapeLiverpool = async () => {
     'https://store.liverpoolfc.com/kit/goalkeeper',
   ];
   let browser;
-  let allProducts = [];
+  let allProducts: any[] = [];
   try {
     // ...existing code...
     browser = await puppeteer.launch({
@@ -45,7 +45,7 @@ const scrapeLiverpool = async () => {
       let products = [];
       if (foundSelector) {
         products = await page.evaluate((selector) => {
-          const items = [];
+          const items: any[] = [];
           document.querySelectorAll(selector).forEach((card) => {
             // Name from .ds-card-title
             const name = card.querySelector('.ds-card-title')?.textContent.trim();

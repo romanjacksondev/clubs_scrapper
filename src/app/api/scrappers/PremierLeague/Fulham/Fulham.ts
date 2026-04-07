@@ -1,7 +1,5 @@
-import path from 'path';
-import fs from 'fs';
-import { launchAndGetPage } from '../puppeteerUtils';
 import * as cheerio from 'cheerio';
+import { launchAndGetPage } from '../puppeteerUtils';
 
 const scrapeFulham = async function () {
   const url = 'https://shop.fulhamfc.com/kit/kitviewall/';
@@ -27,7 +25,7 @@ const scrapeFulham = async function () {
     let products = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((el) => {
           // Name from .product-list__title inside .product-list__desc-text
           const name = el

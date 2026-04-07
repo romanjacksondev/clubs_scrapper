@@ -1,6 +1,7 @@
+import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import * as cheerio from 'cheerio';
+import { Product } from '../Product';
 puppeteer.use(StealthPlugin());
 
 const scrapeBrighton = async () => {
@@ -36,7 +37,7 @@ const scrapeBrighton = async () => {
     let products: Product[] = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((el) => {
           // Name from .product-list__title inside .product-list__desc-text
           const name = el

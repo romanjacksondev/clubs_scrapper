@@ -12,7 +12,7 @@ const scrapeManCity = async () => {
     'https://shop.mancity.com/en/kits/men/goalkeeper-kits/',
   ];
   let browser;
-  let allProducts = [];
+  let allProducts: any[] = [];
   try {
     browser = await puppeteer.launch({
       headless: true,
@@ -29,7 +29,7 @@ const scrapeManCity = async () => {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
         // Extract product data from <script type="application/json" class="product-data">
         const products = await page.evaluate(() => {
-          const items = [];
+          const items: any[] = [];
           document
             .querySelectorAll('script.product-data[type="application/json"]')
             .forEach((script) => {

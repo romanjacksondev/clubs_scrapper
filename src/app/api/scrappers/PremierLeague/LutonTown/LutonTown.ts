@@ -1,7 +1,6 @@
-import path from 'path';
+import * as cheerio from 'cheerio';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import * as cheerio from 'cheerio';
 puppeteer.use(StealthPlugin());
 
 const scrapeLutonTown = async () => {
@@ -37,7 +36,7 @@ const scrapeLutonTown = async () => {
     let products = [];
     if (foundSelector) {
       products = await page.evaluate((selector) => {
-        const items = [];
+        const items: any[] = [];
         document.querySelectorAll(selector).forEach((el) => {
           // Name from .product-list__title inside .product-list__desc-text
           const name = el
