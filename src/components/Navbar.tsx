@@ -15,6 +15,7 @@ export default function AppNavbar() {
         <NavbarLink href="/" active>
           Home
         </NavbarLink>
+        <NavbarLink href="/scrape">Scrape</NavbarLink>
         <NavbarLink href="/clubs">Clubs</NavbarLink>
         <NavbarLink href="/leagues">Leagues</NavbarLink>
       </NavbarCollapse>

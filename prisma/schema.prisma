@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client"
-    output   = "../src/generated"
+  output   = "./generated"
 }
 
 datasource db {
@@ -33,13 +33,22 @@ model Club {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   name        String
   price       Float
   productUrl  String
   clubId      Int
-  club        Club     @relation(fields: [clubId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  club        Club             @relation(fields: [clubId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   deletedAt   DateTime?
+  history     ProductHistory[]
+}
+
+model ProductHistory {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  price      Float
+  recordedAt DateTime @default(now())
 }
