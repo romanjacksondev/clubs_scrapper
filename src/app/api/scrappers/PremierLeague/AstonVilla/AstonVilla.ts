@@ -1,64 +1,69 @@
-import * as cheerio from 'cheerio';
-import puppeteer from 'puppeteer';
+const BASE_URL = 'https://shop.avfc.co.uk';
+// Aston Villa shop runs on Fanatics. Direct requests to most URLs are blocked (403)
+// by Imperva, but navigating from www.avfc.co.uk first sets a session cookie that
+// allows access to /en/kits/. That page fires a JSON API call to
+// /api/product-data?type=collection-explorer which returns all 21 kit products.
+// We intercept that response instead of scraping the DOM.
+
 export default async function scrapeAstonVilla() {
-  const url =
-    'https://shop3.avfc.co.uk/en/aston-villa-football-kits/t-31876437+d-3405109404+z-96-4265943694';
   let browser;
   try {
-    browser = await puppeteer.launch({ headless: true });
+    // Lazy require to avoid Next.js bundler evaluation errors with puppeteer-extra
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const puppeteerExtra = require('puppeteer-extra');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+    puppeteerExtra.use(StealthPlugin());
+
+    browser = await puppeteerExtra.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     const page = await browser.newPage();
     await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     );
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    try {
-      await page.waitForSelector('.ds-card', { timeout: 20000 });
-    } catch (waitErr) {
-      const html = await page.content();
-      throw waitErr;
-    }
-    const html = await page.content();
-    const $ = cheerio.load(html);
-    const products: { name: string; productUrl: string; price: number; currency: string }[] = [];
-    $('.ds-card').each((i, el) => {
-      const anchor = $(el).find('.ds-card-media a').first();
-      const details = $(el).find('.ds-card-details');
-      const name = details.find('.ds-card-title').text().trim();
-      let productUrl = anchor.attr('href');
-      if (productUrl && !productUrl.startsWith('http')) {
-        productUrl = 'https://shop3.avfc.co.uk' + productUrl;
-      }
-      let priceText = details.find('.minimal-price .money-value').first().text().trim();
-      let price = null;
-      let currency = null;
-      if (priceText) {
-        const match = priceText.match(/([A-Z]{2}\$|\£|\€)([0-9,.]+)/);
-        if (match) {
-          price = parseFloat(match[2].replace(/,/g, ''));
-          if (match[1] === 'US$') currency = 'USD';
-          else if (match[1] === '£') currency = 'GBP';
-          else if (match[1] === '€') currency = 'EUR';
+
+    // Visit the main AVFC site first so the shop recognises us as a referral visitor
+    await page.goto('https://www.avfc.co.uk/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+
+    // Collect the product-data API response as it loads
+    let productData: any = null;
+    page.on('response', async (resp: any) => {
+      if (resp.url().includes('product-data') && !productData) {
+        try {
+          productData = await resp.json();
+        } catch {
+          /* ignore parse errors */
         }
-      }
-      if (!price) {
-        priceText = details.find('.money-value').first().text().trim();
-        const match = priceText.match(/([A-Z]{2}\$|\£|\€)([0-9,.]+)/);
-        if (match) {
-          price = parseFloat(match[2].replace(/,/g, ''));
-          if (match[1] === 'US$') currency = 'USD';
-          else if (match[1] === '£') currency = 'GBP';
-          else if (match[1] === '€') currency = 'EUR';
-        }
-      }
-      if (name && price && currency && productUrl) {
-        products.push({ name, productUrl, price, currency });
       }
     });
-    return products;
+
+    await page.goto(`${BASE_URL}/en/kits/`, { waitUntil: 'networkidle2', timeout: 60000 });
+
+    const products: any[] = productData?.search?.products ?? [];
+
+    await browser.close();
+
+    return products
+      .map((p: any) => {
+        const name: string = p.title?.trim();
+        const relUrl: string = p.url?.trim();
+        if (!name || !relUrl) return null;
+        const productUrl = `${BASE_URL}/${relUrl}`;
+        const priceStr =
+          p.price?.clearance?.money?.userCurrencyValue ||
+          p.price?.sale?.money?.userCurrencyValue ||
+          p.price?.regular?.money?.userCurrencyValue;
+        const price = parseFloat(priceStr);
+        if (!price) return null;
+        return { name, productUrl, price, currency: 'GBP' };
+      })
+      .filter(Boolean);
   } catch (e) {
-    return [];
-  } finally {
+    console.error('Error in scrapeAstonVilla:', e);
     if (browser) await browser.close();
+    return [];
   }
 }

@@ -20,7 +20,7 @@ export function useScrape(onSuccess: (products: Product[]) => void) {
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ league: leagueName, club: clubName }),
+        body: JSON.stringify({ league: leagueName, club: clubName, clubId }),
       });
       if (res.ok) {
         const data = await res.json();

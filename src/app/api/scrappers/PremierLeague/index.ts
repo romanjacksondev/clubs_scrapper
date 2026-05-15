@@ -13,11 +13,11 @@ import Liverpool from './Liverpool/Liverpool';
 import LutonTown from './LutonTown/LutonTown';
 import ManchesterCity from './ManchesterCity/ManchesterCity';
 import ManchesterUnited from './ManchesterUnited/ManchesterUnited';
-import Newcastle from './Newcastle/Newcastle';
+import Newcastle from './NewcastleUnited/NewcastleUnited';
 import NottinghamForest from './NottinghamForest/NottinghamForest';
 import SheffieldUnited from './SheffieldUnited/SheffieldUnited';
-import Tottenham from './Tottenham/Tottenham';
-import WestHam from './WestHam/WestHam';
+import Tottenham from './TottenhamHotspur/TottenhamHotspur';
+import WestHam from './WestHamUnited/WestHamUnited';
 import Wolves from './Wolves/Wolves';
 
 export {

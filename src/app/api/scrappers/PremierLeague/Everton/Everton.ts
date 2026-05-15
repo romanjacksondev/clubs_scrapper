@@ -1,82 +1,59 @@
-import puppeteer from 'puppeteer';
+const BASE_URL = 'https://store.evertonfc.com';
+// Everton store runs on Salesforce Commerce Cloud (SFCC) with an Iris React frontend.
+// The kit product listing is embedded as JSON in the second "items" array of the
+// Search-Show page (loads without bot-protection on the demandware path).
+// Price used: current sale/clearance if present, otherwise regular price.
 
 const scrapeEverton = async function () {
-  const url =
-    'https://store.evertonfc.com/en/everton-football-kits/t-20548909+d-0149874993+z-90-1284331857';
-  let browser;
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    const res = await fetch(
+      `${BASE_URL}/on/demandware.store/Sites-evertonfc-Site/en_GB/Search-Show?cgid=kits`,
+      {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+      },
     );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-    // Try to wait for multiple possible selectors
-    let foundSelector = null;
-    try {
-      await page.waitForSelector('.ds-card', { timeout: 15000 });
-      foundSelector = '.ds-card';
-    } catch {
-      try {
-        await page.waitForSelector('.product-card', { timeout: 10000 });
-        foundSelector = '.product-card';
-      } catch {
-        // Could not find expected product selectors, falling back to HTML extraction.
+    const html = await res.text();
+
+    // Products are in the second "items":[ array — the first is a "What's New" carousel
+    const firstIdx = html.indexOf('"items":[');
+    const secondIdx = html.indexOf('"items":[', firstIdx + 1);
+    if (secondIdx === -1) return [];
+
+    // Extract the array content
+    let depth = 0;
+    let end = secondIdx + 9;
+    while (end < html.length) {
+      if (html[end] === '[') depth++;
+      else if (html[end] === ']') {
+        if (depth === 0) break;
+        depth--;
       }
+      end++;
     }
-    let products = [];
-    if (foundSelector) {
-      products = await page.evaluate((selector) => {
-        const items: any[] = [];
-        document.querySelectorAll(selector).forEach((card) => {
-          // Name from .ds-card-title
-          const name = card.querySelector('.ds-card-title')?.textContent.trim();
-          // Price from .money-value
-          let priceText = card.querySelector('.money-value')?.textContent.trim();
-          const price = priceText ? parseFloat(priceText.replace(/[^0-9.]/g, '')) : null;
-          // Product URL from .ds-card-details > a or .ds-card-media > a
-          let productUrl =
-            card.querySelector('.ds-card-details a')?.getAttribute('href') ||
-            card.querySelector('.ds-card-media a')?.getAttribute('href');
-          if (productUrl && productUrl.startsWith('/')) {
-            productUrl = 'https://store.evertonfc.com' + productUrl;
-          }
-          const currency = 'GBP';
-          if (name && price && productUrl) {
-            items.push({ name, productUrl, price, currency });
-          }
-        });
-        return items;
-      }, foundSelector);
-    } else {
-      // Fallback: get page HTML and use cheerio
-      const html = await page.content();
-      const cheerio = require('cheerio');
-      const $ = cheerio.load(html);
-      $('.ds-card').each((i: any, el: any) => {
-        const name = $(el).find('.ds-card-title').text().trim();
-        let priceText = $(el).find('.money-value').first().text().trim();
-        const price = priceText ? parseFloat(priceText.replace(/[^0-9.]/g, '')) : null;
-        let productUrl =
-          $(el).find('.ds-card-details a').attr('href') ||
-          $(el).find('.ds-card-media a').attr('href');
-        if (productUrl && productUrl.startsWith('/')) {
-          productUrl = 'https://store.evertonfc.com' + productUrl;
-        }
-        const currency = 'GBP';
-        if (name && price && productUrl) {
-          products.push({ name, productUrl, price, currency });
-        }
-      });
-    }
-    await browser.close();
-    return products;
+    const items: any[] = JSON.parse(html.substring(secondIdx + 8, end + 1));
+
+    return items
+      .map((item: any) => {
+        const name: string = item.title?.trim();
+        const relUrl: string = item.url?.trim();
+        if (!name || !relUrl) return null;
+        const productUrl = `${BASE_URL}/${relUrl}`;
+        // Use the lowest available price: clearance > sale > regular
+        const priceStr =
+          item.price?.clearance?.money?.userCurrencyValue ||
+          item.price?.sale?.money?.userCurrencyValue ||
+          item.price?.regular?.money?.userCurrencyValue;
+        const price = parseFloat(priceStr);
+        if (!price) return null;
+        return { name, productUrl, price, currency: 'GBP' };
+      })
+      .filter(Boolean);
   } catch (e) {
-    if (browser) await browser.close();
+    console.error('Error in scrapeEverton:', e);
     return [];
   }
 };

@@ -511,7 +511,7 @@ async function main() {
     {
       name: 'Boca Juniors',
       officialSiteUrl: 'https://www.bocajuniors.com.ar',
-      officialStoreUrl: 'https://bocashop.com.ar',
+      officialStoreUrl: 'https://www.bocashop.com.ar',
       leagueId: leagueRecords[10].id,
     },
     {
