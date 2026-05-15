@@ -129,6 +129,14 @@ The `scrapperLauncher.ts` dynamically imports the right file by stripping spaces
 | `puppeteerUtils.ts`   | Shared Puppeteer launch helper for JS-rendered stores.                                                                                                                                                                                                                                                                                                                                                                       |
 | `Product.ts`          | Shared `Product` interface.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
+### Brasileirão (Brazil)
+
+| Club        | Store                    | Platform | Approach                                                                                     | Status     |
+| ----------- | ------------------------ | -------- | -------------------------------------------------------------------------------------------- | ---------- |
+| Flamengo    | `loja.flamengo.com.br`   | VTEX     | `scrapeVtexStore` — catalog API `fq=C:/115/` (Mantos), paginated 50/page                     | ✅ Working |
+| Palmeiras   | `www.palmeirasstore.com` | VTEX     | `scrapeVtexStore` — catalog API `fq=C:/343/` (Uniforme de Jogo), paginated 50/page           | ✅ Working |
+| Corinthians | `www.shoptimao.com.br`   | Netshoes | `fetch` `/api/friendly/camisas?page=N`; price = `salePrice / 100`; paginated by `totalPages` | ✅ Working |
+
 ### Primera División (Argentina)
 
 | Club         | Store                 | Platform | Approach                                                                      | Status     |

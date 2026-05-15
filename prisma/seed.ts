@@ -479,7 +479,7 @@ async function main() {
     {
       name: 'Palmeiras',
       officialSiteUrl: 'https://www.palmeiras.com.br',
-      officialStoreUrl: 'https://loja.palmeiras.com.br',
+      officialStoreUrl: 'https://www.palmeirasstore.com',
       leagueId: leagueRecords[8].id,
     },
     {

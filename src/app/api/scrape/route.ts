@@ -1,13 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { processProducts, purgeOldHistory } from './productsProcessor';
 import { launchScrapper } from './scrapperLauncher';
 
-export async function POST(request: {
-  json: () =>
-    | PromiseLike<{ league: any; club: any; clubId: any }>
-    | { league: any; club: any; clubId: any };
-}) {
+export async function POST(request: NextRequest) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const incomingSecret = request.headers.get('x-cron-secret');
+    if (incomingSecret !== cronSecret) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
   let { league, club, clubId } = await request.json();
   // Remove spaces for folder/file matching
   const trimmedLeague = league.replace(/\s+/g, '');
