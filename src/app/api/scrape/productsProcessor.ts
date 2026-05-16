@@ -30,10 +30,12 @@ export async function processProducts(data: Product[], clubId: number) {
           productUrl: product.productUrl,
         },
       });
-      // Always record a history snapshot on every scrape
-      await prisma.productHistory.create({
-        data: { productId: existingProduct.id, price: product.price },
-      });
+      // Only record a history snapshot when the price has changed
+      if (existingProduct.price !== product.price) {
+        await prisma.productHistory.create({
+          data: { productId: existingProduct.id, price: product.price },
+        });
+      }
     } else {
       const created = await prisma.product.create({
         data: {

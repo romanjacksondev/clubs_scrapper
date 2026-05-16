@@ -10,8 +10,8 @@ export async function GET(request: Request) {
   }
 
   const products = await prisma.product.findMany({
-    where: { clubId: parseInt(clubId, 10) },
-    orderBy: { name: 'asc' }
+    where: { clubId: parseInt(clubId, 10), deletedAt: null },
+    orderBy: { name: 'asc' },
   });
   return NextResponse.json(products);
 }

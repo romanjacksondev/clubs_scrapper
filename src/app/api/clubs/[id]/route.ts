@@ -35,8 +35,12 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
   try {
-    await prisma.product.deleteMany({ where: { clubId } });
-    await prisma.club.delete({ where: { id: clubId } });
+    const now = new Date();
+    await prisma.product.updateMany({
+      where: { clubId, deletedAt: null },
+      data: { deletedAt: now },
+    });
+    await prisma.club.update({ where: { id: clubId }, data: { deletedAt: now } });
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json({ error: 'Failed to delete club' }, { status: 500 });
