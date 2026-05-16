@@ -16,10 +16,14 @@ export async function POST(req: Request) {
     if (!name?.trim() || !leagueId) {
       return NextResponse.json({ error: 'Name and league are required' }, { status: 400 });
     }
+    const parsedLeagueId = parseInt(String(leagueId), 10);
+    if (isNaN(parsedLeagueId)) {
+      return NextResponse.json({ error: 'Invalid leagueId' }, { status: 400 });
+    }
     const club = await prisma.club.create({
       data: {
         name: name.trim(),
-        leagueId: parseInt(leagueId, 10),
+        leagueId: parsedLeagueId,
         officialSiteUrl: officialSiteUrl?.trim() ?? '',
         officialStoreUrl: officialStoreUrl?.trim() ?? '',
       },

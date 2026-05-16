@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
   if (!league || !club || !clubId) {
     return NextResponse.json({ error: 'Missing league, club or clubId' }, { status: 400 });
   }
+  if (typeof league !== 'string' || typeof club !== 'string') {
+    return NextResponse.json({ error: 'league and club must be strings' }, { status: 400 });
+  }
 
   const parsedClubId = parseInt(String(clubId), 10);
   if (isNaN(parsedClubId)) {
@@ -39,8 +42,8 @@ export async function POST(request: NextRequest) {
   }
 
   // Remove spaces for folder/file matching
-  const trimmedLeague = (league as string).replace(/\s+/g, '');
-  const trimmedClub = (club as string).replace(/\s+/g, '');
+  const trimmedLeague = league.replace(/\s+/g, '');
+  const trimmedClub = club.replace(/\s+/g, '');
   console.log('Launching scrapper for:', { trimmedLeague, trimmedClub });
 
   // Dynamically import the scrapper based on league and club

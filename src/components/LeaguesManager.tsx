@@ -27,10 +27,19 @@ export default function LeaguesManager() {
   useEffect(() => {
     let cancelled = false;
     fetch('/api/leagues')
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load leagues');
+        return r.json();
+      })
       .then((data) => {
         if (!cancelled) {
           setLeagues(data);
+          setLoading(false);
+        }
+      })
+      .catch((e: Error) => {
+        if (!cancelled) {
+          setError(e.message);
           setLoading(false);
         }
       });
@@ -41,7 +50,7 @@ export default function LeaguesManager() {
 
   async function load() {
     const res = await fetch('/api/leagues');
-    setLeagues(await res.json());
+    if (res.ok) setLeagues(await res.json());
   }
 
   async function handleAdd(e: React.FormEvent) {

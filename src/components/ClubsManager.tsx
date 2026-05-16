@@ -45,15 +45,28 @@ export default function ClubsManager() {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch('/api/clubs').then((r) => r.json()),
-      fetch('/api/leagues').then((r) => r.json()),
-    ]).then(([clubData, leagueData]) => {
-      if (!cancelled) {
-        setClubs(clubData);
-        setLeagues(leagueData);
-        setLoading(false);
-      }
-    });
+      fetch('/api/clubs').then((r) => {
+        if (!r.ok) throw new Error('Failed to load clubs');
+        return r.json();
+      }),
+      fetch('/api/leagues').then((r) => {
+        if (!r.ok) throw new Error('Failed to load leagues');
+        return r.json();
+      }),
+    ])
+      .then(([clubData, leagueData]) => {
+        if (!cancelled) {
+          setClubs(clubData);
+          setLeagues(leagueData);
+          setLoading(false);
+        }
+      })
+      .catch((e: Error) => {
+        if (!cancelled) {
+          setError(e.message);
+          setLoading(false);
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -61,8 +74,14 @@ export default function ClubsManager() {
 
   async function load() {
     const [clubData, leagueData] = await Promise.all([
-      fetch('/api/clubs').then((r) => r.json()),
-      fetch('/api/leagues').then((r) => r.json()),
+      fetch('/api/clubs').then((r) => {
+        if (!r.ok) throw new Error('Failed to load clubs');
+        return r.json();
+      }),
+      fetch('/api/leagues').then((r) => {
+        if (!r.ok) throw new Error('Failed to load leagues');
+        return r.json();
+      }),
     ]);
     setClubs(clubData);
     setLeagues(leagueData);

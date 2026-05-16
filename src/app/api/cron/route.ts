@@ -24,17 +24,12 @@ export async function POST(request: NextRequest) {
     include: { league: true },
   });
 
-  const results: {
-    club: string;
-    status: 'ok' | 'empty' | 'error';
-    count?: number;
-    error?: string;
-  }[] = [];
+  type Result = { club: string; status: 'ok' | 'empty' | 'error'; count?: number; error?: string };
 
-  for (const club of clubs) {
-    const trimmedLeague = club.league.name.replace(/\s+/g, '');
-    const trimmedClub = club.name.replace(/\s+/g, '');
-    try {
+  const settled = await Promise.allSettled(
+    clubs.map(async (club): Promise<Result> => {
+      const trimmedLeague = club.league.name.replace(/\s+/g, '');
+      const trimmedClub = club.name.replace(/\s+/g, '');
       const data = await Promise.race([
         (async () => {
           const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
@@ -48,16 +43,22 @@ export async function POST(request: NextRequest) {
         ),
       ]);
       if (data.length === 0) {
-        results.push({ club: club.name, status: 'empty', error: 'No products returned' });
-        continue;
+        return { club: club.name, status: 'empty', error: 'No products returned' };
       }
       const products = await processProducts(data, club.id);
-      results.push({ club: club.name, status: 'ok', count: products.length });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      results.push({ club: club.name, status: 'error', error: msg });
-    }
-  }
+      return { club: club.name, status: 'ok', count: products.length };
+    }),
+  );
+
+  const results: Result[] = settled.map((s, i) =>
+    s.status === 'fulfilled'
+      ? s.value
+      : {
+          club: clubs[i].name,
+          status: 'error',
+          error: s.reason instanceof Error ? s.reason.message : String(s.reason),
+        },
+  );
 
   await purgeOldHistory();
   return NextResponse.json({ results });
