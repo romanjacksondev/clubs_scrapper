@@ -6,6 +6,7 @@ import { formatPrice } from '../../../../lib/formatPrice';
 
 interface HistoryEntry {
   price: number;
+  currency: string;
   recordedAt: string;
 }
 
@@ -121,7 +122,7 @@ export default function ProductHistoryPage() {
                   {new Date(entry.recordedAt).toLocaleString()}
                 </td>
                 <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                  {formatPrice(entry.price, product.currency)}
+                  {formatPrice(entry.price, entry.currency)}
                 </td>
               </tr>
             ))}

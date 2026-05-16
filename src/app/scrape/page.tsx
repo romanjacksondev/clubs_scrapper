@@ -8,11 +8,16 @@ import { useScrape } from '../../hooks/useScrape';
 import { formatPrice } from '../../lib/formatPrice';
 
 export default function ScrapePage() {
-  const leagues = useLeagues();
-  const clubs = useClubs();
+  const { leagues, loading: loadingLeagues, error: leaguesError } = useLeagues();
+  const { clubs, loading: loadingClubs, error: clubsError } = useClubs();
   const [selectedLeagueId, setSelectedLeagueId] = useState<number | null>(null);
   const [selectedClubId, setSelectedClubId] = useState<number | null>(null);
-  const { products, setProducts } = useProducts(selectedClubId);
+  const {
+    products,
+    setProducts,
+    loading: loadingProducts,
+    error: productsError,
+  } = useProducts(selectedClubId);
 
   const { scraping, scrapeError, scrape } = useScrape((scraped) => {
     setProducts(scraped);
@@ -52,15 +57,17 @@ export default function ScrapePage() {
           <select
             value={selectedLeagueId || ''}
             onChange={handleLeagueChange}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loadingLeagues}
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:dark:bg-gray-800 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
-            <option value="">-- Choose a League --</option>
+            <option value="">{loadingLeagues ? 'Loading...' : '-- Choose a League --'}</option>
             {leagues.map((league) => (
               <option key={league.id} value={league.id}>
                 {league.name}
               </option>
             ))}
           </select>
+          {leaguesError && <p className="mt-1 text-xs text-red-600">{leaguesError}</p>}
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
@@ -79,6 +86,7 @@ export default function ScrapePage() {
               </option>
             ))}
           </select>
+          {clubsError && <p className="mt-1 text-xs text-red-600">{clubsError}</p>}
         </div>
       </div>
 
@@ -104,7 +112,11 @@ export default function ScrapePage() {
               {clubs.find((c) => c.id === selectedClubId)?.name}
             </span>
           </h2>
-          {products.length > 0 ? (
+          {loadingProducts ? (
+            <p className="text-gray-500 dark:text-gray-400">Loading products...</p>
+          ) : productsError ? (
+            <p className="text-red-600 dark:text-red-400">{productsError}</p>
+          ) : products.length > 0 ? (
             <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>

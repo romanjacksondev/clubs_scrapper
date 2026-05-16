@@ -12,16 +12,26 @@ export interface Product {
 
 export function useProducts(clubId: number | null) {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!clubId) {
       setProducts([]);
+      setError('');
       return;
     }
+    setLoading(true);
+    setError('');
     fetch(`/api/products?clubId=${clubId}`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then(setProducts);
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load products');
+        return res.json();
+      })
+      .then(setProducts)
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setLoading(false));
   }, [clubId]);
 
-  return { products, setProducts };
+  return { products, setProducts, loading, error };
 }

@@ -23,25 +23,30 @@ export async function GET(request: NextRequest) {
 
   const rows = await prisma.$queryRaw<DiscountRow[]>`
     SELECT
-      p.id::int                                                             AS "id",
-      p.name                                                                AS "name",
-      p.price::float8                                                       AS "currentPrice",
-      MAX(ph.price)::float8                                                 AS "previousPrice",
-      ROUND(((MAX(ph.price) - p.price) / MAX(ph.price))::numeric * 100)::int
-                                                                            AS "discountPercent",
-      p.currency                                                            AS "currency",
-      p."productUrl"                                                        AS "productUrl",
-      c.name                                                                AS "clubName",
-      l.name                                                                AS "leagueName"
-    FROM "Product"        p
-    JOIN "ProductHistory" ph ON ph."productId" = p.id
-    JOIN "Club"           c  ON c.id           = p."clubId"
-    JOIN "League"         l  ON l.id           = c."leagueId"
+      p.id::int                                                                AS "id",
+      p.name                                                                   AS "name",
+      p.price::float8                                                          AS "currentPrice",
+      ph_prev.price::float8                                                    AS "previousPrice",
+      ROUND(((ph_prev.price - p.price) / ph_prev.price)::numeric * 100)::int  AS "discountPercent",
+      p.currency                                                               AS "currency",
+      p."productUrl"                                                           AS "productUrl",
+      c.name                                                                   AS "clubName",
+      l.name                                                                   AS "leagueName"
+    FROM "Product"  p
+    JOIN "Club"     c  ON c.id = p."clubId"
+    JOIN "League"   l  ON l.id = c."leagueId"
+    JOIN LATERAL (
+      SELECT price
+      FROM   "ProductHistory"
+      WHERE  "productId" = p.id
+        AND  price > p.price
+      ORDER BY "recordedAt" DESC
+      LIMIT  1
+    ) ph_prev ON true
     WHERE p."deletedAt" IS NULL
       AND c."deletedAt" IS NULL
       AND l."deletedAt" IS NULL
-    GROUP BY p.id, p.name, p.price, p.currency, p."productUrl", c.name, l.name
-    HAVING (MAX(ph.price) - p.price) / MAX(ph.price) >= ${threshold}
+      AND (ph_prev.price - p.price) / ph_prev.price >= ${threshold}
     ORDER BY "discountPercent" DESC
   `;
 

@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
 import { formatPrice } from '../lib/formatPrice';
 
 export default function Home() {
-  const { discountedProducts, loading: loadingDiscounts } = useDiscountedProducts();
+  const [minDiscount, setMinDiscount] = useState(30);
+  const { discountedProducts, loading: loadingDiscounts } = useDiscountedProducts(minDiscount);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 w-full">
@@ -19,9 +21,23 @@ export default function Home() {
       </div>
 
       <section>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-          🔥 Deals — 30%+ Off
-        </h2>
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            🔥 Deals — {minDiscount}%+ Off
+          </h2>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min="5"
+              max="70"
+              step="5"
+              value={minDiscount}
+              onChange={(e) => setMinDiscount(parseInt(e.target.value, 10))}
+              className="w-28 accent-blue-600"
+            />
+            <span className="text-sm text-gray-500 dark:text-gray-400 w-8">{minDiscount}%</span>
+          </div>
+        </div>
         {loadingDiscounts ? (
           <p className="text-gray-500 dark:text-gray-400">Loading deals...</p>
         ) : discountedProducts.length > 0 ? (

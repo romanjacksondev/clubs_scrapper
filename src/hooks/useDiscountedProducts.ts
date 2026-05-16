@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export interface DiscountedProduct {
   id: number;
@@ -12,24 +12,32 @@ export interface DiscountedProduct {
   leagueName: string;
 }
 
-export function useDiscountedProducts() {
+export function useDiscountedProducts(minDiscount = 30) {
   const [discountedProducts, setDiscountedProducts] = useState<DiscountedProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setLoading(true);
-    fetch('/api/discounts')
-      .then((res) => (res.ok ? res.json() : []))
+    setError('');
+    fetch(`/api/discounts?minDiscount=${minDiscount}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to load deals');
+        return res.json();
+      })
       .then((data) => {
         setDiscountedProducts(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  };
+      .catch((e: Error) => {
+        setError(e.message);
+        setLoading(false);
+      });
+  }, [minDiscount]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
-  return { discountedProducts, loading, refresh };
+  return { discountedProducts, loading, error, refresh };
 }
