@@ -29,20 +29,17 @@ export default function Home() {
       </div>
 
       <section>
-        <div className="flex flex-wrap items-center gap-4 mb-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              🔥 Deals — <span className="text-blue-600 dark:text-blue-400">{minDiscount}%+</span>{' '}
-              Off
-              {(loadingDiscounts || minDiscount !== debouncedDiscount) && (
-                <span className="ml-3 text-sm font-normal text-gray-400 dark:text-gray-500">
-                  loading…
-                </span>
-              )}
-            </h2>
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-400 dark:text-gray-500">5%</span>
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+            🔥 Deals
+            {(loadingDiscounts || minDiscount !== debouncedDiscount) && (
+              <span className="ml-3 text-sm font-normal text-gray-400 dark:text-gray-500">
+                loading…
+              </span>
+            )}
+          </h2>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">Min. discount</span>
             <input
               type="range"
               min="5"
@@ -50,9 +47,14 @@ export default function Home() {
               step="5"
               value={minDiscount}
               onChange={(e) => setMinDiscount(parseInt(e.target.value, 10))}
-              className="w-48 accent-blue-600 cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((minDiscount - 5) / 65) * 100}%, #374151 ${((minDiscount - 5) / 65) * 100}%, #374151 100%)`,
+              }}
+              className="w-56 h-2 rounded-full cursor-pointer appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
             />
-            <span className="text-xs text-gray-400 dark:text-gray-500">70%</span>
+            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 w-16">
+              {minDiscount}%
+            </span>
           </div>
         </div>
         {loadingDiscounts ? (
