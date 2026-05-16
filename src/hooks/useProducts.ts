@@ -4,6 +4,7 @@ export interface Product {
   id: number;
   name: string;
   price: number;
+  currency: string;
   productUrl: string;
   clubId: number;
   updatedAt: string;

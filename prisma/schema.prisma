@@ -36,6 +36,7 @@ model Product {
   id          Int              @id @default(autoincrement())
   name        String
   price       Float
+  currency    String           @default("USD")
   productUrl  String
   clubId      Int
   club        Club             @relation(fields: [clubId], references: [id])

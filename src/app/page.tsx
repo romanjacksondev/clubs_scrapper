@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
+import { formatPrice } from '../lib/formatPrice';
 
 export default function Home() {
   const { discountedProducts, loading: loadingDiscounts } = useDiscountedProducts();
@@ -64,10 +65,10 @@ export default function Home() {
                       {product.name}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-500 dark:text-gray-400 line-through">
-                      ${product.previousPrice.toFixed(2)}
+                      {formatPrice(product.previousPrice, product.currency)}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-green-700 dark:text-green-400 font-semibold">
-                      ${product.currentPrice.toFixed(2)}
+                      {formatPrice(product.currentPrice, product.currency)}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
                       <span className="inline-block bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 text-xs font-bold px-2 py-1 rounded">

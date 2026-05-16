@@ -1,5 +1,6 @@
 // productsProcessor.ts
 import { prisma } from '../../../lib/prisma';
+import { Product } from '../scrappers/PremierLeague/Product';
 
 const HISTORY_RETENTION_DAYS = 90;
 
@@ -11,7 +12,7 @@ export async function purgeOldHistory() {
   });
 }
 
-export async function processProducts(data: any[], clubId: number) {
+export async function processProducts(data: Product[], clubId: number) {
   // Upsert each product (avoid duplicates by name and clubId, case-insensitive)
   for (const product of data) {
     const existingProduct = await prisma.product.findFirst({
@@ -25,6 +26,7 @@ export async function processProducts(data: any[], clubId: number) {
         where: { id: existingProduct.id },
         data: {
           price: product.price,
+          currency: product.currency ?? 'USD',
           productUrl: product.productUrl,
         },
       });
@@ -37,6 +39,7 @@ export async function processProducts(data: any[], clubId: number) {
         data: {
           name: product.name,
           price: product.price,
+          currency: product.currency ?? 'USD',
           productUrl: product.productUrl,
           clubId,
         },

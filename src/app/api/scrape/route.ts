@@ -25,6 +25,12 @@ export async function POST(request: NextRequest) {
   try {
     const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
     const data = await scrapper();
+    if (data.length === 0) {
+      return NextResponse.json(
+        { error: 'Scrapper returned no products — DB not updated to avoid data loss' },
+        { status: 422 },
+      );
+    }
     const products = await processProducts(data, parseInt(clubId, 10));
     await purgeOldHistory();
     return NextResponse.json({ products });

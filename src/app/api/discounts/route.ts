@@ -30,6 +30,7 @@ export async function GET() {
         currentPrice,
         previousPrice: maxHistoricalPrice,
         discountPercent: Math.round(discountPercent * 100),
+        currency: product.currency,
         productUrl: product.productUrl,
         clubName: product.club.name,
         leagueName: product.club.league.name,

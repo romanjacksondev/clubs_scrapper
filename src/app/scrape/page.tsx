@@ -5,6 +5,7 @@ import { useClubs } from '../../hooks/useClubs';
 import { useLeagues } from '../../hooks/useLeagues';
 import { useProducts } from '../../hooks/useProducts';
 import { useScrape } from '../../hooks/useScrape';
+import { formatPrice } from '../../lib/formatPrice';
 
 export default function ScrapePage() {
   const leagues = useLeagues();
@@ -131,7 +132,7 @@ export default function ScrapePage() {
                       {product.name}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-gray-100">
-                      ${product.price.toFixed(2)}
+                      {formatPrice(product.price, product.currency)}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">
                       {product.updatedAt ? new Date(product.updatedAt).toLocaleString() : '—'}

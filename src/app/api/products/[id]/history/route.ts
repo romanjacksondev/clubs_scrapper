@@ -24,6 +24,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     id: product.id,
     name: product.name,
     currentPrice: product.price,
+    currency: product.currency,
     productUrl: product.productUrl,
     clubName: product.club.name,
     leagueName: product.club.league.name,

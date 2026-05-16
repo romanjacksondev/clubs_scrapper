@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { formatPrice } from '../../../../lib/formatPrice';
 
 interface HistoryEntry {
   price: number;
@@ -12,6 +13,7 @@ interface ProductDetail {
   id: number;
   name: string;
   currentPrice: number;
+  currency: string;
   productUrl: string;
   clubName: string;
   leagueName: string;
@@ -75,7 +77,7 @@ export default function ProductHistoryPage() {
             Current Price
           </p>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            ${product.currentPrice.toFixed(2)}
+            {formatPrice(product.currentPrice, product.currency)}
           </p>
         </div>
         <div>
@@ -119,7 +121,7 @@ export default function ProductHistoryPage() {
                   {new Date(entry.recordedAt).toLocaleString()}
                 </td>
                 <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                  ${entry.price.toFixed(2)}
+                  {formatPrice(entry.price, product.currency)}
                 </td>
               </tr>
             ))}

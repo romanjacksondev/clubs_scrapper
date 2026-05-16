@@ -6,6 +6,7 @@ export interface DiscountedProduct {
   currentPrice: number;
   previousPrice: number;
   discountPercent: number;
+  currency: string;
   productUrl: string;
   clubName: string;
   leagueName: string;
