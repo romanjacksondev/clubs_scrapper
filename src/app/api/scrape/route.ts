@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { prisma } from '../../../lib/prisma';
 import { processProducts, purgeOldHistory } from './productsProcessor';
 import { launchScrapper } from './scrapperLauncher';
 
 export async function POST(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret && process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
   if (cronSecret) {
     const incomingSecret = request.headers.get('x-cron-secret');
     if (incomingSecret !== cronSecret) {
@@ -16,6 +20,19 @@ export async function POST(request: NextRequest) {
   if (!league || !club || !clubId) {
     return NextResponse.json({ error: 'Missing league, club or clubId' }, { status: 400 });
   }
+
+  const parsedClubId = parseInt(clubId, 10);
+  if (isNaN(parsedClubId)) {
+    return NextResponse.json({ error: 'Invalid clubId' }, { status: 400 });
+  }
+  const clubRecord = await prisma.club.findFirst({
+    where: { id: parsedClubId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!clubRecord) {
+    return NextResponse.json({ error: 'Club not found' }, { status: 404 });
+  }
+
   // Remove spaces for folder/file matching
   const trimmedLeague = (league as string).replace(/\s+/g, '');
   const trimmedClub = (club as string).replace(/\s+/g, '');
@@ -31,14 +48,17 @@ export async function POST(request: NextRequest) {
         { status: 422 },
       );
     }
-    const products = await processProducts(data, parseInt(clubId, 10));
+    const products = await processProducts(data, parsedClubId);
     await purgeOldHistory();
     return NextResponse.json({ products });
   } catch (e) {
     console.error('Scrapper error:', e);
     const error = e instanceof Error ? e : new Error(String(e));
     return NextResponse.json(
-      { error: 'Scrapper not found or failed', details: error.message, stack: error.stack },
+      {
+        error: 'Scrapper not found or failed',
+        ...(process.env.NODE_ENV !== 'production' && { details: error.message }),
+      },
       { status: 500 },
     );
   }
