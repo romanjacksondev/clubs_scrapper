@@ -16,12 +16,17 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { league, club, clubId } = await request.json();
+  let league: unknown, club: unknown, clubId: unknown;
+  try {
+    ({ league, club, clubId } = await request.json());
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   if (!league || !club || !clubId) {
     return NextResponse.json({ error: 'Missing league, club or clubId' }, { status: 400 });
   }
 
-  const parsedClubId = parseInt(clubId, 10);
+  const parsedClubId = parseInt(String(clubId), 10);
   if (isNaN(parsedClubId)) {
     return NextResponse.json({ error: 'Invalid clubId' }, { status: 400 });
   }

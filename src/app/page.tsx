@@ -1,12 +1,20 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
 import { formatPrice } from '../lib/formatPrice';
 
 export default function Home() {
   const [minDiscount, setMinDiscount] = useState(30);
-  const { discountedProducts, loading: loadingDiscounts } = useDiscountedProducts(minDiscount);
+  const [debouncedDiscount, setDebouncedDiscount] = useState(30);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedDiscount(minDiscount), 400);
+    return () => clearTimeout(t);
+  }, [minDiscount]);
+
+  const { discountedProducts, loading: loadingDiscounts } =
+    useDiscountedProducts(debouncedDiscount);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 w-full">
@@ -22,10 +30,19 @@ export default function Home() {
 
       <section>
         <div className="flex flex-wrap items-center gap-4 mb-4">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            🔥 Deals — {minDiscount}%+ Off
-          </h2>
-          <div className="flex items-center gap-2">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              🔥 Deals — <span className="text-blue-600 dark:text-blue-400">{minDiscount}%+</span>{' '}
+              Off
+              {(loadingDiscounts || minDiscount !== debouncedDiscount) && (
+                <span className="ml-3 text-sm font-normal text-gray-400 dark:text-gray-500">
+                  loading…
+                </span>
+              )}
+            </h2>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-gray-400 dark:text-gray-500">5%</span>
             <input
               type="range"
               min="5"
@@ -33,9 +50,9 @@ export default function Home() {
               step="5"
               value={minDiscount}
               onChange={(e) => setMinDiscount(parseInt(e.target.value, 10))}
-              className="w-28 accent-blue-600"
+              className="w-48 accent-blue-600 cursor-pointer"
             />
-            <span className="text-sm text-gray-500 dark:text-gray-400 w-8">{minDiscount}%</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">70%</span>
           </div>
         </div>
         {loadingDiscounts ? (

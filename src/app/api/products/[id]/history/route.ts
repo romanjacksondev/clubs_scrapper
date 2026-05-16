@@ -8,8 +8,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: 'Invalid product id' }, { status: 400 });
   }
 
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
+  const product = await prisma.product.findFirst({
+    where: { id: productId, deletedAt: null },
     include: {
       history: { orderBy: { recordedAt: 'desc' } },
       club: { include: { league: true } },

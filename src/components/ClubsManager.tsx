@@ -12,11 +12,7 @@ import {
   TextInput,
 } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-
-interface League {
-  id: number;
-  name: string;
-}
+import type { League } from '../hooks/useLeagues';
 
 interface Club {
   id: number;
