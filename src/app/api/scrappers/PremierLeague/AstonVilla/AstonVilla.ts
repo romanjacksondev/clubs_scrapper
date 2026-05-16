@@ -1,3 +1,5 @@
+import { launchBrowser } from '../puppeteerUtils';
+
 const BASE_URL = 'https://shop.avfc.co.uk';
 // Aston Villa shop runs on Fanatics. Direct requests to most URLs are blocked (403)
 // by Imperva, but navigating from www.avfc.co.uk first sets a session cookie that
@@ -8,17 +10,7 @@ const BASE_URL = 'https://shop.avfc.co.uk';
 export default async function scrapeAstonVilla() {
   let browser;
   try {
-    // Lazy require to avoid Next.js bundler evaluation errors with puppeteer-extra
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteerExtra = require('puppeteer-extra');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteerExtra.use(StealthPlugin());
-
-    browser = await puppeteerExtra.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser(true);
     const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',

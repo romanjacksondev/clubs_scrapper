@@ -1,3 +1,5 @@
+import { launchBrowser } from '../puppeteerUtils';
+
 // Manchester United official store (store.manutd.com) runs on Scayle/Nuxt.
 // Each category page embeds a <script type="application/ld+json"> with an
 // ItemList schema containing product names, URLs and GBP prices — we parse
@@ -18,16 +20,7 @@ const scrapeManUnited = async function () {
   const seen = new Set<string>();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteerExtra = require('puppeteer-extra');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteerExtra.use(StealthPlugin());
-
-    browser = await puppeteerExtra.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser(true);
     const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',

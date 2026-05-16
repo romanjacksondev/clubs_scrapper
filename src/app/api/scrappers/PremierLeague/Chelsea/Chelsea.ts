@@ -1,3 +1,5 @@
+import { launchBrowser } from '../puppeteerUtils';
+
 const BASE_URL = 'https://store.chelseafc.com';
 // Chelsea FC shop runs on Fanatics (same platform as Aston Villa).
 // Navigating to /collections/mens-kits fires /api/product-data?type=collection-explorer
@@ -6,17 +8,7 @@ const BASE_URL = 'https://store.chelseafc.com';
 const scrapeChelsea = async function () {
   let browser;
   try {
-    // Lazy require to avoid Next.js bundler evaluation errors with puppeteer-extra
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteerExtra = require('puppeteer-extra');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteerExtra.use(StealthPlugin());
-
-    browser = await puppeteerExtra.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser(true);
     const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -35,7 +27,10 @@ const scrapeChelsea = async function () {
       }
     });
 
-    await page.goto(`${BASE_URL}/collections/mens-kits`, { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.goto(`${BASE_URL}/collections/mens-kits`, {
+      waitUntil: 'networkidle2',
+      timeout: 60000,
+    });
 
     const products: any[] = productData?.search?.products ?? [];
 

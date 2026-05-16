@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     'puppeteer',
     'puppeteer-extra',
     'puppeteer-extra-plugin-stealth',
-    'puppeteer-core',
+    '@sparticuz/chromium',
   ],
 };
 

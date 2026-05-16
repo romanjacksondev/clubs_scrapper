@@ -142,3 +142,24 @@ The `scrapperLauncher.ts` dynamically imports the right file by stripping spaces
 | Club         | Store                 | Platform | Approach                                                                      | Status     |
 | ------------ | --------------------- | -------- | ----------------------------------------------------------------------------- | ---------- |
 | Boca Juniors | `www.bocashop.com.ar` | VTEX     | `fetch` VTEX catalog API `fq=C:/3/6/` (camisetas category), paginated 50/page | ✅ Working |
+
+### Bundesliga (Germany)
+
+| Club                     | Store                                       | Platform           | Approach                                                                                                              | Status      |
+| ------------------------ | ------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Bayer Leverkusen         | `www.bayer04.de/de-de/shop/`                | —                  | Stealth Puppeteer; returns `[]` if Queue-it virtual waiting room is detected                                          | ✅ Working  |
+| Bayern München           | `fcbayern.com/store`                        | Scayle             | Stealth Puppeteer, `/de-de/c/adidas/trikots-mehr/{home,away,champions-league,torwart}`; may 403 from non-EU IPs       | ✅ Working  |
+| Borussia Dortmund        | `shop.bvb.de`                               | —                  | Stealth Puppeteer; returns `[]` if Queue-it is detected                                                               | ⚠️ Untested |
+| Borussia Mönchengladbach | `shop.borussia.de`                          | Scayle             | Stealth Puppeteer, `/de-de/trikots`; `a[data-test-id="product-card-product-name"]` for name, `[data-test-id="price"]` | ✅ Working  |
+| Darmstadt 98             | `shop.sv98.de`                              | Shopware 6         | Stealth Puppeteer, `.product-box` / `a.product-name` / `.product-price-info` across 4 category URLs                   | ✅ Working  |
+| Eintracht Frankfurt      | `stores.eintracht.de`                       | Gatsby SPA         | Stealth Puppeteer (fetch returns empty shell), `a.ef-product-card`, `h5`, `.ef-product__price--new`                   | ✅ Working  |
+| FC Augsburg              | `shop.fcaugsburg.de`                        | LMS Sport GmbH     | `fetch` + Cheerio; links start with `fca-`, product URL built as `${BASE_URL}/fcaugsburg/${href}`                     | ✅ Working  |
+| 1. FC Heidenheim         | `merchandising-onlineshop.com/fcheidenheim` | Shopware           | Stealth Puppeteer; returns `[]` when Queue-it is active                                                               | ⚠️ Untested |
+| Mainz 05                 | `shop.mainz05.de`                           | Shopware 6         | Stealth Puppeteer, `.product-box` / `.product-price-info`; URLs `/Profis/Trikots-Trainingsware/…` (some return 500)   | ✅ Working  |
+| RB Leipzig               | `www.redbullshop.com`                       | Red Bull Shop      | Stealth Puppeteer, `/de-int/c/rbl-official-kit-by-puma/`; card `a[href*="/de-int/p/"]`, name `<p>`, price child text  | ✅ Working  |
+| SC Freiburg              | `shop.scfreiburg.com`                       | Custom (004 GmbH)  | `fetch` + Cheerio, category 2 (Trikots & Training); product name derived from URL slug                                | ⚠️ Untested |
+| TSG Hoffenheim           | `shop.tsg-hoffenheim.de`                    | SAP Commerce Cloud | SAP OCC REST API at `prod-api.tsg-hoffenheim.de/occ/v2/tsgh-store/products/search` — no Puppeteer needed              | ✅ Working  |
+| 1. FC Union Berlin       | `fanartikel.union-zeughaus.de`              | Shopify            | `fetch` Shopify JSON API `/collections/trikots-co/products.json` — no Puppeteer needed                                | ✅ Working  |
+| VfB Stuttgart            | `shop.vfb.de`                               | Next.js / Tailwind | Stealth Puppeteer, `/en/jerseys-and-training/jerseys`; name from `img[alt]`, price from ancestor `innerText`          | ✅ Working  |
+| VfL Wolfsburg            | `shop.vfl-wolfsburg.de`                     | Shopware 6         | Stealth Puppeteer, `.product-box`; name from `a.product-image-link[title]`, price from `.product-price-info`          | ✅ Working  |
+| Werder Bremen            | `shop.werder.de`                            | BigCommerce        | Stealth Puppeteer, `/trikots.html/`; reads `<product-card>` web component attributes (`name`, `url`, `sales-price`)   | ✅ Working  |

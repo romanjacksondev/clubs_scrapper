@@ -1,3 +1,5 @@
+import { launchBrowser } from '../puppeteerUtils';
+
 const BASE_URL = 'https://store.liverpoolfc.com';
 // Liverpool store runs on Magento 2 with a custom Lfc theme, fronted by Queue-it
 // (Cloudflare virtual queue). Plain fetch is 302'd to the queue; stealth Puppeteer
@@ -7,17 +9,7 @@ const BASE_URL = 'https://store.liverpoolfc.com';
 const scrapeLiverpool = async () => {
   let browser;
   try {
-    // Lazy require to avoid Next.js bundler evaluation errors with puppeteer-extra
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteerExtra = require('puppeteer-extra');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-    puppeteerExtra.use(StealthPlugin());
-
-    browser = await puppeteerExtra.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser(true);
     const page = await browser.newPage();
     await page.setUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
