@@ -8,9 +8,13 @@ export async function GET(request: Request) {
   if (!clubId) {
     return NextResponse.json([]);
   }
+  const parsedClubId = parseInt(clubId, 10);
+  if (isNaN(parsedClubId)) {
+    return NextResponse.json({ error: 'Invalid clubId' }, { status: 400 });
+  }
 
   const products = await prisma.product.findMany({
-    where: { clubId: parseInt(clubId, 10), deletedAt: null },
+    where: { clubId: parsedClubId, deletedAt: null },
     orderBy: { name: 'asc' },
   });
   return NextResponse.json(products);

@@ -13,7 +13,10 @@ export async function purgeOldHistory() {
 }
 
 export async function processProducts(data: Product[], clubId: number) {
-  // Upsert each product atomically — a failure mid-loop rolls back all writes
+  const returnedNames = new Set(data.map((p) => p.name.toLowerCase()));
+
+  // Upsert each product atomically — a failure mid-loop rolls back all writes.
+  // At the end of the transaction, products no longer returned by the scraper are soft-deleted.
   await prisma.$transaction(
     async (tx) => {
       for (const product of data) {
@@ -21,6 +24,7 @@ export async function processProducts(data: Product[], clubId: number) {
           where: {
             name: { equals: product.name, mode: 'insensitive' },
             clubId,
+            deletedAt: null,
           },
         });
         const currency = product.currency ?? 'USD';
@@ -50,6 +54,21 @@ export async function processProducts(data: Product[], clubId: number) {
             data: { productId: created.id, price: created.price, currency: created.currency },
           });
         }
+      }
+
+      // Soft-delete products that were not returned by this scrape run
+      const activeProducts = await tx.product.findMany({
+        where: { clubId, deletedAt: null },
+        select: { id: true, name: true },
+      });
+      const staleIds = activeProducts
+        .filter((p) => !returnedNames.has(p.name.toLowerCase()))
+        .map((p) => p.id);
+      if (staleIds.length > 0) {
+        await tx.product.updateMany({
+          where: { id: { in: staleIds } },
+          data: { deletedAt: new Date() },
+        });
       }
     },
     { timeout: 30000 },

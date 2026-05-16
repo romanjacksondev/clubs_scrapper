@@ -35,6 +35,13 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   if (isNaN(leagueId)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
+  const target = await prisma.league.findFirst({
+    where: { id: leagueId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!target) {
+    return NextResponse.json({ error: 'League not found' }, { status: 404 });
+  }
   try {
     const now = new Date();
     await prisma.product.updateMany({

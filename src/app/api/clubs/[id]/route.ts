@@ -19,11 +19,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!name?.trim() || !leagueId) {
       return NextResponse.json({ error: 'Name and league are required' }, { status: 400 });
     }
+    const parsedLeagueId = parseInt(leagueId, 10);
+    if (isNaN(parsedLeagueId)) {
+      return NextResponse.json({ error: 'Invalid leagueId' }, { status: 400 });
+    }
     const club = await prisma.club.update({
       where: { id: clubId },
       data: {
         name: name.trim(),
-        leagueId: parseInt(leagueId, 10),
+        leagueId: parsedLeagueId,
         officialSiteUrl: officialSiteUrl?.trim() ?? '',
         officialStoreUrl: officialStoreUrl?.trim() ?? '',
       },
@@ -40,6 +44,13 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const clubId = parseInt(id, 10);
   if (isNaN(clubId)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
+  }
+  const target = await prisma.club.findFirst({
+    where: { id: clubId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!target) {
+    return NextResponse.json({ error: 'Club not found' }, { status: 404 });
   }
   try {
     const now = new Date();

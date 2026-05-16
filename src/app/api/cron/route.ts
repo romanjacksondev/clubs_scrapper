@@ -4,6 +4,8 @@ import { prisma } from '../../../lib/prisma';
 import { processProducts, purgeOldHistory } from '../scrape/productsProcessor';
 import { launchScrapper } from '../scrape/scrapperLauncher';
 
+const SCRAPER_TIMEOUT_MS = 60_000;
+
 export async function POST(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
@@ -33,8 +35,18 @@ export async function POST(request: NextRequest) {
     const trimmedLeague = club.league.name.replace(/\s+/g, '');
     const trimmedClub = club.name.replace(/\s+/g, '');
     try {
-      const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
-      const data = await scrapper();
+      const data = await Promise.race([
+        (async () => {
+          const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
+          return scrapper();
+        })(),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`Timed out after ${SCRAPER_TIMEOUT_MS / 1000}s`)),
+            SCRAPER_TIMEOUT_MS,
+          ),
+        ),
+      ]);
       if (data.length === 0) {
         results.push({ club: club.name, status: 'empty', error: 'No products returned' });
         continue;
