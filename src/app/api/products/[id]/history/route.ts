@@ -31,6 +31,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     updatedAt: product.updatedAt,
     history: product.history.map((h) => ({
       price: h.price,
+      currency: h.currency,
       recordedAt: h.recordedAt,
     })),
   });

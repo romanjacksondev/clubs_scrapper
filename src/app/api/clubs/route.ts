@@ -3,6 +3,7 @@ import { prisma } from '../../../lib/prisma';
 
 export async function GET() {
   const clubs = await prisma.club.findMany({
+    where: { deletedAt: null },
     include: { league: true },
     orderBy: { name: 'asc' },
   });

@@ -7,6 +7,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (isNaN(clubId)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
+  const existing = await prisma.club.findFirst({
+    where: { id: clubId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: 'Club not found' }, { status: 404 });
+  }
   try {
     const { name, leagueId, officialSiteUrl, officialStoreUrl } = await req.json();
     if (!name?.trim() || !leagueId) {

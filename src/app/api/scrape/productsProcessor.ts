@@ -13,45 +13,47 @@ export async function purgeOldHistory() {
 }
 
 export async function processProducts(data: Product[], clubId: number) {
-  // Upsert each product (avoid duplicates by name and clubId, case-insensitive)
-  for (const product of data) {
-    const existingProduct = await prisma.product.findFirst({
-      where: {
-        name: { equals: product.name, mode: 'insensitive' },
-        clubId,
-      },
-    });
-    if (existingProduct) {
-      await prisma.product.update({
-        where: { id: existingProduct.id },
-        data: {
-          price: product.price,
-          currency: product.currency ?? 'USD',
-          productUrl: product.productUrl,
-        },
-      });
-      // Only record a history snapshot when the price has changed
-      if (existingProduct.price !== product.price) {
-        await prisma.productHistory.create({
-          data: { productId: existingProduct.id, price: product.price },
+  // Upsert each product atomically — a failure mid-loop rolls back all writes
+  await prisma.$transaction(
+    async (tx) => {
+      for (const product of data) {
+        const existingProduct = await tx.product.findFirst({
+          where: {
+            name: { equals: product.name, mode: 'insensitive' },
+            clubId,
+          },
         });
+        const currency = product.currency ?? 'USD';
+        if (existingProduct) {
+          await tx.product.update({
+            where: { id: existingProduct.id },
+            data: { price: product.price, currency, productUrl: product.productUrl },
+          });
+          // Only record a history snapshot when the price has changed
+          if (existingProduct.price !== product.price) {
+            await tx.productHistory.create({
+              data: { productId: existingProduct.id, price: product.price, currency },
+            });
+          }
+        } else {
+          const created = await tx.product.create({
+            data: {
+              name: product.name,
+              price: product.price,
+              currency,
+              productUrl: product.productUrl,
+              clubId,
+            },
+          });
+          // Record the initial price in history
+          await tx.productHistory.create({
+            data: { productId: created.id, price: created.price, currency: created.currency },
+          });
+        }
       }
-    } else {
-      const created = await prisma.product.create({
-        data: {
-          name: product.name,
-          price: product.price,
-          currency: product.currency ?? 'USD',
-          productUrl: product.productUrl,
-          clubId,
-        },
-      });
-      // Record the initial price in history
-      await prisma.productHistory.create({
-        data: { productId: created.id, price: created.price },
-      });
-    }
-  }
+    },
+    { timeout: 30000 },
+  );
 
   // Return the up-to-date DB records (with id, updatedAt, etc.)
   return prisma.product.findMany({

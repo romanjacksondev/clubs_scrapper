@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const leagues = await prisma.league.findMany({
+    where: { deletedAt: null },
     orderBy: { name: 'asc' },
   });
   return NextResponse.json(leagues);

@@ -7,6 +7,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (isNaN(leagueId)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
+  const existing = await prisma.league.findFirst({
+    where: { id: leagueId, deletedAt: null },
+    select: { id: true },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: 'League not found' }, { status: 404 });
+  }
   try {
     const { name } = await req.json();
     if (!name?.trim()) {
@@ -29,7 +36,16 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
   try {
-    await prisma.league.delete({ where: { id: leagueId } });
+    const now = new Date();
+    await prisma.product.updateMany({
+      where: { club: { leagueId }, deletedAt: null },
+      data: { deletedAt: now },
+    });
+    await prisma.club.updateMany({
+      where: { leagueId, deletedAt: null },
+      data: { deletedAt: now },
+    });
+    await prisma.league.update({ where: { id: leagueId }, data: { deletedAt: now } });
     return new NextResponse(null, { status: 204 });
   } catch {
     return NextResponse.json({ error: 'Failed to delete league' }, { status: 500 });

@@ -786,6 +786,7 @@ export const ProductHistoryScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
   price: 'price',
+  currency: 'currency',
   recordedAt: 'recordedAt'
 } as const
 

@@ -51,5 +51,6 @@ model ProductHistory {
   productId  Int
   product    Product  @relation(fields: [productId], references: [id])
   price      Float
+  currency   String   @default("USD")
   recordedAt DateTime @default(now())
 }
