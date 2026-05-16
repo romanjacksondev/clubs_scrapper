@@ -12,14 +12,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  let { league, club, clubId } = await request.json();
-  // Remove spaces for folder/file matching
-  const trimmedLeague = league.replace(/\s+/g, '');
-  const trimmedClub = club.replace(/\s+/g, '');
-  console.log('Launching scrapper for:', { trimmedLeague, trimmedClub });
+  const { league, club, clubId } = await request.json();
   if (!league || !club || !clubId) {
     return NextResponse.json({ error: 'Missing league, club or clubId' }, { status: 400 });
   }
+  // Remove spaces for folder/file matching
+  const trimmedLeague = (league as string).replace(/\s+/g, '');
+  const trimmedClub = (club as string).replace(/\s+/g, '');
+  console.log('Launching scrapper for:', { trimmedLeague, trimmedClub });
 
   // Dynamically import the scrapper based on league and club
   try {

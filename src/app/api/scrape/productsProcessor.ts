@@ -1,6 +1,6 @@
 // productsProcessor.ts
 import { prisma } from '../../../lib/prisma';
-import { Product } from '../scrappers/PremierLeague/Product';
+import { Product } from '../../../types/Product';
 
 const HISTORY_RETENTION_DAYS = 90;
 

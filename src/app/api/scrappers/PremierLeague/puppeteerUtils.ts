@@ -14,21 +14,19 @@ export async function launchBrowser(stealth = false): Promise<Browser> {
 
   if (isVercel) {
     const chromium = (await import('@sparticuz/chromium')).default;
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const puppeteerCore = require('puppeteer-core');
+    const puppeteerCore = await import('puppeteer-core');
     const launchOptions = {
       args: chromium.args,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless as boolean,
+      headless: true as const,
     };
     if (stealth) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { addExtra } = require('puppeteer-extra');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-      const p = addExtra(puppeteerCore);
+      const { addExtra } = await import('puppeteer-extra');
+      const StealthPlugin = (await import('puppeteer-extra-plugin-stealth')).default;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p = addExtra(puppeteerCore as any);
       p.use(StealthPlugin());
-      return p.launch(launchOptions);
+      return p.launch(launchOptions) as unknown as Browser;
     }
     return puppeteerCore.launch(launchOptions);
   } else {
@@ -37,23 +35,29 @@ export async function launchBrowser(stealth = false): Promise<Browser> {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     };
     if (stealth) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const puppeteerExtra = require('puppeteer-extra');
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+      const puppeteerExtra = (await import('puppeteer-extra')).default;
+      const StealthPlugin = (await import('puppeteer-extra-plugin-stealth')).default;
       puppeteerExtra.use(StealthPlugin());
-      return puppeteerExtra.launch(launchOptions);
+      return puppeteerExtra.launch(launchOptions) as unknown as Browser;
     }
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('puppeteer').launch(launchOptions);
+    const puppeteer = await import('puppeteer');
+    return puppeteer.launch(launchOptions) as unknown as Browser;
   }
 }
 
-export async function launchAndGetPage(url: string): Promise<{ browser: Browser; page: Page }> {
-  const browser = await launchBrowser(false);
+export async function launchAndGetPage(
+  url: string,
+  stealth = false,
+): Promise<{ browser: Browser; page: Page }> {
+  const browser = await launchBrowser(stealth);
   const page = await browser.newPage();
-  await page.setUserAgent(USER_AGENT);
-  await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
-  await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+  try {
+    await page.setUserAgent(USER_AGENT);
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' });
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+  } catch (err) {
+    await browser.close();
+    throw err;
+  }
   return { browser, page };
 }
