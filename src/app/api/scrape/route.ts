@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '../../../lib/prisma';
-import { processProducts, purgeOldHistory } from './productsProcessor';
+import { processProducts } from './productsProcessor';
 import { launchScrapper } from './scrapperLauncher';
 
 export async function POST(request: NextRequest) {
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
     const products = await processProducts(data, parsedClubId);
-    await purgeOldHistory();
     return NextResponse.json({ products });
   } catch (e) {
     console.error('Scrapper error:', e);
