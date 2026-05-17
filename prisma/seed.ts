@@ -416,19 +416,49 @@ async function main() {
     {
       name: 'Ajax',
       officialSiteUrl: 'https://www.ajax.nl',
-      officialStoreUrl: 'https://shop.ajax.nl',
+      officialStoreUrl: 'https://www.ajax.nl/shop',
       leagueId: leagueRecords[5].id,
     },
     {
       name: 'PSV Eindhoven',
       officialSiteUrl: 'https://www.psv.nl',
-      officialStoreUrl: 'https://shop.psv.nl',
+      officialStoreUrl: 'https://psvfanshop.nl',
       leagueId: leagueRecords[5].id,
     },
     {
       name: 'Feyenoord',
       officialSiteUrl: 'https://www.feyenoord.nl',
-      officialStoreUrl: 'https://shop.feyenoord.nl',
+      officialStoreUrl: 'https://www.feyenoordshop.nl',
+      leagueId: leagueRecords[5].id,
+    },
+    {
+      name: 'AZ',
+      officialSiteUrl: 'https://www.az.nl',
+      officialStoreUrl: 'https://azshop.nl',
+      leagueId: leagueRecords[5].id,
+    },
+    {
+      name: 'FC Utrecht',
+      officialSiteUrl: 'https://www.fcutrecht.nl',
+      officialStoreUrl: 'https://shop.fcutrecht.nl',
+      leagueId: leagueRecords[5].id,
+    },
+    {
+      name: 'FC Twente',
+      officialSiteUrl: 'https://www.fctwente.nl',
+      officialStoreUrl: 'https://shop.fctwente.nl',
+      leagueId: leagueRecords[5].id,
+    },
+    {
+      name: 'NEC',
+      officialSiteUrl: 'https://www.nec-nijmegen.nl',
+      officialStoreUrl: 'https://www.necshop.nl',
+      leagueId: leagueRecords[5].id,
+    },
+    {
+      name: 'SC Heerenveen',
+      officialSiteUrl: 'https://www.sc-heerenveen.nl',
+      officialStoreUrl: 'https://www.heerenveenshop.nl',
       leagueId: leagueRecords[5].id,
     },
     // Primeira Liga (Portugal)

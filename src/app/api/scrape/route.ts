@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { auth } from '../../../auth';
 import { prisma } from '../../../lib/prisma';
 import { processProducts } from './productsProcessor';
 import { launchScrapper } from './scrapperLauncher';
 
 export async function POST(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret && process.env.NODE_ENV === 'production') {
-    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
-  }
-  if (cronSecret) {
-    const incomingSecret = request.headers.get('x-cron-secret');
-    if (incomingSecret !== cronSecret) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   let league: unknown, club: unknown, clubId: unknown;

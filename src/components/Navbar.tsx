@@ -1,8 +1,11 @@
 'use client';
 
 import { Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from 'flowbite-react';
+import { signOut, useSession } from 'next-auth/react';
 
 export default function AppNavbar() {
+  const { data: session } = useSession();
+
   return (
     <Navbar fluid>
       <NavbarBrand href="/">
@@ -15,9 +18,19 @@ export default function AppNavbar() {
         <NavbarLink href="/" active>
           Home
         </NavbarLink>
-        <NavbarLink href="/scrape">Scrape</NavbarLink>
-        <NavbarLink href="/clubs">Clubs</NavbarLink>
-        <NavbarLink href="/leagues">Leagues</NavbarLink>
+        {session && <NavbarLink href="/scrape">Scrape</NavbarLink>}
+        {session && <NavbarLink href="/clubs">Clubs</NavbarLink>}
+        {session && <NavbarLink href="/leagues">Leagues</NavbarLink>}
+        {session ? (
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+          >
+            Sign out ({session.user?.name})
+          </button>
+        ) : (
+          <NavbarLink href="/login">Sign in</NavbarLink>
+        )}
       </NavbarCollapse>
     </Navbar>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import AuthProvider from '../components/AuthProvider';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import './globals.css';
@@ -31,9 +32,11 @@ export default function RootLayout({
           geistSans.variable
         } ${geistMono.variable} bg-white dark:bg-gray-900 min-h-screen flex flex-col`}
       >
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
