@@ -67,6 +67,7 @@ export default function ClubProductsPage() {
                   Last Updated
                 </th>
                 <th className="px-4 py-3" />
+                <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -81,6 +82,14 @@ export default function ClubProductsPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {new Date(p.updatedAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      href={`/products/${p.id}/history`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+                    >
+                      History
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <a

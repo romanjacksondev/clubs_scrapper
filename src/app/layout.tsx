@@ -33,7 +33,9 @@ export default function RootLayout({
         } ${geistMono.variable} bg-white dark:bg-gray-900 min-h-screen flex flex-col`}
       >
         <AuthProvider>
-          <Navbar />
+          <div className="sticky top-0 z-50">
+            <Navbar />
+          </div>
           <main className="flex-1">{children}</main>
           <Footer />
         </AuthProvider>
