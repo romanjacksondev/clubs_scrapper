@@ -18,6 +18,7 @@ export async function scrapeJonasShop(
   kitListPath: string,
   categoryId: number,
   currency: string = 'GBP',
+  subId: number | string = '',
 ): Promise<Product[]> {
   const base = baseUrl.replace(/\/$/, '');
   const referer = base + '/' + kitListPath.replace(/^\//, '');
@@ -25,7 +26,7 @@ export async function scrapeJonasShop(
 
   const body = new URLSearchParams({
     id: String(categoryId),
-    subid: '',
+    subid: String(subId),
     star_shirt: 'Y',
     display_oos: 'N',
     websales_brch: '300',
