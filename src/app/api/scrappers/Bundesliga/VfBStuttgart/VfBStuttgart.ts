@@ -27,7 +27,7 @@ const scrapeVfBStuttgart = async (): Promise<Product[]> => {
     // Product data lives in RSC escaped-JSON chunks: \"isSearchable\":true,\"name\":\"...\",
     // ...\"seoCanonical\":\"/en/...\",  ...\"price\":{\"price\":\"EUR XX.XX\"
     const pattern =
-      /\\"isSearchable\\":true,\\"name\\":\\"([^\\"]+?)\\".*?\\"seoCanonical\\":\\"(\/en\/[^\\"]+?)\\".*?\\"price\\":\{\\"price\\":\\"EUR ([\d.]+)\\"/gs;
+      /\\"isSearchable\\":true,\\"name\\":\\"([^\\"]+?)\\"[\s\S]*?\\"seoCanonical\\":\\"(\/en\/[^\\"]+?)\\"[\s\S]*?\\"price\\":\{\\"price\\":\\"EUR ([\d.]+)\\"/g;
 
     let match: RegExpExecArray | null;
     while ((match = pattern.exec(html)) !== null) {
