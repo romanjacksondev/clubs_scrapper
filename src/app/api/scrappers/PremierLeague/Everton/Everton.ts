@@ -51,7 +51,7 @@ const scrapeEverton = async function () {
         if (!price) return null;
         return { name, productUrl, price, currency: 'GBP' };
       })
-      .filter(Boolean);
+      .filter((p): p is NonNullable<typeof p> => p !== null);
   } catch (e) {
     console.error('Error in scrapeEverton:', e);
     return [];

@@ -36,14 +36,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Club not found' }, { status: 404 });
   }
 
-  // Remove spaces and dots for folder/file matching (e.g. "1. FC Heidenheim" → "1FCHeidenheim")
-  const trimmedLeague = league.replace(/[\s.]+/g, '');
-  const trimmedClub = club.replace(/[\s.]+/g, '');
-  console.log('Launching scrapper for:', { trimmedLeague, trimmedClub });
+  console.log('Launching scrapper for:', { league, club });
 
-  // Dynamically import the scrapper based on league and club
   try {
-    const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
+    const scrapper = launchScrapper(club);
     const data = await scrapper();
     if (data.length === 0) {
       return NextResponse.json(

@@ -42,7 +42,10 @@ const scrapeManCity = async () => {
                   currency = data.price.currency || 'GBP';
                 }
                 if (name && price && productUrl) {
-                  items.push({ name, productUrl, price, currency });
+                  const absoluteUrl = productUrl.startsWith('http')
+                    ? productUrl
+                    : `https://shop.mancity.com${productUrl}`;
+                  items.push({ name, productUrl: absoluteUrl, price, currency });
                 }
               } catch (err) {
                 // Ignore parse errors
