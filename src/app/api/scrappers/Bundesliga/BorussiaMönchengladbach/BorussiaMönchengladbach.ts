@@ -1,8 +1,8 @@
 // Borussia Mönchengladbach official store (shop.borussia.de) — Scayle platform (SSR with JS hydration).
 // Jerseys category: /de-de/trikots — products rendered as anchor elements with /de-de/p/ paths.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const JERSEYS_URL = 'https://shop.borussia.de/de-de/trikots';
 const STORE_BASE = 'https://shop.borussia.de';

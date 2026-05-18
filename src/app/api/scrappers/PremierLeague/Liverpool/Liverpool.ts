@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://store.liverpoolfc.com';
 // Liverpool store runs on Magento 2 with a custom Lfc theme, fronted by Queue-it

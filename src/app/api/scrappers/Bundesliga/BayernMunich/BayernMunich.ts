@@ -3,8 +3,8 @@
 // Category path changed from /jerseys-more/ to /trikots-mehr/ in May 2026.
 // Uses puppeteer-extra with stealth to handle bot detection.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://fcbayern.com/store';
 const LOCALE = 'de-de';

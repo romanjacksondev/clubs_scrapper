@@ -4,7 +4,7 @@
 // There is no standalone home-kit collection; all current kits are covered by
 // the umbrella 'kits' collection plus the specific sub-collections.
 
-import { Product } from '../Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.nottinghamforest.co.uk';
 

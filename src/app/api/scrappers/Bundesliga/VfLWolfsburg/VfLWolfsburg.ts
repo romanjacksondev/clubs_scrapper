@@ -2,8 +2,8 @@
 // Jerseys at /trikots-co/spieloutfits/heim/ and /auswaerts/ (products are JS-rendered, requires Puppeteer).
 // Card: .product-box, name: a.product-image-link[title], price: .product-price-info
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://shop.vfl-wolfsburg.de';
 

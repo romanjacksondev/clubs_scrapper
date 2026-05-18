@@ -2,7 +2,7 @@
 // The standard Shopify products.json endpoint returns GBP prices when
 // ?country=GB is appended — no browser automation needed.
 
-import { Product } from '../Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.newcastleunited.com';
 

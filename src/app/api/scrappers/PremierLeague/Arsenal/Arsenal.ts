@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
-import { Product } from '../Product';
-import { launchAndGetPage } from '../puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchAndGetPage } from '../../shared/puppeteerUtils';
 
 export default async function scrapeArsenal() {
   const url = 'https://arsenaldirect.arsenal.com/Football-Shirts-and-Kit/c/kit';

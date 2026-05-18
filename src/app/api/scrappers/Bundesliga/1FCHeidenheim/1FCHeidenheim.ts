@@ -1,8 +1,8 @@
 // 1. FC Heidenheim official store (merchandising-onlineshop.com/fcheidenheim) — Shopware platform.
 // Protected by Queue-it bot protection; returns [] when queue is active.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://www.merchandising-onlineshop.com/fcheidenheim';
 const JERSEYS_URLS = [`${STORE_BASE}/trikots.html`, `${STORE_BASE}/`];

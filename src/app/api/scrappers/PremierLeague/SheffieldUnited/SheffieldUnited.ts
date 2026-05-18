@@ -3,7 +3,7 @@
 // JS (id=117, websales_brch=201). All kits are currently on clearance so
 // display_oos=Y is required to return results.
 
-import { Product } from '../Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://www.sufcdirect.co.uk';
 

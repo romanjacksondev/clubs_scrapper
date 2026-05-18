@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 // Manchester United official store (store.manutd.com) runs on Scayle/Nuxt.
 // Each category page embeds a <script type="application/ld+json"> with an

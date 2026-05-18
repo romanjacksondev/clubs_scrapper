@@ -1,4 +1,4 @@
-import { Product } from '../PremierLeague/Product';
+import { Product } from './Product';
 
 const PAGE_SIZE = 50;
 

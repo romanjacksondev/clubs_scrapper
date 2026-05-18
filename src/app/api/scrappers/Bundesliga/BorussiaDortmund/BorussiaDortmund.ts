@@ -2,8 +2,8 @@
 // If Queue-it virtual waiting room is detected, returns an empty array.
 // Otherwise scrapes the /c/trikots jerseys listing page.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_URL = 'https://shop.bvb.de/c/trikots';
 

@@ -4,7 +4,7 @@
 // Products are listed in <h3> heading elements with an anchor and a price line below.
 
 import * as cheerio from 'cheerio';
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.fcaugsburg.de';
 const JERSEYS_URL = `${BASE_URL}/fcaugsburg/SynwayWarengruppen/data/shop/9c091dbc-b9eb-4382-a952-002ea86c972e`;

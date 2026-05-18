@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
-import { Product } from '../Product';
-import { launchBrowser } from '../puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const scrapeBournemouth = async function () {
   const url = 'https://superstore.afcb.co.uk/afc-bournemouth/kit';

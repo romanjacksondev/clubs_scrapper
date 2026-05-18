@@ -4,7 +4,7 @@
 // Navigates to the homepage, finds the jersey/kit collection link in the
 // navigation, then scrapes product cards from that page.
 
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://www.feyenoordshop.nl';
 

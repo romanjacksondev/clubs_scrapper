@@ -1,118 +1,61 @@
-// SC Heerenveen official store (www.heerenveenshop.nl).
-// Platform is unconfirmed; Puppeteer with stealth handles both Shopify and
-// other e-commerce platforms.
-// Navigates to the homepage, discovers the jersey/kit collection link in the
-// navigation, then scrapes product cards.
+// SC Heerenveen official store (www.feanstoreonline.nl) — custom Umbraco/TRES platform.
+// Products are server-rendered on the /shop/wedstrijd page.
+// Each product card is a .card element with an <a href="/producten/..."> name
+// and a .price-inc price element.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import * as cheerio from 'cheerio';
+import { Product } from '../../shared/Product';
 
-const STORE_BASE = 'https://www.heerenveenshop.nl';
+const BASE = 'https://www.feanstoreonline.nl';
+const LISTING_URL = `${BASE}/shop/wedstrijd`;
 
-const KIT_NAV_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis'];
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept-Language': 'nl-NL,nl;q=0.9',
+  Accept: 'text/html',
+};
 
 const scrapeSCHeerenveen = async (): Promise<Product[]> => {
-  let browser: any;
+  const products: Product[] = [];
+  const seen = new Set<string>();
+
   try {
-    browser = await launchBrowser(true);
-
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8' });
-
-    await page.goto(STORE_BASE, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise((r) => setTimeout(r, 1500));
-
-    // Try to discover a kit/jersey collection from the navigation
-    const kitUrl: string | null = await page.evaluate(
-      (storeBase: string, keywords: string[]) => {
-        const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('nav a, header a'));
-        for (const link of links) {
-          const text = (link.textContent || '').toLowerCase();
-          const href = link.getAttribute('href') || '';
-          if (keywords.some((k) => text.includes(k)) && href.length > 1) {
-            return href.startsWith('http') ? href : `${storeBase}${href}`;
-          }
-        }
-        return null;
-      },
-      STORE_BASE,
-      KIT_NAV_KEYWORDS,
-    );
-
-    if (kitUrl && kitUrl !== STORE_BASE) {
-      const response = await page.goto(kitUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-      if (!response || response.status() >= 400) {
-        await browser.close();
-        return [];
-      }
-      await new Promise((r) => setTimeout(r, 1500));
+    const res = await fetch(LISTING_URL, { headers: HEADERS });
+    if (!res.ok) {
+      console.error(`SCHeerenveen: HTTP ${res.status}`);
+      return [];
     }
 
-    await page
-      .waitForSelector('a[href*="/products/"], a[href*="product"], .product-card, .product-item', {
-        timeout: 8000,
-      })
-      .catch(() => {});
+    const html = await res.text();
+    const $ = cheerio.load(html);
 
-    const products: Product[] = await page.evaluate((storeBase: string) => {
-      const results: Array<{ name: string; price: number; productUrl: string; currency: string }> =
-        [];
-      const seen = new Set<string>();
+    $('.card').each((_, card) => {
+      const anchor = $(card).find('a[href^="/producten/"]').first();
+      const href = anchor.attr('href');
+      if (!href) return;
 
-      // Cover both Shopify (/products/) and generic product link patterns
-      const anchors = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('a[href*="/products/"], a[href*="product"]'),
-      );
+      const productUrl = `${BASE}${href}`;
+      if (seen.has(productUrl)) return;
+      seen.add(productUrl);
 
-      for (const anchor of anchors) {
-        const href = anchor.getAttribute('href') || '';
-        if (!href || href.includes('?') || href.includes('#')) continue;
-        const productUrl = href.startsWith('http') ? href : `${storeBase}${href}`;
-        if (seen.has(productUrl)) continue;
-        seen.add(productUrl);
+      const name = anchor.text().trim();
+      if (!name) return;
 
-        const card =
-          anchor.closest<HTMLElement>(
-            '.product-card-wrapper, .product-item, [class*="product-card"], [class*="product_card"], [class*="ProductCard"]',
-          ) ?? anchor.parentElement;
+      const priceText = $(card).find('.price-inc').first().text().trim();
+      // Price format: "€ 79,99"
+      const priceMatch = priceText.match(/[\d,.]+/);
+      if (!priceMatch) return;
+      const price = parseFloat(priceMatch[0].replace(',', '.'));
+      if (!price || price <= 0) return;
 
-        let name = '';
-        const img = anchor.querySelector<HTMLImageElement>('img[alt]');
-        if (img) name = img.getAttribute('alt')?.trim() || '';
-        if (!name) {
-          const heading = card?.querySelector('h2, h3, h4, [class*="title"], [class*="name"]');
-          name = heading?.textContent?.trim() || anchor.textContent?.trim() || '';
-        }
-        if (!name || name.length < 3) continue;
-
-        let price = 0;
-        let el: HTMLElement | null = anchor.parentElement;
-        for (let i = 0; i < 8; i++) {
-          if (!el) break;
-          const m = (el.innerText || '').match(/€\s*([\d]+[.,][\d]+)/);
-          if (m) {
-            price = parseFloat(m[1].replace(',', '.'));
-            break;
-          }
-          el = el.parentElement;
-        }
-        if (price <= 0) continue;
-
-        results.push({ name, productUrl, price, currency: 'EUR' });
-      }
-      return results;
-    }, STORE_BASE);
-
-    await browser.close();
-    return products;
-  } catch (e) {
-    console.error('Error in scrapeSCHeerenveen:', e);
-    if (browser) await browser.close();
-    return [];
+      products.push({ name, productUrl, price, currency: 'EUR' });
+    });
+  } catch (err) {
+    console.error('SCHeerenveen: error', err);
   }
+
+  return products;
 };
 
 export default scrapeSCHeerenveen;

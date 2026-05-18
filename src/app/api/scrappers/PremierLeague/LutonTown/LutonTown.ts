@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const scrapeLutonTown = async () => {
   const url = 'https://shop.lutontown.co.uk/kit/kit/allkit/';

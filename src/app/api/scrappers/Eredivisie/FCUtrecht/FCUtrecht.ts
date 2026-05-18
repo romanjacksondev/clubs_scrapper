@@ -2,7 +2,7 @@
 // The Shopify products.json endpoint returns all products; we filter by
 // title keywords to keep only jerseys / match kits.
 
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const BASE = 'https://shop.fcutrecht.nl';
 

@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://store.chelseafc.com';
 // Chelsea FC shop runs on Fanatics (same platform as Aston Villa).

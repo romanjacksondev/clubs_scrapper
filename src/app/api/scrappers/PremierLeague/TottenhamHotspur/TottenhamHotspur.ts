@@ -1,4 +1,4 @@
-import { Product } from '../Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.tottenhamhotspur.com';
 

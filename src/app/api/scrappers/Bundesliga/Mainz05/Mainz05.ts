@@ -1,8 +1,8 @@
 // Mainz 05 official store (shop.mainz05.de) — Shopware-based platform.
 // Some category paths return 500 errors; navigate with stealth and search for jersey links.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://shop.mainz05.de';
 const JERSEYS_URLS = [

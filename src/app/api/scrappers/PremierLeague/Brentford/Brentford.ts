@@ -1,4 +1,4 @@
-import { scrapeJonasShop } from '../jonasShopScraper';
+import { scrapeJonasShop } from '../../shared/jonasShopScraper';
 
 const scrapeBrentford = async function () {
   try {

@@ -1,5 +1,5 @@
-import { scrapeJonasShop } from '../jonasShopScraper';
-import { Product } from '../Product';
+import { scrapeJonasShop } from '../../shared/jonasShopScraper';
+import { Product } from '../../shared/Product';
 
 // West Ham United official store runs on the JonasSports platform.
 // Category ID 128 = "All Kit" listing page.

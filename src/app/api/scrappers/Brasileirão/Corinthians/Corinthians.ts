@@ -1,4 +1,4 @@
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 // Corinthians official store — Shop Timão (Netshoes platform)
 // /api/friendly/{category} returns paginated products, page=1..N

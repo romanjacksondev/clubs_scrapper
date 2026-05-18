@@ -1,4 +1,4 @@
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://www.bocashop.com.ar';
 

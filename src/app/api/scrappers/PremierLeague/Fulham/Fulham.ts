@@ -1,4 +1,4 @@
-import { scrapeJonasShop } from '../jonasShopScraper';
+import { scrapeJonasShop } from '../../shared/jonasShopScraper';
 
 const scrapeFulham = async function () {
   return scrapeJonasShop('https://shop.fulhamfc.com', '/kit/kitviewall/', 174);

@@ -1,4 +1,4 @@
-import { scrapeVtexStore } from '../vtexScraper';
+import { scrapeVtexStore } from '../../shared/vtexScraper';
 
 // Palmeiras official store (VTEX)
 // Category 343 = "Uniforme de Jogo" (all match kits)

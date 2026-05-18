@@ -3,7 +3,7 @@
 // URL slug is used to derive a clean product name.
 
 import * as cheerio from 'cheerio';
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.scfreiburg.com';
 

@@ -3,8 +3,8 @@
 // Product cards: each has two <a> links with same href; the image <img alt="..."> holds the name.
 // Price: walk up from the image link until €XX.XX is found in innerText.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://shop.vfb.de';
 const JERSEYS_URL = `${STORE_BASE}/en/jerseys-and-training/jerseys`;

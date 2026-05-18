@@ -2,7 +2,7 @@
 // Uses Shopify's unauthenticated JSON API: /collections/trikots-co/products.json
 // No Puppeteer needed — server-rendered JSON response.
 
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://fanartikel.union-zeughaus.de';
 const COLLECTION = 'trikots-co';

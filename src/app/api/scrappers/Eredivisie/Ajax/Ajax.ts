@@ -2,8 +2,8 @@
 // Products are fetched client-side; Puppeteer is needed to render the page.
 // Kit categories live at /shop/wedstrijd/{thuistenue|uittenue|derde-tenue|keeperstenue}.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://www.ajax.nl';
 

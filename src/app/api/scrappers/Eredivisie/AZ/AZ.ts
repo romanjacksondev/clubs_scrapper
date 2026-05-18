@@ -4,8 +4,8 @@
 // Navigates to the homepage, discovers the kit collection link from the nav,
 // then scrapes product cards.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://azshop.nl';
 

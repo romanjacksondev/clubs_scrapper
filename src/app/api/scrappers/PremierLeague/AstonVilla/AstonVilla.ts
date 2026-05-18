@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://shop.avfc.co.uk';
 // Aston Villa shop runs on Fanatics. Direct requests to most URLs are blocked (403)

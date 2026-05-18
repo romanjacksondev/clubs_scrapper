@@ -2,8 +2,8 @@
 // Jersey category: /de-int/c/rbl-official-kit-by-puma/
 // Card: a[href*="/de-int/p/"], name: <p> inside card, price: div with exact "XX,XX €" text.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://www.redbullshop.com';
 const JERSEYS_URL = `${STORE_BASE}/de-int/c/rbl-official-kit-by-puma/`;

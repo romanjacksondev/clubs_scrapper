@@ -2,8 +2,8 @@
 // Uses puppeteer to navigate — direct fetch of /Trikots/ returns no content.
 // Tries to find jerseys from the homepage or category navigation.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://shop.sv98.de';
 const JERSEYS_URLS = [

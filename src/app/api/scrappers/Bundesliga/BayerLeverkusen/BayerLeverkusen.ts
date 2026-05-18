@@ -1,8 +1,8 @@
 // Bayer 04 Leverkusen official store (www.bayer04.de/de-de/shop/) — protected by Queue-it.
 // If Queue-it virtual waiting room or "staytuned" page is detected, returns an empty array.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const SHOP_URL = 'https://www.bayer04.de/de-de/shop/';
 const JERSEYS_URL = 'https://www.bayer04.de/de-de/shop/trikots/';

@@ -1,5 +1,5 @@
-import { scrapeJonasShop } from '../jonasShopScraper';
-import { Product } from '../Product';
+import { scrapeJonasShop } from '../../shared/jonasShopScraper';
+import { Product } from '../../shared/Product';
 
 // Wolverhampton Wanderers official store runs on the JonasSports platform.
 // Category ID 55 = "All Kit" listing page.

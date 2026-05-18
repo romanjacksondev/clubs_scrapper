@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const scrapeManCity = async () => {
   const urls = [

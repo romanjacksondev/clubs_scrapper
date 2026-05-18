@@ -4,7 +4,7 @@
 // Navigates to the store homepage and follows the main wedstrijdkleding / kits
 // navigation link to reach the jersey listing.
 
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://psvfanshop.nl';
 

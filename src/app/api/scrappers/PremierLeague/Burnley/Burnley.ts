@@ -1,4 +1,4 @@
-import { launchBrowser } from '../puppeteerUtils';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const scrapeBurnley = async function () {
   const url = 'https://shop.burnleyfc.com/kits/replicakit/view-all/';

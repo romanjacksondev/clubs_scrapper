@@ -1,4 +1,4 @@
-import { scrapeVtexStore } from '../vtexScraper';
+import { scrapeVtexStore } from '../../shared/vtexScraper';
 
 // Flamengo official store (VTEX)
 // Category 115 = "Mantos" (all jerseys: Jogo 1, Jogo 2, Jogo 3)

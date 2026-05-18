@@ -2,8 +2,8 @@
 // Jerseys at /trikots.html/ — 12 products rendered via JS-injected custom element attributes.
 // Read name, url, and price directly from <product-card> element attributes.
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const JERSEYS_URL = 'https://shop.werder.de/trikots.html/';
 

@@ -2,7 +2,7 @@
 // OCC baseSite: tsgh-store. Category: TSG-Trikotkollektion (24 products, single page).
 // Using the OCC REST API directly avoids scraping a JS-rendered SPA.
 
-import { Product } from '../../PremierLeague/Product';
+import { Product } from '../../shared/Product';
 
 const API_BASE = 'https://prod-api.tsg-hoffenheim.de/occ/v2/tsgh-store';
 const STORE_BASE = 'https://shop.tsg-hoffenheim.de';

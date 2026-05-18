@@ -2,8 +2,8 @@
 // Products are rendered client-side; requires Puppeteer (fetch returns empty shell).
 // Card: a.ef-product-card, name: h5 inside, price: .ef-product__price--new
 
-import { Product } from '../../PremierLeague/Product';
-import { launchBrowser } from '../../PremierLeague/puppeteerUtils';
+import { Product } from '../../shared/Product';
+import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://stores.eintracht.de';
 
