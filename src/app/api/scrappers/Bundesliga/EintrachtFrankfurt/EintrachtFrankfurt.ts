@@ -1,72 +1,71 @@
-// Eintracht Frankfurt official store (stores.eintracht.de) — Gatsby SPA.
-// Products are rendered client-side; requires Puppeteer (fetch returns empty shell).
-// Card: a.ef-product-card, name: h5 inside, price: .ef-product__price--new
+// Eintracht Frankfurt official store (stores.eintracht.de) — Gatsby static site.
+// Product data is embedded in Gatsby page-data.json files — no Puppeteer needed.
+// Each category page exposes .result.data.allNewShopProduct.nodes with name, slug, and variant pricing.
 
 import { Product } from '../../shared/Product';
-import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://stores.eintracht.de';
 
-const JERSEY_CATEGORIES = [
-  `${BASE_URL}/fanshop/adidas/heimtrikot/`,
-  `${BASE_URL}/fanshop/adidas/auswaertstrikot/`,
-  `${BASE_URL}/fanshop/adidas/ausweichtrikot/`,
+const JERSEY_PAGE_DATA = [
+  `${BASE_URL}/page-data/fanshop/adidas/heimtrikot/page-data.json`,
+  `${BASE_URL}/page-data/fanshop/adidas/auswaertstrikot/page-data.json`,
+  `${BASE_URL}/page-data/fanshop/adidas/ausweichtrikot/page-data.json`,
 ];
 
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept: 'application/json',
+};
+
+interface EFVariantPrice {
+  customerGroup: string;
+  price: number;
+}
+
+interface EFVariant {
+  prices: EFVariantPrice[];
+}
+
+interface EFProductNode {
+  name: { de: string };
+  full_slugs: { de: string };
+  variants: EFVariant[];
+}
+
 export default async function scrapeEintrachtFrankfurt(): Promise<Product[]> {
-  let browser: any;
-  try {
-    browser = await launchBrowser(true);
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'de-DE,de;q=0.9' });
+  const allProducts: Product[] = [];
+  const seen = new Set<string>();
 
-    const allProducts: Product[] = [];
-    const seen = new Set<string>();
+  for (const jsonUrl of JERSEY_PAGE_DATA) {
+    try {
+      const res = await fetch(jsonUrl, { headers: HEADERS });
+      if (!res.ok) continue;
 
-    for (const catUrl of JERSEY_CATEGORIES) {
-      const response = await page.goto(catUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-      if (!response || response.status() >= 400) continue;
+      const data = await res.json();
+      const nodes: EFProductNode[] = data?.result?.data?.allNewShopProduct?.nodes ?? [];
 
-      await page.waitForSelector('a.ef-product-card', { timeout: 8000 }).catch(() => {});
+      for (const node of nodes) {
+        const name = node.name?.de;
+        const slug = node.full_slugs?.de;
+        if (!name || !slug) continue;
 
-      const pageProducts: Product[] = await page.evaluate((baseUrl: string) => {
-        const results: Product[] = [];
-        const cards = Array.from(document.querySelectorAll<HTMLAnchorElement>('a.ef-product-card'));
+        const productUrl = `${BASE_URL}${slug.replace(/\/$/, '')}`;
+        if (seen.has(productUrl)) continue;
+        seen.add(productUrl);
 
-        for (const card of cards) {
-          const path = card.getAttribute('href') || '';
-          const href = path.startsWith('http') ? path : baseUrl + path.replace(/\/$/, '');
-          if (!href.includes(baseUrl)) continue;
+        // Use the retail (EK = Einzelkunde) price from the first variant
+        const prices = node.variants?.[0]?.prices ?? [];
+        const ekPrice = prices.find((p) => p.customerGroup === 'EK');
+        const price = ekPrice?.price ?? 0;
+        if (price <= 0) continue;
 
-          const name = card.querySelector('h5')?.textContent?.trim() || '';
-          if (!name || name.length < 3) continue;
-
-          const priceText = card.querySelector('.ef-product__price--new')?.textContent || '';
-          const priceMatch = priceText.match(/([\d]+[,.][\d]+)/);
-          const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : 0;
-          if (price <= 0) continue;
-
-          results.push({ name, productUrl: href, price, currency: 'EUR' });
-        }
-        return results;
-      }, BASE_URL);
-
-      for (const p of pageProducts) {
-        if (!seen.has(p.productUrl)) {
-          seen.add(p.productUrl);
-          allProducts.push(p);
-        }
+        allProducts.push({ name, productUrl, price, currency: 'EUR' });
       }
+    } catch (e) {
+      console.error(`Error scraping EintrachtFrankfurt at ${jsonUrl}:`, e);
     }
-
-    await browser.close();
-    return allProducts;
-  } catch (e) {
-    console.error('Error in scrapeEintrachtFrankfurt:', e);
-    if (browser) await browser.close();
-    return [];
   }
+
+  return allProducts;
 }

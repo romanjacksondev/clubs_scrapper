@@ -1,72 +1,67 @@
-// RB Leipzig official store (redbullshop.com/de-int/rb-leipzig/) — Red Bull Shop platform.
+// RB Leipzig official store (redbullshop.com/de-int/rb-leipzig/) — Red Bull Shop platform (server-rendered HTML).
 // Jersey category: /de-int/c/rbl-official-kit-by-puma/
-// Card: a[href*="/de-int/p/"], name: <p> inside card, price: div with exact "XX,XX €" text.
+// Card: a[href*="/de-int/p/"], name: <p> inside card, price: div/span with exact "XX,XX €" text.
 
+import * as cheerio from 'cheerio';
 import { Product } from '../../shared/Product';
-import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://www.redbullshop.com';
 const JERSEYS_URL = `${STORE_BASE}/de-int/c/rbl-official-kit-by-puma/`;
 
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept-Language': 'de-DE,de;q=0.9',
+  Accept: 'text/html',
+};
+
 const scrapeRBLeipzig = async (): Promise<Product[]> => {
-  let browser: any;
   try {
-    browser = await launchBrowser(true);
+    const res = await fetch(JERSEYS_URL, { headers: HEADERS });
+    if (!res.ok) return [];
 
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'de-DE,de;q=0.9' });
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const products: Product[] = [];
+    const seen = new Set<string>();
 
-    const response = await page.goto(JERSEYS_URL, { waitUntil: 'networkidle2', timeout: 40000 });
-    if (!response || response.status() >= 400) {
-      await browser.close();
-      return [];
-    }
+    $('a[href*="/de-int/p/"]').each((_, el) => {
+      const rawHref = $(el).attr('href') || '';
+      if (!rawHref) return;
 
-    await page.waitForSelector('a[href*="/de-int/p/"]', { timeout: 10000 }).catch(() => {});
-
-    const products: Product[] = await page.evaluate((storeBase: string) => {
-      const results: Product[] = [];
-      const seen = new Set<string>();
-
-      const cards = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('a[href*="/de-int/p/"]'),
-      );
-
-      for (const card of cards) {
-        // Normalise href — strip variant query param
-        const href = (storeBase + new URL(card.href).pathname).replace(/\/$/, '');
-        if (seen.has(href)) continue;
-        seen.add(href);
-
-        // Product name is the <p> element inside the card
-        const name = card.querySelector('p')?.textContent?.trim() || '';
-        if (!name || name.length < 3) continue;
-
-        // Price: find a child element whose entire text is exactly "XX,XX €"
-        let price = 0;
-        for (const el of card.querySelectorAll<HTMLElement>('div, span')) {
-          const t = el.textContent?.trim() || '';
-          const m = t.match(/^(\d+[,.]\d{2})\s*€$/);
-          if (m) {
-            price = parseFloat(m[1].replace(',', '.'));
-            break;
-          }
-        }
-        if (price <= 0) continue;
-
-        results.push({ name, productUrl: href, price, currency: 'EUR' });
+      // Build absolute URL and strip query params / trailing slash
+      const fullHref = rawHref.startsWith('http') ? rawHref : `${STORE_BASE}${rawHref}`;
+      let productUrl: string;
+      try {
+        const u = new URL(fullHref);
+        productUrl = `${STORE_BASE}${u.pathname}`.replace(/\/$/, '');
+      } catch {
+        return;
       }
-      return results;
-    }, STORE_BASE);
+      if (seen.has(productUrl)) return;
+      seen.add(productUrl);
 
-    await browser.close();
+      const name = $(el).find('p').first().text().trim();
+      if (!name || name.length < 3) return;
+
+      // Price: first child div or span whose trimmed text matches "XX,XX €"
+      let price = 0;
+      $(el)
+        .find('div, span')
+        .each((__, priceEl) => {
+          if (price > 0) return;
+          const t = $(priceEl).text().trim();
+          const m = t.match(/^(\d+[,.]\d{2})\s*€$/);
+          if (m) price = parseFloat(m[1].replace(',', '.'));
+        });
+      if (price <= 0) return;
+
+      products.push({ name, productUrl, price, currency: 'EUR' });
+    });
+
     return products;
   } catch (e) {
     console.error('Error in scrapeRBLeipzig:', e);
-    if (browser) await browser.close();
     return [];
   }
 };
