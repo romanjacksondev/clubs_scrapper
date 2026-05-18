@@ -92,6 +92,11 @@ import scrapeNapoli from './SerieA/Napoli/Napoli';
 import scrapeTorino from './SerieA/Torino/Torino';
 import scrapeUdinese from './SerieA/Udinese/Udinese';
 
+// — Primeira Liga —
+import scrapeBenfica from './PrimeiraLiga/Benfica/Benfica';
+import scrapePorto from './PrimeiraLiga/Porto/Porto';
+import scrapeSpotingCP from './PrimeiraLiga/SportingCP/SportingCP';
+
 // — Eredivisie —
 import scrapeAjax from './Eredivisie/Ajax/Ajax';
 import scrapeAZ from './Eredivisie/AZ/AZ';
@@ -187,6 +192,11 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Napoli: scrapeNapoli,
   Torino: scrapeTorino,
   Udinese: scrapeUdinese,
+
+  // Primeira Liga
+  Benfica: scrapeBenfica,
+  Porto: scrapePorto,
+  'Sporting CP': scrapeSpotingCP,
 
   // Eredivisie
   Ajax: scrapeAjax,
