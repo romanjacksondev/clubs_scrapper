@@ -1,5 +1,7 @@
 // Mainz 05 official store (shop.mainz05.de) — Shopware 6 platform (server-rendered HTML).
-// Same structure as Darmstadt 98: product links with title attribute, prices in span[class*="product-price"].
+// Product name: a[class*="product-name"] text content.
+// Price: span.list-price-price (retail) if present, otherwise first product-price match.
+// When a member-discounted price (with-list-price) is shown, the original retail price is in .list-price-price.
 
 import * as cheerio from 'cheerio';
 import { Product } from '../../shared/Product';
@@ -31,18 +33,24 @@ const scrapeMainz05 = async (): Promise<Product[]> => {
       const $ = cheerio.load(html);
 
       $('.product-box').each((_, el) => {
-        const link = $(el).find(`a[href^="${STORE_BASE}"][title]`).first();
+        const link = $(el).find('a[class*="product-name"]').first();
         const href = link.attr('href') || '';
-        const name = link.attr('title') || '';
-        if (!href || !name || name.length < 3 || seen.has(href)) return;
-        seen.add(href);
+        const name = link.text().replace(/\s+/g, ' ').trim();
+        if (!href || !name || name.length < 3) return;
 
-        const priceText = $(el).find('[class*="product-price"]').first().text();
+        const productUrl = href.startsWith('http') ? href : `${STORE_BASE}${href}`;
+        if (seen.has(productUrl)) return;
+        seen.add(productUrl);
+
+        // Prefer the original retail price (.list-price-price) over any member discount price
+        const retailPriceText = $(el).find('.list-price-price').first().text();
+        const fallbackPriceText = $(el).find('[class*="product-price"]').first().text();
+        const priceText = retailPriceText || fallbackPriceText;
         const priceMatch = priceText.match(/(\d+,\d+)/);
         const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : 0;
         if (price <= 0) return;
 
-        allProducts.push({ name, productUrl: href, price, currency: 'EUR' });
+        allProducts.push({ name, productUrl, price, currency: 'EUR' });
       });
     } catch (e) {
       console.error(`Error scraping Mainz05 at ${url}:`, e);
