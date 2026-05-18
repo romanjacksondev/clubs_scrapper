@@ -3,6 +3,7 @@
 // Handles pagination via WooCommerce page-numbers links (up to 10 pages).
 
 import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://store.frosinonecalcio.com';
@@ -20,7 +21,7 @@ const HEADERS: Record<string, string> = {
  * Prefers the sale price (inside <ins>) over the regular price.
  * Handles both comma-decimal (€ 60,00) and dot-decimal (€ 60.00) formats.
  */
-function parseWcPrice($el: cheerio.Cheerio<cheerio.Element>): number {
+function parseWcPrice($el: cheerio.Cheerio<AnyNode>): number {
   const saleBdi = $el.find('ins .woocommerce-Price-amount bdi').first().text();
   const anyBdi = $el.find('.woocommerce-Price-amount bdi').first().text();
   const raw = (saleBdi || anyBdi).replace(/[^0-9,.]/g, '').replace(/\u00a0/g, '');
