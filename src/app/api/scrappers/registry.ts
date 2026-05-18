@@ -78,6 +78,11 @@ import scrapeHellasVerona from './SerieA/HellasVerona/HellasVerona';
 import scrapeInterMilan from './SerieA/InterMilan/InterMilan';
 import scrapeJuventus from './SerieA/Juventus/Juventus';
 import scrapeLazio from './SerieA/Lazio/Lazio';
+import scrapeLecce from './SerieA/Lecce/Lecce';
+import scrapeMonza from './SerieA/Monza/Monza';
+import scrapeNapoli from './SerieA/Napoli/Napoli';
+import scrapeTorino from './SerieA/Torino/Torino';
+import scrapeUdinese from './SerieA/Udinese/Udinese';
 
 // — Eredivisie —
 import scrapeAjax from './Eredivisie/Ajax/Ajax';
@@ -161,6 +166,11 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   'Inter Milan': scrapeInterMilan,
   Juventus: scrapeJuventus,
   Lazio: scrapeLazio,
+  Lecce: scrapeLecce,
+  Monza: scrapeMonza,
+  Napoli: scrapeNapoli,
+  Torino: scrapeTorino,
+  Udinese: scrapeUdinese,
 
   // Eredivisie
   Ajax: scrapeAjax,
