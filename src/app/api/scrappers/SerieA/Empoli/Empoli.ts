@@ -93,5 +93,3 @@ const scrapeEmpoli = async (): Promise<Product[]> => {
 };
 
 export default scrapeEmpoli;
-
-export default scrapeEmpoli;
