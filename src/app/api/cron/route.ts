@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
   const settled = await Promise.allSettled(
     clubs.map(async (club): Promise<Result> => {
-      const trimmedLeague = club.league.name.replace(/\s+/g, '');
-      const trimmedClub = club.name.replace(/\s+/g, '');
+      const trimmedLeague = club.league.name.replace(/[\s.]+/g, '');
+      const trimmedClub = club.name.replace(/[\s.]+/g, '');
       const data = await Promise.race([
         (async () => {
           const scrapper = await launchScrapper(trimmedLeague, trimmedClub);
