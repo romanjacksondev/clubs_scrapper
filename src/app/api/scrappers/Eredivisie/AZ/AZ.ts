@@ -1,113 +1,74 @@
 // AZ Alkmaar official store (azshop.nl) — Shopify.
-// The Shopify products.json API is blocked by bot-protection for unauthenticated
-// requests from server-side fetch; Puppeteer with stealth is used instead.
-// Navigates to the homepage, discovers the kit collection link from the nav,
-// then scrapes product cards.
+// Fetches the homepage HTML to find the kit collection URL from navigation,
+// then calls the Shopify /products.json API endpoint.
 
+import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
 import { Product } from '../../shared/Product';
-import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const STORE_BASE = 'https://azshop.nl';
+const KIT_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis'];
 
-const KIT_NAV_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis'];
+interface ShopifyVariant {
+  price: string;
+}
+interface ShopifyProduct {
+  title: string;
+  handle: string;
+  variants: ShopifyVariant[];
+}
+
+const HEADERS: Record<string, string> = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,*/*;q=0.8',
+  'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+};
 
 const scrapeAZ = async (): Promise<Product[]> => {
-  let browser: any;
   try {
-    browser = await launchBrowser(true);
+    // Discover kit collection URL from homepage navigation
+    const homeRes = await fetch(STORE_BASE, { headers: HEADERS });
+    if (!homeRes.ok) return [];
+    const homeHtml = await homeRes.text();
+    const $ = cheerio.load(homeHtml);
 
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8' });
-
-    await page.goto(STORE_BASE, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise((r) => setTimeout(r, 1500));
-
-    // Discover kit collection URL from navigation
-    const kitUrl: string | null = await page.evaluate(
-      (storeBase: string, keywords: string[]) => {
-        const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('nav a, header a'));
-        for (const link of links) {
-          const text = (link.textContent || '').toLowerCase();
-          const href = link.getAttribute('href') || '';
-          if (keywords.some((k) => text.includes(k)) && href.includes('/collections/')) {
-            return href.startsWith('http') ? href : `${storeBase}${href}`;
-          }
+    let collectionSlug = 'shirts';
+    $('nav a, header a').each((_: number, el: AnyNode) => {
+      const text = $(el).text().toLowerCase();
+      const href = $(el).attr('href') || '';
+      if (KIT_KEYWORDS.some((k) => text.includes(k)) && href.includes('/collections/')) {
+        const m = href.match(/\/collections\/([^/?#]+)/);
+        if (m) {
+          collectionSlug = m[1];
+          return false; // break each
         }
-        return null;
-      },
-      STORE_BASE,
-      KIT_NAV_KEYWORDS,
-    );
-
-    const targetUrl = kitUrl ?? `${STORE_BASE}/collections/all`;
-
-    const response = await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-    if (!response || response.status() >= 400) {
-      await browser.close();
-      return [];
-    }
-
-    await new Promise((r) => setTimeout(r, 1500));
-    await page.waitForSelector('a[href*="/products/"]', { timeout: 8000 }).catch(() => {});
-
-    const products: Product[] = await page.evaluate((storeBase: string) => {
-      const results: Array<{ name: string; price: number; productUrl: string; currency: string }> =
-        [];
-      const seen = new Set<string>();
-
-      const anchors = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>('a[href*="/products/"]'),
-      );
-
-      for (const anchor of anchors) {
-        const href = anchor.getAttribute('href') || '';
-        const productUrl = href.startsWith('http') ? href : `${storeBase}${href}`;
-        if (productUrl.includes('?') || productUrl.includes('#')) continue;
-        if (seen.has(productUrl)) continue;
-        seen.add(productUrl);
-
-        const card =
-          anchor.closest<HTMLElement>(
-            '.product-card-wrapper, .product-item, [class*="product-card"], [class*="product_card"]',
-          ) ?? anchor.parentElement;
-
-        let name = '';
-        const img = anchor.querySelector<HTMLImageElement>('img[alt]');
-        if (img) name = img.getAttribute('alt')?.trim() || '';
-        if (!name) {
-          const heading = card?.querySelector('h2, h3, h4, [class*="title"]');
-          name = heading?.textContent?.trim() || anchor.textContent?.trim() || '';
-        }
-        if (!name || name.length < 3) continue;
-
-        let price = 0;
-        let el: HTMLElement | null = anchor.parentElement;
-        for (let i = 0; i < 8; i++) {
-          if (!el) break;
-          const m = (el.innerText || '').match(/€\s*([\d]+[.,][\d]+)/);
-          if (m) {
-            price = parseFloat(m[1].replace(',', '.'));
-            break;
-          }
-          el = el.parentElement;
-        }
-        if (price <= 0) continue;
-
-        results.push({ name, productUrl, price, currency: 'EUR' });
       }
-      return results;
-    }, STORE_BASE);
+    });
 
-    await browser.close();
-    return products;
-  } catch (e) {
-    console.error('Error in scrapeAZ:', e);
-    if (browser) await browser.close();
+    const jsonRes = await fetch(
+      `${STORE_BASE}/collections/${collectionSlug}/products.json?limit=250`,
+      { headers: { ...HEADERS, Accept: 'application/json' } },
+    );
+    if (!jsonRes.ok) return [];
+    const text = await jsonRes.text();
+    if (text.trimStart().startsWith('<')) return []; // bot-protection HTML
+    const data = JSON.parse(text) as { products: ShopifyProduct[] };
+
+    const seen = new Set<string>();
+    return (data.products ?? []).flatMap((p) => {
+      const productUrl = `${STORE_BASE}/products/${p.handle}`;
+      if (seen.has(productUrl)) return [];
+      seen.add(productUrl);
+      const price = parseFloat(p.variants?.[0]?.price ?? '0');
+      if (!p.title || price <= 0) return [];
+      return [{ name: p.title, productUrl, price, currency: 'EUR' }];
+    });
+  } catch {
     return [];
   }
 };
-
 export default scrapeAZ;
