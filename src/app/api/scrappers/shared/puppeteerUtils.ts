@@ -18,8 +18,7 @@ export async function launchBrowser(stealth = false): Promise<Browser> {
     const launchOptions = {
       args: [...chromium.args, '--single-process'],
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless as true,
-      defaultViewport: chromium.defaultViewport,
+      headless: true as const,
     };
     if (stealth) {
       const { addExtra } = await import('puppeteer-extra');
