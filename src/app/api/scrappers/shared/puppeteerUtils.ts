@@ -16,9 +16,10 @@ export async function launchBrowser(stealth = false): Promise<Browser> {
     const chromium = (await import('@sparticuz/chromium')).default;
     const puppeteerCore = await import('puppeteer-core');
     const launchOptions = {
-      args: chromium.args,
+      args: [...chromium.args, '--single-process'],
       executablePath: await chromium.executablePath(),
-      headless: true as const,
+      headless: chromium.headless as true,
+      defaultViewport: chromium.defaultViewport,
     };
     if (stealth) {
       const { addExtra } = await import('puppeteer-extra');

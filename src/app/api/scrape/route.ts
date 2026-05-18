@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Puppeteer scrapers can take 20–60 s; Vercel default is 10 s.
+export const maxDuration = 300;
+
 import { auth } from '../../../auth';
 import { prisma } from '../../../lib/prisma';
 import { processProducts } from './productsProcessor';
