@@ -56,6 +56,14 @@ import scrapePalmeiras from './Brasileirão/Palmeiras/Palmeiras';
 
 // — Primera División —
 import scrapeBocaJuniors from './PrimeraDivisión/BocaJuniors/BocaJuniors';
+import scrapeEstudiantes from './PrimeraDivisión/Estudiantes/Estudiantes';
+import scrapeHuracán from './PrimeraDivisión/Huracán/Huracán';
+import scrapeIndependiente from './PrimeraDivisión/Independiente/Independiente';
+import scrapeRacingClub from './PrimeraDivisión/RacingClub/RacingClub';
+import scrapeRiverPlate from './PrimeraDivisión/RiverPlate/RiverPlate';
+import scrapeRosarioCentral from './PrimeraDivisión/RosarioCentral/RosarioCentral';
+import scrapeSanLorenzo from './PrimeraDivisión/SanLorenzo/SanLorenzo';
+import scrapeVélezSarsfield from './PrimeraDivisión/VélezSarsfield/VélezSarsfield';
 
 // — La Liga —
 import scrapeAtleticoMadrid from './LaLiga/AtléticoMadrid/AtléticoMadrid';
@@ -144,6 +152,14 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
 
   // Primera División
   'Boca Juniors': scrapeBocaJuniors,
+  'River Plate': scrapeRiverPlate,
+  'San Lorenzo': scrapeSanLorenzo,
+  Independiente: scrapeIndependiente,
+  Estudiantes: scrapeEstudiantes,
+  'Vélez Sarsfield': scrapeVélezSarsfield,
+  'Rosario Central': scrapeRosarioCentral,
+  'Racing Club': scrapeRacingClub,
+  Huracán: scrapeHuracán,
 
   // La Liga
   'Atlético Madrid': scrapeAtleticoMadrid,
