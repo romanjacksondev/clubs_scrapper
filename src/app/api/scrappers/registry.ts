@@ -92,6 +92,22 @@ import scrapeNapoli from './SerieA/Napoli/Napoli';
 import scrapeTorino from './SerieA/Torino/Torino';
 import scrapeUdinese from './SerieA/Udinese/Udinese';
 
+// — MLS —
+import scrapeInterMiami from './MLS/InterMiami/InterMiami';
+import scrapeLAGalaxy from './MLS/LAGalaxy/LAGalaxy';
+import scrapeNewYorkCityFC from './MLS/NewYorkCityFC/NewYorkCityFC';
+
+// — Ligue 1 —
+import scrapeMarseille from './Ligue1/Marseille/Marseille';
+import scrapeMonaco from './Ligue1/Monaco/Monaco';
+import scrapeOlympiqueLyonnais from './Ligue1/OlympiqueLyonnais/OlympiqueLyonnais';
+import scrapePSG from './Ligue1/PSG/PSG';
+
+// — Liga MX —
+import scrapeChivas from './LigaMX/ChivasGuadalajara/ChivasGuadalajara';
+import scrapeClubAmerica from './LigaMX/ClubAmerica/ClubAmerica';
+import scrapeCruzAzul from './LigaMX/CruzAzul/CruzAzul';
+
 // — Primeira Liga —
 import scrapeBenfica from './PrimeiraLiga/Benfica/Benfica';
 import scrapePorto from './PrimeiraLiga/Porto/Porto';
@@ -192,6 +208,22 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Napoli: scrapeNapoli,
   Torino: scrapeTorino,
   Udinese: scrapeUdinese,
+
+  // MLS
+  'Inter Miami': scrapeInterMiami,
+  'LA Galaxy': scrapeLAGalaxy,
+  'New York City FC': scrapeNewYorkCityFC,
+
+  // Ligue 1
+  Marseille: scrapeMarseille,
+  Monaco: scrapeMonaco,
+  'Olympique Lyonnais': scrapeOlympiqueLyonnais,
+  'Paris Saint-Germain': scrapePSG,
+
+  // Liga MX
+  'Chivas Guadalajara': scrapeChivas,
+  'Club América': scrapeClubAmerica,
+  'Cruz Azul': scrapeCruzAzul,
 
   // Primeira Liga
   Benfica: scrapeBenfica,
