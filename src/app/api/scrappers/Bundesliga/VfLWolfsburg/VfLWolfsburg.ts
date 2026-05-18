@@ -1,9 +1,9 @@
 // VfL Wolfsburg official store (shop.vfl-wolfsburg.de) — Shopware 6.
-// Jerseys at /trikots-co/spieloutfits/heim/ and /auswaerts/ (products are JS-rendered, requires Puppeteer).
-// Card: .product-box, name: a.product-image-link[title], price: .product-price-info
+// Products are server-rendered in static HTML — no JS rendering needed.
+// Card: div.card.product-box, name: a.product-image-link[title], price: span.product-price
 
+import * as cheerio from 'cheerio';
 import { Product } from '../../shared/Product';
-import { launchBrowser } from '../../shared/puppeteerUtils';
 
 const BASE_URL = 'https://shop.vfl-wolfsburg.de';
 
@@ -12,52 +12,43 @@ const KIT_PAGES = [
   `${BASE_URL}/trikots-co/spieloutfits/auswaerts/`,
 ];
 
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept-Language': 'de-DE,de;q=0.9',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+};
+
 export default async function scrapeVfLWolfsburg(): Promise<Product[]> {
-  let browser: any;
-  try {
-    browser = await launchBrowser(true);
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'de-DE,de;q=0.9' });
+  const products: Product[] = [];
+  const seen = new Set<string>();
 
-    const products: Product[] = [];
-    const seen = new Set<string>();
+  for (const pageUrl of KIT_PAGES) {
+    try {
+      const res = await fetch(pageUrl, { headers: HEADERS });
+      if (!res.ok) continue;
+      const html = await res.text();
+      const $ = cheerio.load(html);
 
-    for (const pageUrl of KIT_PAGES) {
-      const response = await page.goto(pageUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-      if (!response || response.status() >= 400) continue;
+      $('.product-box').each((_, el) => {
+        const link = $(el).find('a.product-image-link');
+        const name = link.attr('title')?.trim() || '';
+        const href = link.attr('href') || '';
+        const productUrl = href.startsWith('http') ? href : `${BASE_URL}${href}`;
 
-      await new Promise((r) => setTimeout(r, 1000));
-      await page.waitForSelector('.product-box', { timeout: 8000 }).catch(() => {});
+        const priceText = $(el).find('.product-price').first().text();
+        const m = priceText.match(/([\d]+,[\d]+)/);
+        const price = m ? parseFloat(m[1].replace(',', '.')) : 0;
 
-      const pageProducts: Product[] = await page.evaluate((base: string) => {
-        return Array.from(document.querySelectorAll<HTMLElement>('.product-box')).map((card) => {
-          const link = card.querySelector<HTMLAnchorElement>('a.product-image-link');
-          const name = link?.getAttribute('title')?.trim() || '';
-          const href = link?.getAttribute('href') || '';
-          const productUrl = href.startsWith('http') ? href : `${base}${href}`;
-          const priceText = card.querySelector('.product-price-info')?.textContent || '';
-          const m = priceText.match(/([\d]+,[\d]+)\s*€/);
-          const price = m ? parseFloat(m[1].replace(',', '.')) : 0;
-          return { name, productUrl, price, currency: 'EUR' };
-        });
-      }, BASE_URL);
-
-      for (const p of pageProducts) {
-        if (p.name && p.price > 0 && !seen.has(p.productUrl)) {
-          seen.add(p.productUrl);
-          products.push(p);
+        if (name && price > 0 && !seen.has(productUrl)) {
+          seen.add(productUrl);
+          products.push({ name, productUrl, price, currency: 'EUR' });
         }
-      }
+      });
+    } catch (e) {
+      console.error(`scrapeVfLWolfsburg error on ${pageUrl}:`, e);
     }
-
-    await browser.close();
-    return products;
-  } catch (e) {
-    console.error('scrapeVfLWolfsburg error:', e);
-    if (browser) await browser.close();
-    return [];
   }
+
+  return products;
 }
