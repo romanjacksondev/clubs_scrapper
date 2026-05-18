@@ -6,6 +6,7 @@
 // URL: first <a> href inside the product container.
 
 import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://tiendavelez.com.ar';
@@ -18,7 +19,7 @@ const HEADERS: Record<string, string> = {
   'Accept-Language': 'es-AR,es;q=0.9',
 };
 
-function parseTiendanubePrice($el: cheerio.Cheerio<cheerio.AnyNode>): number {
+function parseTiendanubePrice($el: cheerio.Cheerio<AnyNode>): number {
   const variantsAttr = $el.find('[data-variants]').attr('data-variants');
   if (variantsAttr) {
     try {
