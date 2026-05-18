@@ -46,7 +46,7 @@ const scrapeFrosinone = async (): Promise<Product[]> => {
 
       $('li.product').each((_, el) => {
         const $el = $(el);
-        const productUrl = $el.find('a.woocommerce-LoopProduct-link').first().attr('href') || '';
+        const productUrl = $el.find('a[href*="/product/"]').first().attr('href') || '';
         const name = $el.find('.woocommerce-loop-product__title').first().text().trim();
         const price = parseWcPrice($el);
 

@@ -1,5 +1,7 @@
 // Fanatics Italy platform (bolognafcstore.com) — SSR with React/Next.js.
-// Products are listed as full-URL text anchors; the price text follows the title link.
+// The top-level /it/kit-gara page only lists sub-categories; individual products
+// live on pages like /it/kit-gara/kit-gara-home-2526.
+// Prices are in data-product-price / data-product-promo-price (cents).
 
 import { Product } from '../../shared/Product';
 
@@ -13,82 +15,69 @@ const HEADERS: Record<string, string> = {
   'Accept-Language': 'it-IT,it;q=0.9',
 };
 
-// Navigation and informational slugs that are not product pages.
-const NAV_SLUGS = new Set([
-  'kit-gara',
-  'abbigliamento',
-  'bambino-e-neonato',
-  'accessori',
-  'idee-regalo',
-  'outlet',
-  'mid-season-promo',
-  'accedi',
-  'lacquisto',
-  'metodi-di-pagamento',
-  'la-spedizione',
-  'buoni-regalo-gift-card',
-  'tracciamento-ordine',
-  'tracciamento-reso',
-  'customer-care',
-  'registrazione',
-  'resi-amp-rimborsi',
-  'fanatics-italy-srl',
-  'condizioni-generali-di-vendita',
-  'privacy',
-  'cookie-policy',
-  'bologna-fc-store',
-  'bologna-store',
-  'bologna-pop-up-store',
-  'back-to-spring',
-]);
-
-/**
- * Extract the current selling price from the HTML chunk following a product anchor.
- *
- * Handles these Fanatics price patterns (after stripping tags):
- *   - Plain price:            "€ 68,00"
- *   - Discounted:             "€ 69,00 Prima era: € 99,00 (-30%)"  → current = first
- *   - Bundle discounted:      "Valore Bundle: € 147,00 (-30%) € 103,00" → current = last
- */
-function extractCurrentPrice(chunk: string): number {
-  const text = chunk.replace(/<[^>]+>/g, ' ');
-  const prices = [...text.matchAll(/€\s*([\d,]+)/g)].map((m) => parseFloat(m[1].replace(',', '.')));
-  if (prices.length === 0) return 0;
-  if (text.includes('Valore Bundle:') && prices.length >= 2) {
-    return prices[prices.length - 1];
-  }
-  return prices[0];
+/** Extract price in EUR from data-product card attributes (values are in cents). */
+function priceFromCard(cardHtml: string): number {
+  const inPromo = /data-product-in-promo="1"/.test(cardHtml);
+  const promoMatch = cardHtml.match(/data-product-promo-price="(\d+)"/);
+  const regularMatch = cardHtml.match(/data-product-price="(\d+)"/);
+  const cents = inPromo && promoMatch ? promoMatch[1] : regularMatch?.[1];
+  if (!cents || cents === '0') return 0;
+  return parseInt(cents, 10) / 100;
 }
 
 const scrapeBologna = async (): Promise<Product[]> => {
   try {
-    const res = await fetch(KITS_URL, { headers: HEADERS });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
+    // Step 1: find sub-category pages from the kit-gara index
+    const indexRes = await fetch(KITS_URL, { headers: HEADERS });
+    if (!indexRes.ok) throw new Error(`HTTP ${indexRes.status}`);
+    const indexHtml = await indexRes.text();
 
+    const subCatRe = /href="(https:\/\/www\.bolognafcstore\.com\/it\/kit-gara\/[\w-]+)"/g;
+    const subCategories = new Set<string>();
+    let sm: RegExpExecArray | null;
+    while ((sm = subCatRe.exec(indexHtml)) !== null) subCategories.add(sm[1]);
+
+    if (subCategories.size === 0) throw new Error('No sub-categories found on kit-gara page');
+
+    // Step 2: scrape each sub-category page for product cards
     const products: Product[] = [];
     const seen = new Set<string>();
 
-    // Match text-only anchors with a first-level /it/ slug (no sub-paths in the href).
-    // [^<]{5,120} ensures the content is plain text (no child elements like <img>).
-    const anchorRe =
-      /href="(https:\/\/www\.bolognafcstore\.com\/it\/([\w-]+))"[^>]*>([^<]{5,120})<\/a>/g;
-    let m: RegExpExecArray | null;
-    while ((m = anchorRe.exec(html)) !== null) {
-      const productUrl = m[1];
-      const slug = m[2];
-      const name = m[3].trim();
+    for (const catUrl of subCategories) {
+      try {
+        const res = await fetch(catUrl, { headers: HEADERS });
+        if (!res.ok) continue;
+        const html = await res.text();
 
-      if (NAV_SLUGS.has(slug) || seen.has(productUrl)) continue;
-      // Product names start with a capital letter and contain at least one space.
-      if (!/^[A-Z]/.test(name) || !name.includes(' ')) continue;
+        // Each product card: <div class="product-card" data-product-price="..." ...>
+        const cardRe = /<div class="product-card"((?:[^>]|\n)*?)>(.*?)<\/figure>/gs;
+        let m: RegExpExecArray | null;
+        while ((m = cardRe.exec(html)) !== null) {
+          const attrs = m[1];
+          const body = m[0];
 
-      const chunkStart = m.index + m[0].length;
-      const price = extractCurrentPrice(html.substring(chunkStart, chunkStart + 500));
-      if (price <= 0) continue;
+          // Product URL from the first <a href="..."> inside the card
+          const urlMatch = body.match(
+            /href="(https:\/\/www\.bolognafcstore\.com\/it\/bologna-[\w-]+)"/,
+          );
+          if (!urlMatch) continue;
+          const productUrl = urlMatch[1];
+          if (seen.has(productUrl)) continue;
 
-      seen.add(productUrl);
-      products.push({ name, productUrl, price, currency: 'EUR' });
+          // Product name from img alt attribute
+          const nameMatch = body.match(/alt="([^"]{5,120})"/);
+          if (!nameMatch) continue;
+          const name = nameMatch[1].trim();
+
+          const price = priceFromCard(attrs);
+          if (price <= 0) continue;
+
+          seen.add(productUrl);
+          products.push({ name, productUrl, price, currency: 'EUR' });
+        }
+      } catch {
+        // skip failing sub-category
+      }
     }
 
     return products;
