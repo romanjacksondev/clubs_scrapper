@@ -50,7 +50,7 @@ const scrapeBologna = async (): Promise<Product[]> => {
         const html = await res.text();
 
         // Each product card: <div class="product-card" data-product-price="..." ...>
-        const cardRe = /<div class="product-card"((?:[^>]|\n)*?)>(.*?)<\/figure>/gs;
+        const cardRe = /<div class="product-card"((?:[^>]|\n)*?)>([\s\S]*?)<\/figure>/g;
         let m: RegExpExecArray | null;
         while ((m = cardRe.exec(html)) !== null) {
           const attrs = m[1];

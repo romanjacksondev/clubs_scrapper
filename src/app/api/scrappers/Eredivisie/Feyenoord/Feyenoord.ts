@@ -1,135 +1,95 @@
 // Feyenoord official store (www.feyenoordshop.nl).
-// Platform is not standard Shopify (the JSON API returns HTML); Puppeteer
-// is used to navigate the store and extract product cards.
-// Navigates to the homepage, finds the jersey/kit collection link in the
-// navigation, then scrapes product cards from that page.
+// The store has an invalid TLS certificate and the Shopify JSON API returns HTML
+// (likely Cloudflare). Node's https module with rejectUnauthorized: false is used
+// to bypass the certificate error; static HTML is parsed with cheerio.
 
+import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
+import https from 'https';
 import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://www.feyenoordshop.nl';
-
 const KIT_NAV_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis', 'trikot'];
 
+const TLS_AGENT = new https.Agent({ rejectUnauthorized: false });
+
+const REQ_HEADERS: Record<string, string> = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+};
+
+function httpsGet(url: string, depth = 0): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, { agent: TLS_AGENT, headers: REQ_HEADERS }, (res) => {
+      if (
+        depth < 5 &&
+        res.statusCode &&
+        res.statusCode >= 300 &&
+        res.statusCode < 400 &&
+        res.headers.location
+      ) {
+        resolve(httpsGet(res.headers.location, depth + 1));
+        return;
+      }
+      let body = '';
+      res.on('data', (chunk: Buffer) => {
+        body += chunk.toString();
+      });
+      res.on('end', () => resolve(body));
+    });
+    req.on('error', reject);
+    req.setTimeout(20000, () => req.destroy(new Error('timeout')));
+  });
+}
+
 const scrapeFeyenoord = async (): Promise<Product[]> => {
-  let browser: any;
   try {
-    // --ignore-certificate-errors handles the invalid TLS cert on www.feyenoordshop.nl
-    const isVercel = !!process.env.VERCEL;
-    if (isVercel) {
-      const chromium = (await import('@sparticuz/chromium')).default;
-      const puppeteerCore = await import('puppeteer-core');
-      browser = await puppeteerCore.launch({
-        args: [...chromium.args, '--ignore-certificate-errors'],
-        executablePath: await chromium.executablePath(),
-        headless: true,
-      });
-    } else {
-      const puppeteer = await import('puppeteer');
-      browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--ignore-certificate-errors'],
-      });
-    }
-
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8' });
-
-    await page.goto(STORE_BASE, { waitUntil: 'networkidle2', timeout: 60000 });
-    await new Promise((r) => setTimeout(r, 1500));
-
-    // Discover kit collection URL from navigation
-    const kitUrl: string | null = await page.evaluate(
-      (storeBase: string, keywords: string[]) => {
-        const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('nav a, header a'));
-        for (const link of links) {
-          const text = (link.textContent || '').toLowerCase();
-          const href = link.getAttribute('href') || '';
-          if (keywords.some((k) => text.includes(k)) && href.length > 1) {
-            return href.startsWith('http') ? href : `${storeBase}${href}`;
-          }
-        }
-        return null;
-      },
-      STORE_BASE,
-      KIT_NAV_KEYWORDS,
-    );
+    const homeHtml = await httpsGet(STORE_BASE);
+    const $ = cheerio.load(homeHtml);
+    let kitUrl: string | null = null;
+    $('nav a, header a').each((_: number, el: AnyNode) => {
+      const text = $(el).text().toLowerCase();
+      const href = $(el).attr('href') || '';
+      if (KIT_NAV_KEYWORDS.some((k) => text.includes(k)) && href.length > 1) {
+        kitUrl = href.startsWith('http') ? href : `${STORE_BASE}${href}`;
+        return false;
+      }
+    });
 
     const targetUrl = kitUrl ?? STORE_BASE;
+    const collHtml = await httpsGet(targetUrl);
+    const $c = cheerio.load(collHtml);
+    const seen = new Set<string>();
+    const products: Product[] = [];
+    $c('a').each((_: number, el: AnyNode) => {
+      const href = $c(el).attr('href') || '';
+      if (!href.includes('product') || href.includes('?') || href.includes('#')) return;
+      const productUrl = href.startsWith('http') ? href : `${STORE_BASE}${href}`;
+      if (seen.has(productUrl)) return;
+      seen.add(productUrl);
 
-    if (kitUrl && kitUrl !== STORE_BASE) {
-      const response = await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-      if (!response || response.status() >= 400) {
-        await browser.close();
-        return [];
+      let name = $c(el).find('img[alt]').first().attr('alt')?.trim() || '';
+      if (!name) {
+        name = $c(el).find('h2, h3, h4, [class*="title"], [class*="name"]').first().text().trim();
       }
-      await new Promise((r) => setTimeout(r, 1500));
-    }
+      if (!name) name = $c(el).text().trim();
+      if (!name || name.length < 3) return;
 
-    await page
-      .waitForSelector('a[href*="product"], .product-card, .product-item, [class*="product"]', {
-        timeout: 8000,
-      })
-      .catch(() => {});
-
-    const products: Product[] = await page.evaluate((storeBase: string) => {
-      const results: Array<{ name: string; price: number; productUrl: string; currency: string }> =
-        [];
-      const seen = new Set<string>();
-
-      // Generic product anchor selector — covers most e-commerce platforms
-      const anchors = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>(
-          'a[href*="product"], a[href*="/p/"], a[href*="/shop/"]',
-        ),
+      const card = $c(el).closest(
+        '[class*="product-card"], [class*="product_card"], [class*="product-item"], [class*="ProductCard"]',
       );
+      const priceText = (card.length ? card : $c(el).parent()).text();
+      const priceMatch = priceText.match(/€\s*([\d]+[.,][\d]+)/);
+      if (!priceMatch) return;
+      const price = parseFloat(priceMatch[1].replace(',', '.'));
+      if (price <= 0) return;
 
-      for (const anchor of anchors) {
-        const href = anchor.getAttribute('href') || '';
-        if (!href || href.includes('?') || href.includes('#')) continue;
-        const productUrl = href.startsWith('http') ? href : `${storeBase}${href}`;
-        if (seen.has(productUrl)) continue;
-        seen.add(productUrl);
-
-        const card =
-          anchor.closest<HTMLElement>(
-            '.product-card-wrapper, .product-item, [class*="product-card"], [class*="product_card"], [class*="ProductCard"]',
-          ) ?? anchor.parentElement;
-
-        let name = '';
-        const img = anchor.querySelector<HTMLImageElement>('img[alt]');
-        if (img) name = img.getAttribute('alt')?.trim() || '';
-        if (!name) {
-          const heading = card?.querySelector('h2, h3, h4, [class*="title"], [class*="name"]');
-          name = heading?.textContent?.trim() || anchor.textContent?.trim() || '';
-        }
-        if (!name || name.length < 3) continue;
-
-        let price = 0;
-        let el: HTMLElement | null = anchor.parentElement;
-        for (let i = 0; i < 8; i++) {
-          if (!el) break;
-          const m = (el.innerText || '').match(/€\s*([\d]+[.,][\d]+)/);
-          if (m) {
-            price = parseFloat(m[1].replace(',', '.'));
-            break;
-          }
-          el = el.parentElement;
-        }
-        if (price <= 0) continue;
-
-        results.push({ name, productUrl, price, currency: 'EUR' });
-      }
-      return results;
-    }, STORE_BASE);
-
-    await browser.close();
+      products.push({ name, productUrl, price, currency: 'EUR' });
+    });
     return products;
-  } catch (e) {
-    console.error('Error in scrapeFeyenoord:', e);
-    if (browser) await browser.close();
+  } catch {
     return [];
   }
 };
