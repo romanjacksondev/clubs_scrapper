@@ -20,10 +20,16 @@ const HEADERS: Record<string, string> = {
 function parsePrice(text: string): number {
   const raw = text.replace(/[^0-9.,]/g, '').trim();
   if (!raw) return 0;
-  // Argentine format: period = thousands separator (e.g. "220.000" → 220000)
+  // "1.234,56" — period thousands, comma decimal
+  if (/^\d{1,3}(\.\d{3})+(,\d{2})?$/.test(raw))
+    return parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+  // "1234,56" — comma decimal only
   if (/^\d+,\d{2}$/.test(raw)) return parseFloat(raw.replace(',', '.'));
-  if (/^\d+\.\d{2}$/.test(raw)) return parseFloat(raw);
-  return parseFloat(raw.replace(/\./g, '').replace(',', '.')) || 0;
+  // "1234.56" — period decimal only
+  if (/^\d+\.\d{1,2}$/.test(raw)) return parseFloat(raw);
+  // "220.000" — period thousands, no decimal (integer)
+  if (/^\d+\.\d{3}$/.test(raw)) return parseFloat(raw.replace('.', ''));
+  return parseFloat(raw) || 0;
 }
 
 export default async function scrapeRacingClub(): Promise<Product[]> {
@@ -47,12 +53,12 @@ export default async function scrapeRacingClub(): Promise<Product[]> {
         const urlPath = $el.find('a.price_wrapper[href]').first().attr('href') ?? '';
         const productUrl = urlPath ? `${BASE_URL}${urlPath}` : '';
 
-        if (!name || price <= 0 || !productUrl || seen.has(productUrl)) return;
+        if (!name || !priceText || price <= 0 || !productUrl || seen.has(productUrl)) return;
         seen.add(productUrl);
         products.push({ name, productUrl, price, currency: 'ARS' });
       });
-    } catch (e) {
-      console.error(`Error scraping Racing Club ${pageUrl}:`, e);
+    } catch {
+      continue;
     }
   }
 
