@@ -13,8 +13,30 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [minDiscount]);
 
+  const [sortCol, setSortCol] = useState<'league' | 'club' | 'discount' | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
   const { discountedProducts, loading: loadingDiscounts } =
     useDiscountedProducts(debouncedDiscount);
+
+  function handleSort(col: 'league' | 'club' | 'discount') {
+    if (sortCol === col) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortCol(col);
+      setSortDir('asc');
+    }
+  }
+
+  const sortedProducts = sortCol
+    ? [...discountedProducts].sort((a, b) => {
+        let cmp = 0;
+        if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
+        else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
+        else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
+        return sortDir === 'asc' ? cmp : -cmp;
+      })
+    : discountedProducts;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 w-full">
@@ -64,11 +86,17 @@ export default function Home() {
             <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
               <thead className="bg-gray-100 dark:bg-gray-700">
                 <tr>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    League
+                  <th
+                    className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
+                    onClick={() => handleSort('league')}
+                  >
+                    League{sortCol === 'league' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                   </th>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    Club
+                  <th
+                    className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
+                    onClick={() => handleSort('club')}
+                  >
+                    Club{sortCol === 'club' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                   </th>
                   <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Product
@@ -79,8 +107,11 @@ export default function Home() {
                   <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Now
                   </th>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    Discount
+                  <th
+                    className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
+                    onClick={() => handleSort('discount')}
+                  >
+                    Discount{sortCol === 'discount' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                   </th>
                   <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Actions
@@ -88,7 +119,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {discountedProducts.map((product) => (
+                {sortedProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
                       {product.leagueName}
