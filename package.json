@@ -15,6 +15,7 @@
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@sparticuz/chromium": "^148.0.0",
+    "@vercel/analytics": "^2.0.1",
     "autoprefixer": "^10.4.24",
     "cheerio": "^1.2.0",
     "flowbite": "^4.0.1",
