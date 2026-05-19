@@ -44,7 +44,8 @@ export default function Home() {
         if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
         else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
         else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
-        else if (sortCol === 'usd') cmp = (a.currentPriceUsd ?? Infinity) - (b.currentPriceUsd ?? Infinity);
+        else if (sortCol === 'usd')
+          cmp = (a.currentPriceUsd ?? Infinity) - (b.currentPriceUsd ?? Infinity);
         return sortDir === 'asc' ? cmp : -cmp;
       });
     }

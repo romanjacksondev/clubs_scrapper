@@ -128,10 +128,11 @@ export default function ProductHistoryPage() {
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} width={60} />
                   <Tooltip
-                    formatter={(value: number) => [
-                      formatPrice(value, product.currency),
-                      'Price',
-                    ]}
+                    formatter={(value) =>
+                      value != null
+                        ? [formatPrice(value as number, product.currency), 'Price']
+                        : ['-', 'Price']
+                    }
                   />
                   <Line
                     type="monotone"
