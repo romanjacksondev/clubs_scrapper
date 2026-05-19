@@ -54,3 +54,11 @@ model ProductHistory {
   currency   String   @default("USD")
   recordedAt DateTime @default(now())
 }
+
+// One row per currency. Stores the rate relative to USD (1 unit → USD).
+// Refreshed at most once per day by the exchange-rate utility.
+model ExchangeRate {
+  currency  String   @id
+  rateToUsd Float
+  updatedAt DateTime @updatedAt
+}

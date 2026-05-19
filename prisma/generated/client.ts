@@ -59,3 +59,8 @@ export type Product = Prisma.ProductModel
  * 
  */
 export type ProductHistory = Prisma.ProductHistoryModel
+/**
+ * Model ExchangeRate
+ * 
+ */
+export type ExchangeRate = Prisma.ExchangeRateModel

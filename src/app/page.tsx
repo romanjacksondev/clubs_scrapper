@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
 import { formatPrice } from '../lib/formatPrice';
 
@@ -15,9 +15,15 @@ export default function Home() {
 
   const [sortCol, setSortCol] = useState<'league' | 'club' | 'discount' | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [selectedLeague, setSelectedLeague] = useState('');
 
   const { discountedProducts, loading: loadingDiscounts } =
     useDiscountedProducts(debouncedDiscount);
+
+  const leagues = useMemo(
+    () => [...new Set(discountedProducts.map((p) => p.leagueName))].sort(),
+    [discountedProducts],
+  );
 
   function handleSort(col: 'league' | 'club' | 'discount') {
     if (sortCol === col) {
@@ -28,15 +34,21 @@ export default function Home() {
     }
   }
 
-  const sortedProducts = sortCol
-    ? [...discountedProducts].sort((a, b) => {
+  const sortedProducts = useMemo(() => {
+    let list = selectedLeague
+      ? discountedProducts.filter((p) => p.leagueName === selectedLeague)
+      : discountedProducts;
+    if (sortCol) {
+      list = [...list].sort((a, b) => {
         let cmp = 0;
         if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
         else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
         else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
         return sortDir === 'asc' ? cmp : -cmp;
-      })
-    : discountedProducts;
+      });
+    }
+    return list;
+  }, [discountedProducts, selectedLeague, sortCol, sortDir]);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 w-full">
@@ -60,7 +72,7 @@ export default function Home() {
               </span>
             )}
           </h2>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">Min. discount</span>
             <input
               type="range"
@@ -77,6 +89,18 @@ export default function Home() {
             <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 w-16">
               {minDiscount}%
             </span>
+            <select
+              value={selectedLeague}
+              onChange={(e) => setSelectedLeague(e.target.value)}
+              className="ml-4 px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All leagues</option>
+              {leagues.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         {loadingDiscounts ? (
@@ -107,6 +131,9 @@ export default function Home() {
                   <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Now
                   </th>
+                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    ~USD
+                  </th>
                   <th
                     className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
                     onClick={() => handleSort('discount')}
@@ -135,6 +162,11 @@ export default function Home() {
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-green-700 dark:text-green-400 font-semibold">
                       {formatPrice(product.currentPrice, product.currency)}
+                    </td>
+                    <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm">
+                      {product.currentPriceUsd != null
+                        ? formatPrice(product.currentPriceUsd, 'USD')
+                        : '—'}
                     </td>
                     <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
                       <span className="inline-block bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 text-xs font-bold px-2 py-1 rounded">

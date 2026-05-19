@@ -54,7 +54,8 @@ export const ModelName = {
   League: 'League',
   Club: 'Club',
   Product: 'Product',
-  ProductHistory: 'ProductHistory'
+  ProductHistory: 'ProductHistory',
+  ExchangeRate: 'ExchangeRate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -122,6 +123,15 @@ export const ProductHistoryScalarFieldEnum = {
 } as const
 
 export type ProductHistoryScalarFieldEnum = (typeof ProductHistoryScalarFieldEnum)[keyof typeof ProductHistoryScalarFieldEnum]
+
+
+export const ExchangeRateScalarFieldEnum = {
+  currency: 'currency',
+  rateToUsd: 'rateToUsd',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExchangeRateScalarFieldEnum = (typeof ExchangeRateScalarFieldEnum)[keyof typeof ExchangeRateScalarFieldEnum]
 
 
 export const SortOrder = {
