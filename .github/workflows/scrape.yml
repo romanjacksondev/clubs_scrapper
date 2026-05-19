@@ -10,9 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger cron scrape
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -X POST "${{ secrets.APP_URL }}/api/cron" \
-            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+          echo "→ POST ${APP_URL}/api/cron"
+          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+            -X POST "${APP_URL}/api/cron" \
+            -H "x-cron-secret: ${CRON_SECRET}" \
             -H "Content-Type: application/json" \
-            --fail \
-            --show-error
+            --max-time 320)
+          echo "← HTTP ${HTTP_CODE}"
+          cat response.json
+          [ "$HTTP_CODE" -eq 200 ] || exit 1

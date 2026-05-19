@@ -29,37 +29,45 @@ export async function POST(request: NextRequest) {
 
   type Result = { club: string; status: 'ok' | 'empty' | 'error'; count?: number; error?: string };
 
-  const settled = await Promise.allSettled(
-    clubs.map(async (club): Promise<Result> => {
-      const data = await Promise.race([
-        (async () => {
-          const scrapper = launchScrapper(club.name);
-          return scrapper();
-        })(),
-        new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error(`Timed out after ${SCRAPER_TIMEOUT_MS / 1000}s`)),
-            SCRAPER_TIMEOUT_MS,
-          ),
-        ),
-      ]);
-      if (data.length === 0) {
-        return { club: club.name, status: 'empty', error: 'No products returned' };
-      }
-      const products = await processProducts(data, club.id);
-      return { club: club.name, status: 'ok', count: products.length };
-    }),
-  );
+  const BATCH_SIZE = 3;
+  const results: Result[] = [];
 
-  const results: Result[] = settled.map((s, i) =>
-    s.status === 'fulfilled'
-      ? s.value
-      : {
-          club: clubs[i].name,
-          status: 'error',
-          error: s.reason instanceof Error ? s.reason.message : String(s.reason),
-        },
-  );
+  for (let i = 0; i < clubs.length; i += BATCH_SIZE) {
+    const batch = clubs.slice(i, i + BATCH_SIZE);
+    const settled = await Promise.allSettled(
+      batch.map(async (club): Promise<Result> => {
+        const data = await Promise.race([
+          (async () => {
+            const scrapper = launchScrapper(club.name);
+            return scrapper();
+          })(),
+          new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error(`Timed out after ${SCRAPER_TIMEOUT_MS / 1000}s`)),
+              SCRAPER_TIMEOUT_MS,
+            ),
+          ),
+        ]);
+        if (data.length === 0) {
+          return { club: club.name, status: 'empty', error: 'No products returned' };
+        }
+        const products = await processProducts(data, club.id);
+        return { club: club.name, status: 'ok', count: products.length };
+      }),
+    );
+
+    for (const [j, s] of settled.entries()) {
+      results.push(
+        s.status === 'fulfilled'
+          ? s.value
+          : {
+              club: batch[j].name,
+              status: 'error',
+              error: s.reason instanceof Error ? s.reason.message : String(s.reason),
+            },
+      );
+    }
+  }
 
   await purgeOldHistory();
   return NextResponse.json({ results });
