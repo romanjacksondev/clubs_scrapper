@@ -35,15 +35,22 @@ function parsePrice(text: string): number {
 export default async function scrapeRacingClub(): Promise<Product[]> {
   const products: Product[] = [];
   const seen = new Set<string>();
+  const errors: string[] = [];
 
   for (const pageUrl of KIT_PAGES) {
     try {
       const res = await fetch(pageUrl, { headers: HEADERS });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        errors.push(`${pageUrl} → HTTP ${res.status}`);
+        continue;
+      }
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      $('article.PRODUCT_BOX').each((_, el) => {
+      const boxes = $('article.PRODUCT_BOX');
+      console.log(`[RacingClub] ${pageUrl}: ${boxes.length} articles found`);
+
+      boxes.each((_, el) => {
         const $el = $(el);
         if ($el.find('.price_wrapper.nonavailable').length) return;
 
@@ -57,9 +64,15 @@ export default async function scrapeRacingClub(): Promise<Product[]> {
         seen.add(productUrl);
         products.push({ name, productUrl, price, currency: 'ARS' });
       });
-    } catch {
-      continue;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      errors.push(`${pageUrl} → ${msg}`);
+      console.error(`[RacingClub] fetch error for ${pageUrl}:`, msg);
     }
+  }
+
+  if (products.length === 0 && errors.length > 0) {
+    throw new Error(`RacingClub: all pages failed — ${errors.join('; ')}`);
   }
 
   return products;
