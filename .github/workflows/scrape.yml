@@ -19,7 +19,8 @@ jobs:
             -X POST "${APP_URL}/api/cron" \
             -H "x-cron-secret: ${CRON_SECRET}" \
             -H "Content-Type: application/json" \
-            --max-time 320)
+            --max-time 320 \
+            -L)
           echo "← HTTP ${HTTP_CODE}"
           cat response.json
           [ "$HTTP_CODE" -eq 200 ] || exit 1
