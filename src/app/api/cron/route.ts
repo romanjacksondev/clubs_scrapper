@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Scraping all clubs can take several minutes; raise Vercel's default cap.
+export const maxDuration = 300;
+
 import { prisma } from '../../../lib/prisma';
 import { processProducts, purgeOldHistory } from '../scrape/productsProcessor';
 import { launchScrapper } from '../scrape/scrapperLauncher';
