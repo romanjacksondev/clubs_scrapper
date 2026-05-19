@@ -13,7 +13,7 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [minDiscount]);
 
-  const [sortCol, setSortCol] = useState<'league' | 'club' | 'discount' | null>(null);
+  const [sortCol, setSortCol] = useState<'league' | 'club' | 'discount' | 'usd' | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [selectedLeague, setSelectedLeague] = useState('');
 
@@ -25,7 +25,7 @@ export default function Home() {
     [discountedProducts],
   );
 
-  function handleSort(col: 'league' | 'club' | 'discount') {
+  function handleSort(col: 'league' | 'club' | 'discount' | 'usd') {
     if (sortCol === col) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -44,6 +44,7 @@ export default function Home() {
         if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
         else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
         else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
+        else if (sortCol === 'usd') cmp = (a.currentPriceUsd ?? Infinity) - (b.currentPriceUsd ?? Infinity);
         return sortDir === 'asc' ? cmp : -cmp;
       });
     }
@@ -131,8 +132,11 @@ export default function Home() {
                   <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Now
                   </th>
-                  <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                    ~USD
+                  <th
+                    className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
+                    onClick={() => handleSort('usd')}
+                  >
+                    ~USD{sortCol === 'usd' ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
                   </th>
                   <th
                     className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"

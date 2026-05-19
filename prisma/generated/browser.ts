@@ -42,3 +42,13 @@ export type ProductHistory = Prisma.ProductHistoryModel
  * 
  */
 export type ExchangeRate = Prisma.ExchangeRateModel
+/**
+ * Model ScrapeRun
+ * 
+ */
+export type ScrapeRun = Prisma.ScrapeRunModel
+/**
+ * Model ScrapeRunResult
+ * 
+ */
+export type ScrapeRunResult = Prisma.ScrapeRunResultModel

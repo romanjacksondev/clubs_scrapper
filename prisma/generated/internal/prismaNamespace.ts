@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.3.0
- * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+ * Prisma Client JS version: 7.8.0
+ * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.3.0",
-  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
+  client: "7.8.0",
+  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
 }
 
 /**
@@ -388,7 +388,9 @@ export const ModelName = {
   Club: 'Club',
   Product: 'Product',
   ProductHistory: 'ProductHistory',
-  ExchangeRate: 'ExchangeRate'
+  ExchangeRate: 'ExchangeRate',
+  ScrapeRun: 'ScrapeRun',
+  ScrapeRunResult: 'ScrapeRunResult'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -404,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "league" | "club" | "product" | "productHistory" | "exchangeRate"
+    modelProps: "league" | "club" | "product" | "productHistory" | "exchangeRate" | "scrapeRun" | "scrapeRunResult"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -778,6 +780,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ScrapeRun: {
+      payload: Prisma.$ScrapeRunPayload<ExtArgs>
+      fields: Prisma.ScrapeRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScrapeRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScrapeRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        findFirst: {
+          args: Prisma.ScrapeRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScrapeRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        findMany: {
+          args: Prisma.ScrapeRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>[]
+        }
+        create: {
+          args: Prisma.ScrapeRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        createMany: {
+          args: Prisma.ScrapeRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScrapeRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>[]
+        }
+        delete: {
+          args: Prisma.ScrapeRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        update: {
+          args: Prisma.ScrapeRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScrapeRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScrapeRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScrapeRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScrapeRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunPayload>
+        }
+        aggregate: {
+          args: Prisma.ScrapeRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScrapeRun>
+        }
+        groupBy: {
+          args: Prisma.ScrapeRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScrapeRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScrapeRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScrapeRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    ScrapeRunResult: {
+      payload: Prisma.$ScrapeRunResultPayload<ExtArgs>
+      fields: Prisma.ScrapeRunResultFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScrapeRunResultFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScrapeRunResultFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        findFirst: {
+          args: Prisma.ScrapeRunResultFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScrapeRunResultFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        findMany: {
+          args: Prisma.ScrapeRunResultFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>[]
+        }
+        create: {
+          args: Prisma.ScrapeRunResultCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        createMany: {
+          args: Prisma.ScrapeRunResultCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScrapeRunResultCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>[]
+        }
+        delete: {
+          args: Prisma.ScrapeRunResultDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        update: {
+          args: Prisma.ScrapeRunResultUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScrapeRunResultDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScrapeRunResultUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScrapeRunResultUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScrapeRunResultUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScrapeRunResultPayload>
+        }
+        aggregate: {
+          args: Prisma.ScrapeRunResultAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScrapeRunResult>
+        }
+        groupBy: {
+          args: Prisma.ScrapeRunResultGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScrapeRunResultGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScrapeRunResultCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScrapeRunResultCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -875,6 +1025,27 @@ export const ExchangeRateScalarFieldEnum = {
 } as const
 
 export type ExchangeRateScalarFieldEnum = (typeof ExchangeRateScalarFieldEnum)[keyof typeof ExchangeRateScalarFieldEnum]
+
+
+export const ScrapeRunScalarFieldEnum = {
+  id: 'id',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt'
+} as const
+
+export type ScrapeRunScalarFieldEnum = (typeof ScrapeRunScalarFieldEnum)[keyof typeof ScrapeRunScalarFieldEnum]
+
+
+export const ScrapeRunResultScalarFieldEnum = {
+  id: 'id',
+  scrapeRunId: 'scrapeRunId',
+  clubName: 'clubName',
+  status: 'status',
+  count: 'count',
+  error: 'error'
+} as const
+
+export type ScrapeRunResultScalarFieldEnum = (typeof ScrapeRunResultScalarFieldEnum)[keyof typeof ScrapeRunResultScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1055,6 +1226,21 @@ export type PrismaClientOptions = ({
    * ```
    */
   comments?: runtime.SqlCommenterPlugin[]
+  /**
+   * Optional maximum size for the query plan cache. If not provided, a default size will be used.
+   * A value of `0` can be used to disable the cache entirely. A higher cache size can improve
+   * performance for applications that execute a large number of unique queries, while a smaller
+   * cache size can reduce memory usage.
+   * 
+   * @example
+   * ```
+   * const prisma = new PrismaClient({
+   *   adapter,
+   *   queryPlanCacheMaxSize: 100,
+   * })
+   * ```
+   */
+  queryPlanCacheMaxSize?: number
 }
 export type GlobalOmitConfig = {
   league?: Prisma.LeagueOmit
@@ -1062,6 +1248,8 @@ export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
   productHistory?: Prisma.ProductHistoryOmit
   exchangeRate?: Prisma.ExchangeRateOmit
+  scrapeRun?: Prisma.ScrapeRunOmit
+  scrapeRunResult?: Prisma.ScrapeRunResultOmit
 }
 
 /* Types for Logging */

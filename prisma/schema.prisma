@@ -62,3 +62,20 @@ model ExchangeRate {
   rateToUsd Float
   updatedAt DateTime @updatedAt
 }
+
+model ScrapeRun {
+  id         Int               @id @default(autoincrement())
+  startedAt  DateTime          @default(now())
+  finishedAt DateTime?
+  results    ScrapeRunResult[]
+}
+
+model ScrapeRunResult {
+  id          Int       @id @default(autoincrement())
+  scrapeRunId Int
+  scrapeRun   ScrapeRun @relation(fields: [scrapeRunId], references: [id], onDelete: Cascade)
+  clubName    String
+  status      String
+  count       Int?
+  error       String?
+}

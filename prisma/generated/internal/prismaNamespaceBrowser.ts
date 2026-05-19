@@ -55,7 +55,9 @@ export const ModelName = {
   Club: 'Club',
   Product: 'Product',
   ProductHistory: 'ProductHistory',
-  ExchangeRate: 'ExchangeRate'
+  ExchangeRate: 'ExchangeRate',
+  ScrapeRun: 'ScrapeRun',
+  ScrapeRunResult: 'ScrapeRunResult'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -132,6 +134,27 @@ export const ExchangeRateScalarFieldEnum = {
 } as const
 
 export type ExchangeRateScalarFieldEnum = (typeof ExchangeRateScalarFieldEnum)[keyof typeof ExchangeRateScalarFieldEnum]
+
+
+export const ScrapeRunScalarFieldEnum = {
+  id: 'id',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt'
+} as const
+
+export type ScrapeRunScalarFieldEnum = (typeof ScrapeRunScalarFieldEnum)[keyof typeof ScrapeRunScalarFieldEnum]
+
+
+export const ScrapeRunResultScalarFieldEnum = {
+  id: 'id',
+  scrapeRunId: 'scrapeRunId',
+  clubName: 'clubName',
+  status: 'status',
+  count: 'count',
+  error: 'error'
+} as const
+
+export type ScrapeRunResultScalarFieldEnum = (typeof ScrapeRunResultScalarFieldEnum)[keyof typeof ScrapeRunResultScalarFieldEnum]
 
 
 export const SortOrder = {

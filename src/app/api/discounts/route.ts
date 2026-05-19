@@ -63,5 +63,7 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  return NextResponse.json(withUsd);
+  return NextResponse.json(withUsd, {
+    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+  });
 }

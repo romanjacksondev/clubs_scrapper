@@ -200,7 +200,7 @@ export type ProductHistoryGroupByOutputType = {
   _max: ProductHistoryMaxAggregateOutputType | null
 }
 
-type GetProductHistoryGroupByPayload<T extends ProductHistoryGroupByArgs> = Prisma.PrismaPromise<
+export type GetProductHistoryGroupByPayload<T extends ProductHistoryGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ProductHistoryGroupByOutputType, T['by']> &
       {
@@ -1173,6 +1173,11 @@ export type ProductHistoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Skip the first `n` ProductHistories.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of ProductHistories.
+   */
   distinct?: Prisma.ProductHistoryScalarFieldEnum | Prisma.ProductHistoryScalarFieldEnum[]
 }
 

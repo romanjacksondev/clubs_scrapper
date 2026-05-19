@@ -32,6 +32,8 @@ export async function POST(request: NextRequest) {
   const BATCH_SIZE = 3;
   const results: Result[] = [];
 
+  const run = await prisma.scrapeRun.create({ data: {} });
+
   for (let i = 0; i < clubs.length; i += BATCH_SIZE) {
     const batch = clubs.slice(i, i + BATCH_SIZE);
     const settled = await Promise.allSettled(
@@ -70,5 +72,20 @@ export async function POST(request: NextRequest) {
   }
 
   await purgeOldHistory();
+
+  await prisma.scrapeRunResult.createMany({
+    data: results.map((r) => ({
+      scrapeRunId: run.id,
+      clubName: r.club,
+      status: r.status,
+      count: r.count ?? null,
+      error: r.error ?? null,
+    })),
+  });
+  await prisma.scrapeRun.update({
+    where: { id: run.id },
+    data: { finishedAt: new Date() },
+  });
+
   return NextResponse.json({ results });
 }

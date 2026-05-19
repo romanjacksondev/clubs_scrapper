@@ -2,6 +2,15 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { formatPrice } from '../../../../lib/formatPrice';
 
 interface HistoryEntry {
@@ -104,30 +113,63 @@ export default function ProductHistoryPage() {
       {product.history.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">No price history recorded yet.</p>
       ) : (
-        <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
-          <thead className="bg-gray-100 dark:bg-gray-700">
-            <tr>
-              <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Date
-              </th>
-              <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Price
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {product.history.map((entry, idx) => (
-              <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
-                  {new Date(entry.recordedAt).toLocaleString()}
-                </td>
-                <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                  {formatPrice(entry.price, entry.currency)}
-                </td>
+        <>
+          {product.history.length >= 2 && (
+            <div className="mb-8 h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={[...product.history].reverse().map((h) => ({
+                    date: new Date(h.recordedAt).toLocaleDateString(),
+                    price: h.price,
+                  }))}
+                  margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} width={60} />
+                  <Tooltip
+                    formatter={(value: number) => [
+                      formatPrice(value, product.currency),
+                      'Price',
+                    ]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#3b82f6"
+                    dot={product.history.length <= 20}
+                    strokeWidth={2}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
+            <thead className="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Date
+                </th>
+                <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Price
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {product.history.map((entry, idx) => (
+                <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-700 dark:text-gray-300 text-sm">
+                    {new Date(entry.recordedAt).toLocaleString()}
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
+                    {formatPrice(entry.price, entry.currency)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );

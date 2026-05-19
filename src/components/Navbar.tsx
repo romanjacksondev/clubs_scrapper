@@ -21,6 +21,7 @@ export default function AppNavbar() {
         {session && <NavbarLink href="/scrape">Scrape</NavbarLink>}
         {session && <NavbarLink href="/clubs">Clubs</NavbarLink>}
         {session && <NavbarLink href="/leagues">Leagues</NavbarLink>}
+        {session && <NavbarLink href="/scrapes">Scrape Runs</NavbarLink>}
         {session ? (
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
