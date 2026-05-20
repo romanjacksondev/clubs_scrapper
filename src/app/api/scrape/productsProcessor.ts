@@ -85,16 +85,42 @@ export async function processProducts(data: Product[], clubId: number) {
       : []),
   ]);
 
-  // 5. Soft-delete products no longer returned by the scraper
-  const staleIds = existingProducts
-    .filter((p) => !returnedNames.has(p.name.toLowerCase()))
+  // 5. Handle products no longer returned by the scraper — grace period of 3 days
+  //    before soft-deleting, to avoid losing products that are temporarily unavailable.
+  const now = new Date();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+  const missingProducts = existingProducts.filter((p) => !returnedNames.has(p.name.toLowerCase()));
+
+  const toSoftDelete = missingProducts
+    .filter(
+      (p) => p.missingSince != null && now.getTime() - p.missingSince.getTime() >= THREE_DAYS_MS,
+    )
     .map((p) => p.id);
-  if (staleIds.length > 0) {
-    await prisma.product.updateMany({
-      where: { id: { in: staleIds } },
-      data: { deletedAt: new Date() },
-    });
-  }
+
+  const toMarkMissing = missingProducts.filter((p) => p.missingSince == null).map((p) => p.id);
+
+  // Clear missingSince for products that came back
+  const returnedWithMissing = existingProducts
+    .filter((p) => returnedNames.has(p.name.toLowerCase()) && p.missingSince != null)
+    .map((p) => p.id);
+
+  await Promise.all([
+    toSoftDelete.length > 0
+      ? prisma.product.updateMany({ where: { id: { in: toSoftDelete } }, data: { deletedAt: now } })
+      : Promise.resolve(),
+    toMarkMissing.length > 0
+      ? prisma.product.updateMany({
+          where: { id: { in: toMarkMissing } },
+          data: { missingSince: now },
+        })
+      : Promise.resolve(),
+    returnedWithMissing.length > 0
+      ? prisma.product.updateMany({
+          where: { id: { in: returnedWithMissing } },
+          data: { missingSince: null },
+        })
+      : Promise.resolve(),
+  ]);
 
   // 6. Return the up-to-date DB records
   return prisma.product.findMany({

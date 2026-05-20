@@ -48,6 +48,7 @@ export type ProductMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
+  missingSince: Date | null
 }
 
 export type ProductMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type ProductMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
+  missingSince: Date | null
 }
 
 export type ProductCountAggregateOutputType = {
@@ -72,6 +74,7 @@ export type ProductCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   deletedAt: number
+  missingSince: number
   _all: number
 }
 
@@ -98,6 +101,7 @@ export type ProductMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  missingSince?: true
 }
 
 export type ProductMaxAggregateInputType = {
@@ -110,6 +114,7 @@ export type ProductMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  missingSince?: true
 }
 
 export type ProductCountAggregateInputType = {
@@ -122,6 +127,7 @@ export type ProductCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  missingSince?: true
   _all?: true
 }
 
@@ -221,6 +227,7 @@ export type ProductGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
+  missingSince: Date | null
   _count: ProductCountAggregateOutputType | null
   _avg: ProductAvgAggregateOutputType | null
   _sum: ProductSumAggregateOutputType | null
@@ -256,6 +263,7 @@ export type ProductWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  missingSince?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
   history?: Prisma.ProductHistoryListRelationFilter
 }
@@ -270,6 +278,7 @@ export type ProductOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  missingSince?: Prisma.SortOrderInput | Prisma.SortOrder
   club?: Prisma.ClubOrderByWithRelationInput
   history?: Prisma.ProductHistoryOrderByRelationAggregateInput
 }
@@ -287,6 +296,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  missingSince?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
   club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
   history?: Prisma.ProductHistoryListRelationFilter
 }, "id">
@@ -301,6 +311,7 @@ export type ProductOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  missingSince?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
   _avg?: Prisma.ProductAvgOrderByAggregateInput
   _max?: Prisma.ProductMaxOrderByAggregateInput
@@ -321,6 +332,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
+  missingSince?: Prisma.DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
 }
 
 export type ProductCreateInput = {
@@ -331,6 +343,7 @@ export type ProductCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
   club: Prisma.ClubCreateNestedOneWithoutProductsInput
   history?: Prisma.ProductHistoryCreateNestedManyWithoutProductInput
 }
@@ -345,6 +358,7 @@ export type ProductUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
   history?: Prisma.ProductHistoryUncheckedCreateNestedManyWithoutProductInput
 }
 
@@ -356,6 +370,7 @@ export type ProductUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   club?: Prisma.ClubUpdateOneRequiredWithoutProductsNestedInput
   history?: Prisma.ProductHistoryUpdateManyWithoutProductNestedInput
 }
@@ -370,6 +385,7 @@ export type ProductUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ProductHistoryUncheckedUpdateManyWithoutProductNestedInput
 }
 
@@ -383,6 +399,7 @@ export type ProductCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
 }
 
 export type ProductUpdateManyMutationInput = {
@@ -393,6 +410,7 @@ export type ProductUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProductUncheckedUpdateManyInput = {
@@ -405,6 +423,7 @@ export type ProductUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProductListRelationFilter = {
@@ -427,6 +446,7 @@ export type ProductCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  missingSince?: Prisma.SortOrder
 }
 
 export type ProductAvgOrderByAggregateInput = {
@@ -445,6 +465,7 @@ export type ProductMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  missingSince?: Prisma.SortOrder
 }
 
 export type ProductMinOrderByAggregateInput = {
@@ -457,6 +478,7 @@ export type ProductMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  missingSince?: Prisma.SortOrder
 }
 
 export type ProductSumOrderByAggregateInput = {
@@ -542,6 +564,7 @@ export type ProductCreateWithoutClubInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
   history?: Prisma.ProductHistoryCreateNestedManyWithoutProductInput
 }
 
@@ -554,6 +577,7 @@ export type ProductUncheckedCreateWithoutClubInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
   history?: Prisma.ProductHistoryUncheckedCreateNestedManyWithoutProductInput
 }
 
@@ -596,6 +620,7 @@ export type ProductScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Product"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
+  missingSince?: Prisma.DateTimeNullableFilter<"Product"> | Date | string | null
 }
 
 export type ProductCreateWithoutHistoryInput = {
@@ -606,6 +631,7 @@ export type ProductCreateWithoutHistoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
   club: Prisma.ClubCreateNestedOneWithoutProductsInput
 }
 
@@ -619,6 +645,7 @@ export type ProductUncheckedCreateWithoutHistoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
 }
 
 export type ProductCreateOrConnectWithoutHistoryInput = {
@@ -645,6 +672,7 @@ export type ProductUpdateWithoutHistoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   club?: Prisma.ClubUpdateOneRequiredWithoutProductsNestedInput
 }
 
@@ -658,6 +686,7 @@ export type ProductUncheckedUpdateWithoutHistoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProductCreateManyClubInput = {
@@ -669,6 +698,7 @@ export type ProductCreateManyClubInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  missingSince?: Date | string | null
 }
 
 export type ProductUpdateWithoutClubInput = {
@@ -679,6 +709,7 @@ export type ProductUpdateWithoutClubInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ProductHistoryUpdateManyWithoutProductNestedInput
 }
 
@@ -691,6 +722,7 @@ export type ProductUncheckedUpdateWithoutClubInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   history?: Prisma.ProductHistoryUncheckedUpdateManyWithoutProductNestedInput
 }
 
@@ -703,6 +735,7 @@ export type ProductUncheckedUpdateManyWithoutClubInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  missingSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -746,6 +779,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  missingSince?: boolean
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   history?: boolean | Prisma.Product$historyArgs<ExtArgs>
   _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
@@ -761,6 +795,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  missingSince?: boolean
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -774,6 +809,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  missingSince?: boolean
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -787,9 +823,10 @@ export type ProductSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  missingSince?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "currency" | "productUrl" | "clubId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "currency" | "productUrl" | "clubId" | "createdAt" | "updatedAt" | "deletedAt" | "missingSince", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   history?: boolean | Prisma.Product$historyArgs<ExtArgs>
@@ -818,6 +855,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
+    missingSince: Date | null
   }, ExtArgs["result"]["product"]>
   composites: {}
 }
@@ -1252,6 +1290,7 @@ export interface ProductFieldRefs {
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Product", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Product", 'DateTime'>
+  readonly missingSince: Prisma.FieldRef<"Product", 'DateTime'>
 }
     
 

@@ -22,6 +22,7 @@ export default function ScrapePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [scrapeStates, setScrapeStates] = useState<Record<number, ScrapeStatus>>({});
+  const [scrapingAll, setScrapingAll] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -80,6 +81,14 @@ export default function ScrapePage() {
     }
   }
 
+  async function handleScrapeAll() {
+    setScrapingAll(true);
+    for (const club of clubs) {
+      await handleScrape(club);
+    }
+    setScrapingAll(false);
+  }
+
   const grouped = clubs.reduce<Record<string, ClubStat[]>>((acc, club) => {
     (acc[club.leagueName] ??= []).push(club);
     return acc;
@@ -87,7 +96,16 @@ export default function ScrapePage() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 w-full">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Scrape Products</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Scrape Products</h1>
+        <button
+          onClick={handleScrapeAll}
+          disabled={loading || scrapingAll}
+          className="px-4 py-2 text-sm font-semibold rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+        >
+          {scrapingAll ? 'Scraping all…' : 'Scrape All'}
+        </button>
+      </div>
 
       {error && <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>}
 
