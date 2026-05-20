@@ -1,14 +1,15 @@
 // Nottingham Forest store (shop.nottinghamforest.co.uk) runs on Shopify.
 // The standard Shopify products.json endpoint returns GBP prices when
 // ?country=GB is appended — no browser automation needed.
-// There is no standalone home-kit collection; all current kits are covered by
-// the umbrella 'kits' collection plus the specific sub-collections.
+// 'kits' covers all 7 current kit sale items (away, third, goalkeeper sub-collections
+// are strict subsets). 'kit-training-wear-sale' adds ~10 discounted training items.
+// 'training' covers the full training-wear catalog for price-drop tracking.
 
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://shop.nottinghamforest.co.uk';
 
-const COLLECTIONS = ['kits', 'away-kit', 'third-kit', 'goalkeeper-kit'];
+const COLLECTIONS = ['kits', 'kit-training-wear-sale', 'training'];
 
 const scrapeNottinghamForest = async (): Promise<Product[]> => {
   const seen = new Set<string>();
