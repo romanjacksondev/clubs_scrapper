@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://arsenaldirect.arsenal.com';
-const KITS_URL = `${BASE_URL}/Football-Shirts-and-Kit/c/kit`;
+const KITS_URL = `${BASE_URL}/Football-Shirts-and-Kit/c/kit?show=All`;
 
 // Product data is server-rendered in the static HTML.
 // Each product is wrapped in an <a href="/.../.../p/MJ[ID]"> anchor containing:
@@ -25,7 +25,7 @@ export default async function scrapeArsenal(): Promise<Product[]> {
     const products: Product[] = [];
     const seen = new Set<string>();
 
-    $('a[href*="/p/MJ"]').each((_i, el) => {
+    $('a[href*="/p/"]').each((_i, el) => {
       const href = $(el).attr('href');
       if (!href) return;
       const productUrl = BASE_URL + href;
