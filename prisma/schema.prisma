@@ -30,6 +30,8 @@ model Club {
   updatedAt       DateTime @updatedAt
   deletedAt       DateTime?
   products        Product[]
+
+  @@unique([name, leagueId])
 }
 
 model Product {

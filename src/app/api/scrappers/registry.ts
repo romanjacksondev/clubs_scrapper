@@ -50,9 +50,12 @@ import scrapeVfLWolfsburg from './Bundesliga/VfLWolfsburg/VfLWolfsburg';
 import scrapeWerderBremen from './Bundesliga/WerderBremen/WerderBremen';
 
 // — Brasileirão —
+import scrapeAthleticoPR from './Brasileirão/AthleticoPR/AthleticoPR';
 import scrapeCorinthians from './Brasileirão/Corinthians/Corinthians';
 import scrapeFlamengo from './Brasileirão/Flamengo/Flamengo';
+import scrapeFluminense from './Brasileirão/Fluminense/Fluminense';
 import scrapePalmeiras from './Brasileirão/Palmeiras/Palmeiras';
+import scrapeSaoPaulo from './Brasileirão/SãoPaulo/SãoPaulo';
 
 // — Primera División —
 import scrapeBocaJuniors from './PrimeraDivisión/BocaJuniors/BocaJuniors';
@@ -167,9 +170,12 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   'Werder Bremen': scrapeWerderBremen,
 
   // Brasileirão
+  'Athletico-PR': scrapeAthleticoPR,
   Corinthians: scrapeCorinthians,
   Flamengo: scrapeFlamengo,
+  Fluminense: scrapeFluminense,
   Palmeiras: scrapePalmeiras,
+  'São Paulo': scrapeSaoPaulo,
 
   // Primera División
   'Boca Juniors': scrapeBocaJuniors,

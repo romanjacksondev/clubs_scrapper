@@ -263,6 +263,7 @@ export type ClubOrderByWithRelationInput = {
 
 export type ClubWhereUniqueInput = Prisma.AtLeast<{
   id?: number
+  name_leagueId?: Prisma.ClubNameLeagueIdCompoundUniqueInput
   AND?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   OR?: Prisma.ClubWhereInput[]
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
@@ -275,7 +276,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   deletedAt?: Prisma.DateTimeNullableFilter<"Club"> | Date | string | null
   league?: Prisma.XOR<Prisma.LeagueScalarRelationFilter, Prisma.LeagueWhereInput>
   products?: Prisma.ProductListRelationFilter
-}, "id">
+}, "id" | "name_leagueId">
 
 export type ClubOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -392,6 +393,11 @@ export type ClubListRelationFilter = {
 
 export type ClubOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type ClubNameLeagueIdCompoundUniqueInput = {
+  name: string
+  leagueId: number
 }
 
 export type ClubCountOrderByAggregateInput = {

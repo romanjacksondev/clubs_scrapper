@@ -21,9 +21,15 @@ async function main() {
     { name: 'Primera División' }, // Argentina
   ];
 
-  // Insert leagues
+  // Insert leagues — upsert so re-running the seed never duplicates or errors
   const leagueRecords = await Promise.all(
-    leagues.map((league) => prisma.league.create({ data: league })),
+    leagues.map((league) =>
+      prisma.league.upsert({
+        where: { name: league.name },
+        create: league,
+        update: {},
+      }),
+    ),
   );
 
   // All clubs for each league (Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Eredivisie, Primeira Liga, MLS, Brasileirão, Liga MX, Primera División)
@@ -518,6 +524,24 @@ async function main() {
       officialStoreUrl: 'https://www.shoptimao.com.br',
       leagueId: leagueRecords[8].id,
     },
+    {
+      name: 'Fluminense',
+      officialSiteUrl: 'https://www.fluminense.com.br',
+      officialStoreUrl: 'https://loja.fluminense.com.br',
+      leagueId: leagueRecords[8].id,
+    },
+    {
+      name: 'São Paulo',
+      officialSiteUrl: 'https://www.saopaulofc.net',
+      officialStoreUrl: 'https://loja.saopaulofc.net',
+      leagueId: leagueRecords[8].id,
+    },
+    {
+      name: 'Athletico-PR',
+      officialSiteUrl: 'https://www.athletico.com.br',
+      officialStoreUrl: 'https://loja.athletico.com.br',
+      leagueId: leagueRecords[8].id,
+    },
     // Liga MX (Mexico)
     {
       name: 'Club América',
@@ -594,7 +618,16 @@ async function main() {
     },
   ];
 
-  await prisma.club.createMany({ data: clubs });
+  // Upsert clubs — safe to re-run; never creates duplicates thanks to @@unique([name, leagueId])
+  await Promise.all(
+    clubs.map((club) =>
+      prisma.club.upsert({
+        where: { name_leagueId: { name: club.name, leagueId: club.leagueId } },
+        create: club,
+        update: {},
+      }),
+    ),
+  );
 }
 
 // main()
