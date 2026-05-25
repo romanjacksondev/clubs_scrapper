@@ -12,6 +12,7 @@ export interface DiscountedProduct {
   leagueName: string;
   currentPriceUsd: number | null;
   previousPriceUsd: number | null;
+  discountFoundAt: string;
 }
 
 export function useDiscountedProducts(minDiscount = 30) {

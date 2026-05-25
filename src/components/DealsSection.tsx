@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
 import { formatPrice } from '../lib/formatPrice';
 
-type SortCol = 'league' | 'club' | 'discount' | 'usd';
+type SortCol = 'league' | 'club' | 'discount' | 'usd' | 'date';
 
 export default function DealsSection() {
   const [minDiscount, setMinDiscount] = useState(30);
@@ -15,8 +15,8 @@ export default function DealsSection() {
     return () => clearTimeout(t);
   }, [minDiscount]);
 
-  const [sortCol, setSortCol] = useState<SortCol | null>(null);
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [sortCol, setSortCol] = useState<SortCol | null>('date');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [selectedLeague, setSelectedLeague] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -58,6 +58,8 @@ export default function DealsSection() {
         else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
         else if (sortCol === 'usd')
           cmp = (a.currentPriceUsd ?? Infinity) - (b.currentPriceUsd ?? Infinity);
+        else if (sortCol === 'date')
+          cmp = new Date(a.discountFoundAt).getTime() - new Date(b.discountFoundAt).getTime();
         return sortDir === 'asc' ? cmp : -cmp;
       });
     }
@@ -167,6 +169,12 @@ export default function DealsSection() {
                 >
                   Discount{sortIndicator('discount')}
                 </th>
+                <th
+                  className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 cursor-pointer select-none"
+                  onClick={() => handleSort('date')}
+                >
+                  Found{sortIndicator('date')}
+                </th>
                 <th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
                   Actions
                 </th>
@@ -199,6 +207,13 @@ export default function DealsSection() {
                     <span className="inline-block bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 text-xs font-bold px-2 py-1 rounded">
                       -{product.discountPercent}%
                     </span>
+                  </td>
+                  <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
+                    {new Date(product.discountFoundAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
                     <div className="flex gap-3">

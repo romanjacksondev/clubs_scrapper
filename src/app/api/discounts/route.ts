@@ -14,6 +14,7 @@ interface DiscountRow {
   productUrl: string;
   clubName: string;
   leagueName: string;
+  discountFoundAt: Date;
 }
 
 export async function GET(request: NextRequest) {
@@ -33,7 +34,8 @@ export async function GET(request: NextRequest) {
         p.currency                                                               AS "currency",
         p."productUrl"                                                           AS "productUrl",
         c.name                                                                   AS "clubName",
-        l.name                                                                   AS "leagueName"
+        l.name                                                                   AS "leagueName",
+        p."updatedAt"                                                            AS "discountFoundAt"
       FROM "Product"  p
       JOIN "Club"     c  ON c.id = p."clubId"
       JOIN "League"   l  ON l.id = c."leagueId"
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
         FROM   "ProductHistory"
         WHERE  "productId" = p.id
           AND  price > p.price
+          AND  currency = p.currency
         ORDER BY "recordedAt" DESC
         LIMIT  1
       ) ph_prev ON true
@@ -49,7 +52,7 @@ export async function GET(request: NextRequest) {
         AND c."deletedAt" IS NULL
         AND l."deletedAt" IS NULL
         AND (ph_prev.price - p.price) / ph_prev.price >= ${threshold}
-      ORDER BY "discountPercent" DESC
+      ORDER BY "discountFoundAt" DESC
     `,
     getExchangeRates().catch(() => null),
   ]);
