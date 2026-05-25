@@ -209,11 +209,10 @@ export default function DealsSection() {
                     </span>
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
-                    {new Date(product.discountFoundAt).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
+                    {(() => {
+                      const d = new Date(product.discountFoundAt);
+                      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                    })()}
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-4 py-3">
                     <div className="flex gap-3">
