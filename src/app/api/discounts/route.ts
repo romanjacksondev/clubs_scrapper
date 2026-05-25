@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
         p."productUrl"                                                           AS "productUrl",
         c.name                                                                   AS "clubName",
         l.name                                                                   AS "leagueName",
-        p."updatedAt"                                                            AS "discountFoundAt"
+        COALESCE(ph_curr."recordedAt", p."updatedAt")                           AS "discountFoundAt"
       FROM "Product"  p
       JOIN "Club"     c  ON c.id = p."clubId"
       JOIN "League"   l  ON l.id = c."leagueId"
@@ -48,6 +48,15 @@ export async function GET(request: NextRequest) {
         ORDER BY "recordedAt" DESC
         LIMIT  1
       ) ph_prev ON true
+      LEFT JOIN LATERAL (
+        SELECT "recordedAt"
+        FROM   "ProductHistory"
+        WHERE  "productId" = p.id
+          AND  price = p.price
+          AND  currency = p.currency
+        ORDER BY "recordedAt" DESC
+        LIMIT  1
+      ) ph_curr ON true
       WHERE p."deletedAt" IS NULL
         AND c."deletedAt" IS NULL
         AND l."deletedAt" IS NULL
