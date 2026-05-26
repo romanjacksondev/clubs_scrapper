@@ -71,11 +71,26 @@ import scrapeSanLorenzo from './PrimeraDivisión/SanLorenzo/SanLorenzo';
 import scrapeVélezSarsfield from './PrimeraDivisión/VélezSarsfield/VélezSarsfield';
 
 // — La Liga —
+import scrapeAlaves from './LaLiga/Alavés/Alavés';
+import scrapeAthleticBilbao from './LaLiga/AthleticBilbao/AthleticBilbao';
 import scrapeAtleticoMadrid from './LaLiga/AtléticoMadrid/AtléticoMadrid';
 import scrapeBarcelona from './LaLiga/Barcelona/Barcelona';
+import scrapeCeltaVigo from './LaLiga/CeltaVigo/CeltaVigo';
+import scrapeElche from './LaLiga/Elche/Elche';
+import scrapeEspanyol from './LaLiga/Espanyol/Espanyol';
+import scrapeGetafe from './LaLiga/Getafe/Getafe';
+import scrapeGirona from './LaLiga/Girona/Girona';
+import scrapeLevante from './LaLiga/Levante/Levante';
+import scrapeMallorca from './LaLiga/Mallorca/Mallorca';
+import scrapeOsasuna from './LaLiga/Osasuna/Osasuna';
+import scrapeRayoVallecano from './LaLiga/RayoVallecano/RayoVallecano';
+import scrapeRealBetis from './LaLiga/RealBetis/RealBetis';
 import scrapeRealMadrid from './LaLiga/RealMadrid/RealMadrid';
+import scrapeRealOviedo from './LaLiga/RealOviedo/RealOviedo';
+import scrapeRealSociedad from './LaLiga/RealSociedad/RealSociedad';
 import scrapeSevilla from './LaLiga/Sevilla/Sevilla';
 import scrapeValencia from './LaLiga/Valencia/Valencia';
+import scrapeVillarreal from './LaLiga/Villarreal/Villarreal';
 
 // — Serie A —
 import scrapeACMilan from './SerieA/ACMilan/ACMilan';
@@ -219,10 +234,25 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
 
   // La Liga
   'Atlético Madrid': scrapeAtleticoMadrid,
+  'Athletic Bilbao': scrapeAthleticBilbao,
+  Alavés: scrapeAlaves,
   Barcelona: scrapeBarcelona,
+  'Celta Vigo': scrapeCeltaVigo,
+  Elche: scrapeElche,
+  Espanyol: scrapeEspanyol,
+  Getafe: scrapeGetafe,
+  Girona: scrapeGirona,
+  Levante: scrapeLevante,
+  Mallorca: scrapeMallorca,
+  Osasuna: scrapeOsasuna,
+  'Rayo Vallecano': scrapeRayoVallecano,
+  'Real Betis': scrapeRealBetis,
   'Real Madrid': scrapeRealMadrid,
+  'Real Oviedo': scrapeRealOviedo,
+  'Real Sociedad': scrapeRealSociedad,
   Sevilla: scrapeSevilla,
   Valencia: scrapeValencia,
+  Villarreal: scrapeVillarreal,
 
   // Serie A
   'AC Milan': scrapeACMilan,
