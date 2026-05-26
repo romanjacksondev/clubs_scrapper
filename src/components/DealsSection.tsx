@@ -22,6 +22,21 @@ export default function DealsSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const [adultMaleShirts, setAdultMaleShirts] = useState(false);
 
+  function resetFilters() {
+    setMinDiscount(30);
+    setSelectedLeague('');
+    setSelectedClub('');
+    setSearchQuery('');
+    setAdultMaleShirts(false);
+  }
+
+  const isFiltered =
+    minDiscount !== 30 ||
+    selectedLeague !== '' ||
+    selectedClub !== '' ||
+    searchQuery !== '' ||
+    adultMaleShirts;
+
   const { discountedProducts, loading } = useDiscountedProducts(debouncedDiscount, adultMaleShirts);
 
   const leagues = useMemo(
@@ -155,6 +170,15 @@ export default function DealsSection() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-52"
           />
+
+          {isFiltered && (
+            <button
+              onClick={resetFilters}
+              className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-500 dark:text-gray-400 hover:border-red-400 hover:text-red-500 transition-colors"
+            >
+              ✕ Reset filters
+            </button>
+          )}
         </div>
       </div>
 
