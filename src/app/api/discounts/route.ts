@@ -4,6 +4,74 @@ import { prisma } from '../../../lib/prisma';
 
 const DEFAULT_DISCOUNT_THRESHOLD = 0.3;
 
+const SHIRT_KEYWORDS = [
+  'shirt', // EN, NL
+  'jersey', // EN
+  'maillot', // FR
+  'trikot', // DE
+  'camiseta', // ES
+  'maglia', // IT
+  'camisa', // PT
+];
+
+const WOMEN_KEYWORDS = [
+  'women',
+  "women's",
+  'woman',
+  'ladies',
+  'lady',
+  'female',
+  'girl',
+  'dames',
+  'dame',
+  'mujer',
+  'señora',
+  'donna',
+  'femminile',
+  'femme',
+  'féminin',
+  'damen',
+  'frau',
+  'senhora',
+];
+
+const YOUTH_KEYWORDS = [
+  'kids',
+  'kid',
+  'youth',
+  'junior',
+  'child',
+  'children',
+  'baby',
+  'mini',
+  'toddler',
+  'boys',
+  'girls',
+  'kinderen',
+  'kinder',
+  'jongens',
+  'meisjes',
+  'niño',
+  'niños',
+  'niña',
+  'infantil',
+  'bambini',
+  'bambino',
+  'ragazzo',
+  'enfant',
+  'enfants',
+  'criança',
+];
+
+function isAdultMaleShirt(name: string): boolean {
+  const lower = name.toLowerCase();
+  return (
+    SHIRT_KEYWORDS.some((k) => lower.includes(k)) &&
+    !WOMEN_KEYWORDS.some((k) => lower.includes(k)) &&
+    !YOUTH_KEYWORDS.some((k) => lower.includes(k))
+  );
+}
+
 interface DiscountRow {
   id: number;
   name: string;
@@ -22,6 +90,7 @@ export async function GET(request: NextRequest) {
   const parsed = param !== null ? parseFloat(param) / 100 : NaN;
   const threshold =
     !isNaN(parsed) && parsed > 0 && parsed <= 1 ? parsed : DEFAULT_DISCOUNT_THRESHOLD;
+  const adultMaleShirtsOnly = request.nextUrl.searchParams.get('adultMaleShirts') === 'true';
 
   const [rows, ratesMap] = await Promise.all([
     prisma.$queryRaw<DiscountRow[]>`
@@ -75,7 +144,9 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  return NextResponse.json(withUsd, {
+  const result = adultMaleShirtsOnly ? withUsd.filter((r) => isAdultMaleShirt(r.name)) : withUsd;
+
+  return NextResponse.json(result, {
     headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
   });
 }

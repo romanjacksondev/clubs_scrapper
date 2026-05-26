@@ -1,24 +1,7 @@
 // NEC Nijmegen official store (necfanshop.nl) — Shopify.
-// The Shopify products.json endpoint is publicly accessible.
-// Scrapes the wedstrijd (match kit) collection.
-
 import { Product } from '../../shared/Product';
 
 const BASE = 'https://necfanshop.nl';
-const COLLECTION = 'wedstrijd';
-
-const JERSEY_KEYWORDS = [
-  'shirt',
-  'tenue',
-  'jersey',
-  'wedstrijdshirt',
-  'keepersshirt',
-  'away',
-  'home',
-  'third',
-  'kit',
-  'match',
-];
 
 const scrapeNEC = async (): Promise<Product[]> => {
   const seen = new Set<string>();
@@ -27,7 +10,7 @@ const scrapeNEC = async (): Promise<Product[]> => {
 
   while (true) {
     try {
-      const url = `${BASE}/collections/${COLLECTION}/products.json?limit=250&page=${page}`;
+      const url = `${BASE}/products.json?limit=250&page=${page}`;
       const res = await fetch(url, {
         headers: {
           'User-Agent':
@@ -47,10 +30,6 @@ const scrapeNEC = async (): Promise<Product[]> => {
 
       for (const p of products) {
         const title: string = p.title?.trim() ?? '';
-        const lower = title.toLowerCase();
-        const typeL = (p.product_type ?? '').toLowerCase();
-
-        if (!JERSEY_KEYWORDS.some((k) => lower.includes(k) || typeL.includes(k))) continue;
 
         const productUrl = `${BASE}/products/${p.handle}`;
         if (seen.has(productUrl)) continue;

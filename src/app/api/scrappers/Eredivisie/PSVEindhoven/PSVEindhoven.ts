@@ -1,15 +1,11 @@
 // PSV Eindhoven official store (psvfanshop.nl) — Shopify.
 // The store has an invalid/self-signed TLS certificate; Node's https module
 // with rejectUnauthorized: false is used to bypass the certificate error.
-// Calls the Shopify /products.json API after discovering the kit collection slug.
 
-import * as cheerio from 'cheerio';
-import type { AnyNode } from 'domhandler';
 import https from 'https';
 import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://psvfanshop.nl';
-const KIT_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis'];
 
 const TLS_AGENT = new https.Agent({ rejectUnauthorized: false });
 
@@ -48,38 +44,34 @@ interface ShopifyProduct {
 
 const scrapePSVEindhoven = async (): Promise<Product[]> => {
   try {
-    const homeHtml = await httpsGet(
-      STORE_BASE,
-      'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    );
-    const $ = cheerio.load(homeHtml);
-    let collectionSlug = 'all';
-    $('nav a, header a').each((_: number, el: AnyNode) => {
-      const text = $(el).text().toLowerCase();
-      const href = $(el).attr('href') || '';
-      if (KIT_KEYWORDS.some((k) => text.includes(k)) && href.includes('/collections/')) {
-        const m = href.match(/\/collections\/([^/?#]+)/);
-        if (m) {
-          collectionSlug = m[1];
-          return false;
-        }
-      }
-    });
-    const jsonText = await httpsGet(
-      `${STORE_BASE}/collections/${collectionSlug}/products.json?limit=250`,
-      'application/json',
-    );
-    if (jsonText.trimStart().startsWith('<')) return [];
-    const data = JSON.parse(jsonText) as { products: ShopifyProduct[] };
+    const allProducts: Product[] = [];
     const seen = new Set<string>();
-    return (data.products ?? []).flatMap((p) => {
-      const productUrl = `${STORE_BASE}/products/${p.handle}`;
-      if (seen.has(productUrl)) return [];
-      seen.add(productUrl);
-      const price = parseFloat(p.variants?.[0]?.price ?? '0');
-      if (!p.title || price <= 0) return [];
-      return [{ name: p.title, productUrl, price, currency: 'EUR' }];
-    });
+    let page = 1;
+
+    while (true) {
+      const jsonText = await httpsGet(
+        `${STORE_BASE}/products.json?limit=250&page=${page}`,
+        'application/json',
+      );
+      if (jsonText.trimStart().startsWith('<')) break;
+      const data = JSON.parse(jsonText) as { products: ShopifyProduct[] };
+      const products = data.products ?? [];
+      if (!products.length) break;
+
+      for (const p of products) {
+        const productUrl = `${STORE_BASE}/products/${p.handle}`;
+        if (seen.has(productUrl)) continue;
+        seen.add(productUrl);
+        const price = parseFloat(p.variants?.[0]?.price ?? '0');
+        if (!p.title || price <= 0) continue;
+        allProducts.push({ name: p.title, productUrl, price, currency: 'EUR' });
+      }
+
+      if (products.length < 250) break;
+      page++;
+    }
+
+    return allProducts;
   } catch {
     return [];
   }

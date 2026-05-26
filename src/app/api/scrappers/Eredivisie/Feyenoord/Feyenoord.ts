@@ -9,7 +9,6 @@ import https from 'https';
 import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://www.feyenoordshop.nl';
-const KIT_NAV_KEYWORDS = ['wedstrijd', 'shirt', 'tenu', 'kit', 'jersey', 'thuis', 'trikot'];
 
 const TLS_AGENT = new https.Agent({ rejectUnauthorized: false });
 
@@ -46,19 +45,7 @@ function httpsGet(url: string, depth = 0): Promise<string> {
 
 const scrapeFeyenoord = async (): Promise<Product[]> => {
   try {
-    const homeHtml = await httpsGet(STORE_BASE);
-    const $ = cheerio.load(homeHtml);
-    let kitUrl: string | null = null;
-    $('nav a, header a').each((_: number, el: AnyNode) => {
-      const text = $(el).text().toLowerCase();
-      const href = $(el).attr('href') || '';
-      if (KIT_NAV_KEYWORDS.some((k) => text.includes(k)) && href.length > 1) {
-        kitUrl = href.startsWith('http') ? href : `${STORE_BASE}${href}`;
-        return false;
-      }
-    });
-
-    const targetUrl = kitUrl ?? STORE_BASE;
+    const targetUrl = `${STORE_BASE}/collections/all`;
     const collHtml = await httpsGet(targetUrl);
     const $c = cheerio.load(collHtml);
     const seen = new Set<string>();

@@ -1,28 +1,7 @@
 // FC Utrecht official store (shop.fcutrecht.nl) — Shopify.
-// The Shopify products.json endpoint returns all products; we filter by
-// title keywords to keep only jerseys / match kits.
-
 import { Product } from '../../shared/Product';
 
 const BASE = 'https://shop.fcutrecht.nl';
-
-const JERSEY_KEYWORDS = [
-  'shirt',
-  'tenue',
-  'jersey',
-  'thuisshirt',
-  'uitshirt',
-  'wedstrijdshirt',
-  'minidress',
-  'thuistenue',
-  'uittenue',
-  'derde',
-  'away',
-  'home',
-  'third',
-  'keeper',
-  'match',
-];
 
 const scrapeFCUtrecht = async (): Promise<Product[]> => {
   const seen = new Set<string>();
@@ -51,10 +30,6 @@ const scrapeFCUtrecht = async (): Promise<Product[]> => {
 
       for (const p of products) {
         const title: string = p.title?.trim() ?? '';
-        const lower = title.toLowerCase();
-        const typeL = (p.product_type ?? '').toLowerCase();
-
-        if (!JERSEY_KEYWORDS.some((k) => lower.includes(k) || typeL.includes(k))) continue;
 
         const productUrl = `${BASE}/products/${p.handle}`;
         if (seen.has(productUrl)) continue;
