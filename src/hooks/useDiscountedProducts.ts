@@ -15,7 +15,7 @@ export interface DiscountedProduct {
   discountFoundAt: string;
 }
 
-export function useDiscountedProducts(minDiscount = 30) {
+export function useDiscountedProducts(minDiscount = 30, adultMaleShirts = false) {
   const [discountedProducts, setDiscountedProducts] = useState<DiscountedProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,7 +23,8 @@ export function useDiscountedProducts(minDiscount = 30) {
   const refresh = useCallback(() => {
     setLoading(true);
     setError('');
-    fetch(`/api/discounts?minDiscount=${minDiscount}`)
+    const url = `/api/discounts?minDiscount=${minDiscount}${adultMaleShirts ? '&adultMaleShirts=true' : ''}`;
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load deals');
         return res.json();
@@ -36,7 +37,7 @@ export function useDiscountedProducts(minDiscount = 30) {
         setError(e.message);
         setLoading(false);
       });
-  }, [minDiscount]);
+  }, [minDiscount, adultMaleShirts]);
 
   useEffect(() => {
     refresh();

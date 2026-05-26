@@ -18,14 +18,23 @@ export default function DealsSection() {
   const [sortCol, setSortCol] = useState<SortCol | null>('date');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [selectedLeague, setSelectedLeague] = useState('');
+  const [selectedClub, setSelectedClub] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [adultMaleShirts, setAdultMaleShirts] = useState(false);
 
-  const { discountedProducts, loading } = useDiscountedProducts(debouncedDiscount);
+  const { discountedProducts, loading } = useDiscountedProducts(debouncedDiscount, adultMaleShirts);
 
   const leagues = useMemo(
     () => [...new Set(discountedProducts.map((p) => p.leagueName))].sort(),
     [discountedProducts],
   );
+
+  const clubs = useMemo(() => {
+    const source = selectedLeague
+      ? discountedProducts.filter((p) => p.leagueName === selectedLeague)
+      : discountedProducts;
+    return [...new Set(source.map((p) => p.clubName))].sort();
+  }, [discountedProducts, selectedLeague]);
 
   function handleSort(col: SortCol) {
     if (sortCol === col) {
@@ -44,6 +53,9 @@ export default function DealsSection() {
     let list = selectedLeague
       ? discountedProducts.filter((p) => p.leagueName === selectedLeague)
       : discountedProducts;
+    if (selectedClub) {
+      list = list.filter((p) => p.clubName === selectedClub);
+    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -64,7 +76,7 @@ export default function DealsSection() {
       });
     }
     return list;
-  }, [discountedProducts, selectedLeague, searchQuery, sortCol, sortDir]);
+  }, [discountedProducts, selectedLeague, selectedClub, searchQuery, sortCol, sortDir]);
 
   return (
     <section>
@@ -98,7 +110,10 @@ export default function DealsSection() {
 
           <select
             value={selectedLeague}
-            onChange={(e) => setSelectedLeague(e.target.value)}
+            onChange={(e) => {
+              setSelectedLeague(e.target.value);
+              setSelectedClub('');
+            }}
             className="ml-4 px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All leagues</option>
@@ -108,6 +123,30 @@ export default function DealsSection() {
               </option>
             ))}
           </select>
+
+          <select
+            value={selectedClub}
+            onChange={(e) => setSelectedClub(e.target.value)}
+            className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All clubs</option>
+            {clubs.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => setAdultMaleShirts((v) => !v)}
+            className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
+              adultMaleShirts
+                ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-500'
+                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-blue-500'
+            }`}
+          >
+            👕 Men&apos;s shirts
+          </button>
 
           <input
             type="search"
