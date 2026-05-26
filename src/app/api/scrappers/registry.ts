@@ -20,6 +20,7 @@ import scrapeChelsea from './PremierLeague/Chelsea/Chelsea';
 import scrapeCrystalPalace from './PremierLeague/CrystalPalace/CrystalPalace';
 import scrapeEverton from './PremierLeague/Everton/Everton';
 import scrapeFulham from './PremierLeague/Fulham/Fulham';
+import scrapeLeedsUnited from './PremierLeague/LeedsUnited/LeedsUnited';
 import scrapeLiverpool from './PremierLeague/Liverpool/Liverpool';
 import scrapeLutonTown from './PremierLeague/LutonTown/LutonTown';
 import scrapeManchesterCity from './PremierLeague/ManchesterCity/ManchesterCity';
@@ -27,6 +28,7 @@ import scrapeManchesterUnited from './PremierLeague/ManchesterUnited/ManchesterU
 import scrapeNewcastleUnited from './PremierLeague/NewcastleUnited/NewcastleUnited';
 import scrapeNottinghamForest from './PremierLeague/NottinghamForest/NottinghamForest';
 import scrapeSheffieldUnited from './PremierLeague/SheffieldUnited/SheffieldUnited';
+import scrapeSunderlandAFC from './PremierLeague/SunderlandAFC/SunderlandAFC';
 import scrapeTottenham from './PremierLeague/TottenhamHotspur/TottenhamHotspur';
 import scrapeWestHamUnited from './PremierLeague/WestHamUnited/WestHamUnited';
 import scrapeWolves from './PremierLeague/Wolves/Wolves';
@@ -116,6 +118,31 @@ import scrapeBenfica from './PrimeiraLiga/Benfica/Benfica';
 import scrapePorto from './PrimeiraLiga/Porto/Porto';
 import scrapeSpotingCP from './PrimeiraLiga/SportingCP/SportingCP';
 
+// — EFL Championship —
+import scrapeBirminghamCity from './EFL/BirminghamCity/BirminghamCity';
+import scrapeBlackburnRovers from './EFL/BlackburnRovers/BlackburnRovers';
+import scrapeBristolCity from './EFL/BristolCity/BristolCity';
+import scrapeCardiffCity from './EFL/CardiffCity/CardiffCity';
+import scrapeCharltonAthletic from './EFL/CharltonAthletic/CharltonAthletic';
+import scrapeCoventryCity from './EFL/CoventryCity/CoventryCity';
+import scrapeDerbyCounty from './EFL/DerbyCounty/DerbyCounty';
+import scrapeHullCity from './EFL/HullCity/HullCity';
+import scrapeIpswichTown from './EFL/IpswichTown/IpswichTown';
+import scrapeLeicesterCity from './EFL/LeicesterCity/LeicesterCity';
+import scrapeMiddlesbrough from './EFL/Middlesbrough/Middlesbrough';
+import scrapeMillwallFC from './EFL/MillwallFC/MillwallFC';
+import scrapeNorwichCity from './EFL/NorwichCity/NorwichCity';
+import scrapeOxfordUnited from './EFL/OxfordUnited/OxfordUnited';
+import scrapePortsmouthFC from './EFL/PortsmouthFC/PortsmouthFC';
+import scrapePrestonNE from './EFL/PrestonNE/PrestonNE';
+import scrapeQPR from './EFL/QPR/QPR';
+import scrapeSouthamptonFC from './EFL/SouthamptonFC/SouthamptonFC';
+import scrapeStokeCity from './EFL/StokeCity/StokeCity';
+import scrapeSwanseaCity from './EFL/SwanseaCity/SwanseaCity';
+import scrapeWatfordFC from './EFL/WatfordFC/WatfordFC';
+import scrapeWestBromwichAlbion from './EFL/WestBromwichAlbion/WestBromwichAlbion';
+import scrapeWrexhamAFC from './EFL/WrexhamAFC/WrexhamAFC';
+
 // — Eredivisie —
 import scrapeAjax from './Eredivisie/Ajax/Ajax';
 import scrapeAZ from './Eredivisie/AZ/AZ';
@@ -141,12 +168,14 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Everton: scrapeEverton,
   Fulham: scrapeFulham,
   Liverpool: scrapeLiverpool,
+  'Leeds United': scrapeLeedsUnited,
   'Luton Town': scrapeLutonTown,
   'Manchester City': scrapeManchesterCity,
   'Manchester United': scrapeManchesterUnited,
   'Newcastle United': scrapeNewcastleUnited,
   'Nottingham Forest': scrapeNottinghamForest,
   'Sheffield United': scrapeSheffieldUnited,
+  'Sunderland AFC': scrapeSunderlandAFC,
   'Tottenham Hotspur': scrapeTottenham,
   'West Ham United': scrapeWestHamUnited,
   Wolves: scrapeWolves,
@@ -235,6 +264,31 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Benfica: scrapeBenfica,
   Porto: scrapePorto,
   'Sporting CP': scrapeSpotingCP,
+
+  // EFL Championship
+  'Blackburn Rovers': scrapeBlackburnRovers,
+  'Birmingham City': scrapeBirminghamCity,
+  'Bristol City': scrapeBristolCity,
+  'Cardiff City': scrapeCardiffCity,
+  'Charlton Athletic': scrapeCharltonAthletic,
+  'Coventry City': scrapeCoventryCity,
+  'Derby County': scrapeDerbyCounty,
+  'Hull City': scrapeHullCity,
+  'Ipswich Town': scrapeIpswichTown,
+  'Leicester City': scrapeLeicesterCity,
+  Middlesbrough: scrapeMiddlesbrough,
+  'Millwall FC': scrapeMillwallFC,
+  'Norwich City': scrapeNorwichCity,
+  'Oxford United': scrapeOxfordUnited,
+  'Portsmouth FC': scrapePortsmouthFC,
+  'Preston North End': scrapePrestonNE,
+  QPR: scrapeQPR,
+  'Southampton FC': scrapeSouthamptonFC,
+  'Stoke City': scrapeStokeCity,
+  'Swansea City': scrapeSwanseaCity,
+  'Watford FC': scrapeWatfordFC,
+  'West Bromwich Albion': scrapeWestBromwichAlbion,
+  'Wrexham AFC': scrapeWrexhamAFC,
 
   // Eredivisie
   Ajax: scrapeAjax,
