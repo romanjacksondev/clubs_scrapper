@@ -858,7 +858,7 @@ async function main() {
     {
       name: 'CA Peñarol',
       officialSiteUrl: 'https://www.penarol.org',
-      officialStoreUrl: 'https://tienda.penarol.org',
+      officialStoreUrl: 'https://www.tiendapenarol.com.uy/indumentaria',
       leagueId: leagueRecords[12].id,
     },
     {

@@ -1,6 +1,13 @@
 import { Product } from '../../shared/Product';
+import { scrapeFenicio } from '../../shared/mgrsport';
 
-// Store at tienda.penarol.org is inaccessible (TLS SNI mismatch) — stub
+const STORE_URL = 'https://www.tiendapenarol.com.uy/indumentaria';
+
 export default async function scrapePenarol(): Promise<Product[]> {
-  return [];
+  try {
+    return await scrapeFenicio(STORE_URL);
+  } catch (e) {
+    console.error('Error in scrapePenarol:', e);
+    return [];
+  }
 }
