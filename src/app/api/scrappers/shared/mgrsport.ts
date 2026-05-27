@@ -1,9 +1,9 @@
 /**
- * Scraper helper for clubs hosted on mgrsport.uy (Fenicio eCommerce platform).
+ * Scraper helpers for Fenicio eCommerce platform stores (Uruguay).
  *
- * Products are embedded as HTML-entity-encoded JSON inside the club's category
- * page. A single fetch is sufficient — names and prices are both present in the
- * initial HTML (no JS execution required).
+ * Products are embedded as HTML-entity-encoded JSON inside category pages.
+ * A single fetch is sufficient — names and prices are present in the initial
+ * HTML (no JS execution required).
  *
  * The HTML encodes the product data as &quot; entities. After decoding, each
  * size variant appears as:
@@ -18,7 +18,7 @@
 
 import { Product } from './Product';
 
-const BASE_URL = 'https://www.mgrsport.uy';
+const MGRSPORT_BASE = 'https://www.mgrsport.uy';
 
 const HEADERS = {
   'User-Agent':
@@ -31,8 +31,11 @@ const HEADERS = {
 const VARIANT_RE =
   /"url":"([^"]+)","tieneStock":[^}]+},"nomPresentacion":"[^"]*","nombre":"([^"]+)","nombreCompleto":"[^"]+","precioMonto":(\d+)/g;
 
-export async function scrapeMgrsportClub(clubSlug: string): Promise<Product[]> {
-  const res = await fetch(`${BASE_URL}/${clubSlug}`, { headers: HEADERS });
+/**
+ * Scrape any Fenicio store by providing the full category page URL.
+ */
+export async function scrapeFenicio(pageUrl: string): Promise<Product[]> {
+  const res = await fetch(pageUrl, { headers: HEADERS });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
   // Decode HTML entities embedded by Fenicio
@@ -63,4 +66,12 @@ export async function scrapeMgrsportClub(clubSlug: string): Promise<Product[]> {
   }
 
   return products;
+}
+
+/**
+ * Convenience wrapper for clubs hosted on mgrsport.uy.
+ * Pass the club's URL slug (e.g. 'liverpool', 'danubio', 'cerro').
+ */
+export async function scrapeMgrsportClub(clubSlug: string): Promise<Product[]> {
+  return scrapeFenicio(`${MGRSPORT_BASE}/${clubSlug}`);
 }

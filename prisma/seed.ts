@@ -894,7 +894,7 @@ async function main() {
     {
       name: 'Montevideo City Torque',
       officialSiteUrl: 'https://www.torquefc.com.uy',
-      officialStoreUrl: 'https://www.torquefc.com.uy',
+      officialStoreUrl: 'https://tienda.montevideocitytorque.com/indumentaria',
       leagueId: leagueRecords[12].id,
     },
     {

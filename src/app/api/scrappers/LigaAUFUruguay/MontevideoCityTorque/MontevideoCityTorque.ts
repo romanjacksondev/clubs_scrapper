@@ -1,6 +1,13 @@
 import { Product } from '../../shared/Product';
+import { scrapeFenicio } from '../../shared/mgrsport';
 
-// No accessible public store found — stub
+const STORE_URL = 'https://tienda.montevideocitytorque.com/indumentaria';
+
 export default async function scrapeMontevideoCityTorque(): Promise<Product[]> {
-  return [];
+  try {
+    return await scrapeFenicio(STORE_URL);
+  } catch (e) {
+    console.error('Error in scrapeMontevideoCityTorque:', e);
+    return [];
+  }
 }
