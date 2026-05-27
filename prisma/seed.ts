@@ -20,6 +20,7 @@ async function main() {
     { name: 'Liga MX' },
     { name: 'Primera División' }, // Argentina
     { name: 'EFL Championship' },
+    { name: 'Liga AUF Uruguay' },
   ];
 
   // Insert leagues — upsert so re-running the seed never duplicates or errors
@@ -851,6 +852,104 @@ async function main() {
       officialSiteUrl: 'https://www.dcfc.co.uk',
       officialStoreUrl: 'https://www.dcfcmegastore.co.uk',
       leagueId: leagueRecords[11].id,
+    },
+
+    // Liga AUF Uruguay
+    {
+      name: 'CA Peñarol',
+      officialSiteUrl: 'https://www.penarol.org',
+      officialStoreUrl: 'https://tienda.penarol.org',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Club Nacional',
+      officialSiteUrl: 'https://www.nacional.com.uy',
+      officialStoreUrl: 'https://www.nacional.com.uy/tienda',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Liverpool FC Montevideo',
+      officialSiteUrl: 'https://liverpoolfc.com.uy',
+      officialStoreUrl: 'https://www.mgrsport.uy/liverpool',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Defensor Sporting',
+      officialSiteUrl: 'https://www.defensor.com.uy',
+      officialStoreUrl: 'https://www.defensor.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'CA Juventud',
+      officialSiteUrl: 'https://cajuventud.com.uy',
+      officialStoreUrl: 'https://cajuventud.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Racing Club de Montevideo',
+      officialSiteUrl: 'https://racingclub.com.uy',
+      officialStoreUrl: 'https://racingclubdemontevideo.com.uy/tienda/',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Montevideo City Torque',
+      officialSiteUrl: 'https://www.torquefc.com.uy',
+      officialStoreUrl: 'https://www.torquefc.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Montevideo Wanderers',
+      officialSiteUrl: 'https://www.wanderers.com.uy',
+      officialStoreUrl: 'https://www.wanderers.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'CA Boston River',
+      officialSiteUrl: 'https://www.bostonriver.com.uy',
+      officialStoreUrl: 'https://www.bostonriver.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Central Español FC',
+      officialSiteUrl: 'https://www.centralespanol.com.uy',
+      officialStoreUrl: 'https://www.centralespanol.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Club Deportivo Maldonado',
+      officialSiteUrl: 'https://www.cdmaldonado.com.uy',
+      officialStoreUrl: 'https://www.cdmaldonado.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Albion FC',
+      officialSiteUrl: 'https://www.albionfc.uy',
+      officialStoreUrl: 'https://www.albionfc.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Cerro Largo FC',
+      officialSiteUrl: 'https://www.cerrolargo.com.uy',
+      officialStoreUrl: 'https://www.cerrolargo.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'CA Progreso',
+      officialSiteUrl: 'https://www.caprogreso.com.uy',
+      officialStoreUrl: 'https://www.caprogreso.com.uy',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'Danubio FC',
+      officialSiteUrl: 'https://danubiofc.com.uy',
+      officialStoreUrl: 'https://www.mgrsport.uy/danubio',
+      leagueId: leagueRecords[12].id,
+    },
+    {
+      name: 'CA Cerro',
+      officialSiteUrl: 'https://www.cacerro.com.uy',
+      officialStoreUrl: 'https://www.mgrsport.uy/cerro',
+      leagueId: leagueRecords[12].id,
     },
   ];
 

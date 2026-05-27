@@ -158,6 +158,24 @@ import scrapeWatfordFC from './EFL/WatfordFC/WatfordFC';
 import scrapeWestBromwichAlbion from './EFL/WestBromwichAlbion/WestBromwichAlbion';
 import scrapeWrexhamAFC from './EFL/WrexhamAFC/WrexhamAFC';
 
+// — Liga AUF Uruguay —
+import scrapeAlbionFC from './LigaAUFUruguay/AlbionFC/AlbionFC';
+import scrapeBostonRiver from './LigaAUFUruguay/BostonRiver/BostonRiver';
+import scrapeCentralEspanol from './LigaAUFUruguay/CentralEspañol/CentralEspañol';
+import scrapeCerroUY from './LigaAUFUruguay/Cerro/Cerro';
+import scrapeCerroLargo from './LigaAUFUruguay/CerroLargo/CerroLargo';
+import scrapeClubDepMaldonado from './LigaAUFUruguay/ClubDepMaldonado/ClubDepMaldonado';
+import scrapeDanubio from './LigaAUFUruguay/Danubio/Danubio';
+import scrapeDefensorSporting from './LigaAUFUruguay/DefensorSporting/DefensorSporting';
+import scrapeJuventud from './LigaAUFUruguay/Juventud/Juventud';
+import scrapeLiverpoolUY from './LigaAUFUruguay/Liverpool/Liverpool';
+import scrapeMontevideoCityTorque from './LigaAUFUruguay/MontevideoCityTorque/MontevideoCityTorque';
+import scrapeMontevideoWanderers from './LigaAUFUruguay/MontevideoWanderers/MontevideoWanderers';
+import scrapeNacional from './LigaAUFUruguay/Nacional/Nacional';
+import scrapePenarol from './LigaAUFUruguay/Peñarol/Peñarol';
+import scrapeProgreso from './LigaAUFUruguay/Progreso/Progreso';
+import scrapeRacingClubUY from './LigaAUFUruguay/RacingClub/RacingClub';
+
 // — Eredivisie —
 import scrapeAjax from './Eredivisie/Ajax/Ajax';
 import scrapeAZ from './Eredivisie/AZ/AZ';
@@ -329,4 +347,22 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   NEC: scrapeNEC,
   'PSV Eindhoven': scrapePSVEindhoven,
   'SC Heerenveen': scrapeSCHeerenveen,
+
+  // Liga AUF Uruguay
+  'CA Peñarol': scrapePenarol,
+  'Club Nacional': scrapeNacional,
+  'Liverpool FC Montevideo': scrapeLiverpoolUY,
+  'Defensor Sporting': scrapeDefensorSporting,
+  'CA Juventud': scrapeJuventud,
+  'Racing Club de Montevideo': scrapeRacingClubUY,
+  'Montevideo City Torque': scrapeMontevideoCityTorque,
+  'Montevideo Wanderers': scrapeMontevideoWanderers,
+  'CA Boston River': scrapeBostonRiver,
+  'Central Español FC': scrapeCentralEspanol,
+  'Club Deportivo Maldonado': scrapeClubDepMaldonado,
+  'Albion FC': scrapeAlbionFC,
+  'Cerro Largo FC': scrapeCerroLargo,
+  'CA Progreso': scrapeProgreso,
+  'Danubio FC': scrapeDanubio,
+  'CA Cerro': scrapeCerroUY,
 };
