@@ -53,11 +53,26 @@ import scrapeWerderBremen from './Bundesliga/WerderBremen/WerderBremen';
 
 // — Brasileirão —
 import scrapeAthleticoPR from './Brasileirão/AthleticoPR/AthleticoPR';
+import scrapeAtleticoMineiro from './Brasileirão/AtléticoMineiro/AtléticoMineiro';
+import scrapeBahia from './Brasileirão/Bahia/Bahia';
+import scrapeBotafogo from './Brasileirão/Botafogo/Botafogo';
+import scrapeBragantino from './Brasileirão/Bragantino/Bragantino';
 import scrapeCorinthians from './Brasileirão/Corinthians/Corinthians';
+import scrapeCruzeiro from './Brasileirão/Cruzeiro/Cruzeiro';
 import scrapeFlamengo from './Brasileirão/Flamengo/Flamengo';
 import scrapeFluminense from './Brasileirão/Fluminense/Fluminense';
+import scrapeFortaleza from './Brasileirão/Fortaleza/Fortaleza';
+import scrapeGremio from './Brasileirão/Grêmio/Grêmio';
+import scrapeInternacional from './Brasileirão/Internacional/Internacional';
+import scrapeJuventude from './Brasileirão/Juventude/Juventude';
+import scrapeMirassol from './Brasileirão/Mirassol/Mirassol';
+import scrapeNovorizontino from './Brasileirão/Novorizontino/Novorizontino';
 import scrapePalmeiras from './Brasileirão/Palmeiras/Palmeiras';
+import scrapeSantos from './Brasileirão/Santos/Santos';
+import scrapeSportRecife from './Brasileirão/SportRecife/SportRecife';
 import scrapeSaoPaulo from './Brasileirão/SãoPaulo/SãoPaulo';
+import scrapeVasco from './Brasileirão/VascoDaGama/VascoDaGama';
+import scrapeVitoria from './Brasileirão/Vitória/Vitória';
 
 // — Primera División —
 import scrapeBocaJuniors from './PrimeraDivisión/BocaJuniors/BocaJuniors';
@@ -232,12 +247,27 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   'Werder Bremen': scrapeWerderBremen,
 
   // Brasileirão
+  'Atlético Mineiro': scrapeAtleticoMineiro,
   'Athletico-PR': scrapeAthleticoPR,
+  Bahia: scrapeBahia,
+  Botafogo: scrapeBotafogo,
+  'Red Bull Bragantino': scrapeBragantino,
   Corinthians: scrapeCorinthians,
+  Cruzeiro: scrapeCruzeiro,
   Flamengo: scrapeFlamengo,
   Fluminense: scrapeFluminense,
+  Fortaleza: scrapeFortaleza,
+  Grêmio: scrapeGremio,
+  Internacional: scrapeInternacional,
+  Juventude: scrapeJuventude,
+  Mirassol: scrapeMirassol,
+  Novorizontino: scrapeNovorizontino,
   Palmeiras: scrapePalmeiras,
   'São Paulo': scrapeSaoPaulo,
+  Santos: scrapeSantos,
+  'Sport Recife': scrapeSportRecife,
+  'Vasco da Gama': scrapeVasco,
+  Vitória: scrapeVitoria,
 
   // Primera División
   'Boca Juniors': scrapeBocaJuniors,
