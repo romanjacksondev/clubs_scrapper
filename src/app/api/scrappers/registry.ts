@@ -128,9 +128,36 @@ import scrapeTorino from './SerieA/Torino/Torino';
 import scrapeUdinese from './SerieA/Udinese/Udinese';
 
 // — MLS —
+import scrapeAtlantaUnited from './MLS/AtlantaUnited/AtlantaUnited';
+import scrapeAustinFC from './MLS/AustinFC/AustinFC';
+import scrapeCFMontreal from './MLS/CFMontreal/CFMontreal';
+import scrapeCharlotteFC from './MLS/CharlotteFC/CharlotteFC';
+import scrapeChicagoFire from './MLS/ChicagoFire/ChicagoFire';
+import scrapeColoradoRapids from './MLS/ColoradoRapids/ColoradoRapids';
+import scrapeColumbusCrew from './MLS/ColumbusСrew/ColumbusСrew';
+import scrapeDCUnited from './MLS/DCUnited/DCUnited';
+import scrapeFCCincinnati from './MLS/FCCincinnati/FCCincinnati';
+import scrapeFCDallas from './MLS/FCDallas/FCDallas';
+import scrapeHoustonDynamo from './MLS/HoustonDynamo/HoustonDynamo';
 import scrapeInterMiami from './MLS/InterMiami/InterMiami';
 import scrapeLAGalaxy from './MLS/LAGalaxy/LAGalaxy';
+import scrapeLosAngelesFC from './MLS/LosAngelesFC/LosAngelesFC';
+import scrapeMinnesotaUnited from './MLS/MinnesotaUnited/MinnesotaUnited';
+import scrapeNashvilleSC from './MLS/NashvilleSC/NashvilleSC';
+import scrapeNewEnglandRevolution from './MLS/NewEnglandRevolution/NewEnglandRevolution';
 import scrapeNewYorkCityFC from './MLS/NewYorkCityFC/NewYorkCityFC';
+import scrapeNewYorkRedBulls from './MLS/NewYorkRedBulls/NewYorkRedBulls';
+import scrapeOrlandoCitySC from './MLS/OrlandoCitySC/OrlandoCitySC';
+import scrapePhiladelphiaUnion from './MLS/PhiladelphiaUnion/PhiladelphiaUnion';
+import scrapePortlandTimbers from './MLS/PortlandTimbers/PortlandTimbers';
+import scrapeRealSaltLake from './MLS/RealSaltLake/RealSaltLake';
+import scrapeSanDiegoFC from './MLS/SanDiegoFC/SanDiegoFC';
+import scrapeSanJoseEarthquakes from './MLS/SanJoseEarthquakes/SanJoseEarthquakes';
+import scrapeSeattleSounders from './MLS/SeattleSounders/SeattleSounders';
+import scrapeSportingKansasCity from './MLS/SportingKansasCity/SportingKansasCity';
+import scrapeStLouisCitySC from './MLS/StLouisCitySC/StLouisCitySC';
+import scrapeTorontoFC from './MLS/TorontoFC/TorontoFC';
+import scrapeVancouverWhitecaps from './MLS/VancouverWhitecaps/VancouverWhitecaps';
 
 // — Ligue 1 —
 import scrapeMarseille from './Ligue1/Marseille/Marseille';
@@ -323,9 +350,36 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Udinese: scrapeUdinese,
 
   // MLS
+  'Atlanta United FC': scrapeAtlantaUnited,
+  'Austin FC': scrapeAustinFC,
+  'CF Montréal': scrapeCFMontreal,
+  'Charlotte FC': scrapeCharlotteFC,
+  'Chicago Fire FC': scrapeChicagoFire,
+  'Colorado Rapids': scrapeColoradoRapids,
+  'Columbus Crew': scrapeColumbusCrew,
+  'D.C. United': scrapeDCUnited,
+  'FC Cincinnati': scrapeFCCincinnati,
+  'FC Dallas': scrapeFCDallas,
+  'Houston Dynamo FC': scrapeHoustonDynamo,
   'Inter Miami': scrapeInterMiami,
   'LA Galaxy': scrapeLAGalaxy,
+  'Los Angeles FC': scrapeLosAngelesFC,
+  'Minnesota United FC': scrapeMinnesotaUnited,
+  'Nashville SC': scrapeNashvilleSC,
+  'New England Revolution': scrapeNewEnglandRevolution,
   'New York City FC': scrapeNewYorkCityFC,
+  'New York Red Bulls': scrapeNewYorkRedBulls,
+  'Orlando City SC': scrapeOrlandoCitySC,
+  'Philadelphia Union': scrapePhiladelphiaUnion,
+  'Portland Timbers': scrapePortlandTimbers,
+  'Real Salt Lake': scrapeRealSaltLake,
+  'San Diego FC': scrapeSanDiegoFC,
+  'San Jose Earthquakes': scrapeSanJoseEarthquakes,
+  'Seattle Sounders FC': scrapeSeattleSounders,
+  'Sporting Kansas City': scrapeSportingKansasCity,
+  'St. Louis City SC': scrapeStLouisCitySC,
+  'Toronto FC': scrapeTorontoFC,
+  'Vancouver Whitecaps FC': scrapeVancouverWhitecaps,
 
   // Ligue 1
   Marseille: scrapeMarseille,
