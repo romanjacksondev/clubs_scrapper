@@ -75,14 +75,33 @@ import scrapeVasco from './Brasileirão/VascoDaGama/VascoDaGama';
 import scrapeVitoria from './Brasileirão/Vitória/Vitória';
 
 // — Primera División —
+import scrapeArsenalDeSarandí from './PrimeraDivisión/ArsenalDeSarandí/ArsenalDeSarandí';
+import scrapeAtléticoTucumán from './PrimeraDivisión/AtléticoTucumán/AtléticoTucumán';
+import scrapeBanfield from './PrimeraDivisión/Banfield/Banfield';
+import scrapeBarracasCentral from './PrimeraDivisión/BarracasCentral/BarracasCentral';
+import scrapeBelgrano from './PrimeraDivisión/Belgrano/Belgrano';
 import scrapeBocaJuniors from './PrimeraDivisión/BocaJuniors/BocaJuniors';
+import scrapeCentralCórdoba from './PrimeraDivisión/CentralCórdoba/CentralCórdoba';
+import scrapeDefensaYJusticia from './PrimeraDivisión/DefensaYJusticia/DefensaYJusticia';
 import scrapeEstudiantes from './PrimeraDivisión/Estudiantes/Estudiantes';
+import scrapeGimnasiaYEsgrimaLP from './PrimeraDivisión/GimnasiaYEsgrimaLP/GimnasiaYEsgrimaLP';
+import scrapeGodoyCruz from './PrimeraDivisión/GodoyCruz/GodoyCruz';
 import scrapeHuracán from './PrimeraDivisión/Huracán/Huracán';
 import scrapeIndependiente from './PrimeraDivisión/Independiente/Independiente';
+import scrapeInstituto from './PrimeraDivisión/Instituto/Instituto';
+import scrapeLanús from './PrimeraDivisión/Lanús/Lanús';
+import scrapeNewellsOldBoys from './PrimeraDivisión/NewellsOldBoys/NewellsOldBoys';
+import scrapePatronato from './PrimeraDivisión/Patronato/Patronato';
+import scrapePlatense from './PrimeraDivisión/Platense/Platense';
 import scrapeRacingClub from './PrimeraDivisión/RacingClub/RacingClub';
 import scrapeRiverPlate from './PrimeraDivisión/RiverPlate/RiverPlate';
 import scrapeRosarioCentral from './PrimeraDivisión/RosarioCentral/RosarioCentral';
 import scrapeSanLorenzo from './PrimeraDivisión/SanLorenzo/SanLorenzo';
+import scrapeSanMartínTucumán from './PrimeraDivisión/SanMartínTucumán/SanMartínTucumán';
+import scrapeSarmiento from './PrimeraDivisión/Sarmiento/Sarmiento';
+import scrapeTalleres from './PrimeraDivisión/Talleres/Talleres';
+import scrapeTigre from './PrimeraDivisión/Tigre/Tigre';
+import scrapeUnión from './PrimeraDivisión/Unión/Unión';
 import scrapeVélezSarsfield from './PrimeraDivisión/VélezSarsfield/VélezSarsfield';
 
 // — La Liga —
@@ -166,14 +185,44 @@ import scrapeOlympiqueLyonnais from './Ligue1/OlympiqueLyonnais/OlympiqueLyonnai
 import scrapePSG from './Ligue1/PSG/PSG';
 
 // — Liga MX —
+import scrapeAtlasFC from './LigaMX/AtlasFC/AtlasFC';
+import scrapeAtleticoSanLuis from './LigaMX/AtleticoSanLuis/AtleticoSanLuis';
+import scrapeCFMonterrey from './LigaMX/CFMonterrey/CFMonterrey';
+import scrapeCFPachuca from './LigaMX/CFPachuca/CFPachuca';
 import scrapeChivas from './LigaMX/ChivasGuadalajara/ChivasGuadalajara';
 import scrapeClubAmerica from './LigaMX/ClubAmerica/ClubAmerica';
+import scrapeClubPuebla from './LigaMX/ClubPuebla/ClubPuebla';
+import scrapeClubTijuana from './LigaMX/ClubTijuana/ClubTijuana';
 import scrapeCruzAzul from './LigaMX/CruzAzul/CruzAzul';
+import scrapeDeportivoToluca from './LigaMX/DeportivoToluca/DeportivoToluca';
+import scrapeFCJuarez from './LigaMX/FCJuarez/FCJuarez';
+import scrapeLeonFC from './LigaMX/LeonFC/LeonFC';
+import scrapeMazatlanFC from './LigaMX/MazatlanFC/MazatlanFC';
+import scrapeNecaxa from './LigaMX/Necaxa/Necaxa';
+import scrapePumasUNAM from './LigaMX/PumasUNAM/PumasUNAM';
+import scrapeQueretaroFC from './LigaMX/QueretaroFC/QueretaroFC';
+import scrapeSantosLaguna from './LigaMX/SantosLaguna/SantosLaguna';
+import scrapeTigresUNAM from './LigaMX/TigresUNAM/TigresUNAM';
 
 // — Primeira Liga —
+import scrapeArouca from './PrimeiraLiga/Arouca/Arouca';
+import scrapeAVS from './PrimeiraLiga/AVS/AVS';
 import scrapeBenfica from './PrimeiraLiga/Benfica/Benfica';
+import scrapeBoavista from './PrimeiraLiga/Boavista/Boavista';
+import scrapeBraga from './PrimeiraLiga/Braga/Braga';
+import scrapeCasaPia from './PrimeiraLiga/CasaPia/CasaPia';
+import scrapeEstorilPraia from './PrimeiraLiga/EstorilPraia/EstorilPraia';
+import scrapeEstrelaAmadora from './PrimeiraLiga/EstrelaAmadora/EstrelaAmadora';
+import scrapeFamalicão from './PrimeiraLiga/Famalicão/Famalicão';
+import scrapeFarense from './PrimeiraLiga/Farense/Farense';
+import scrapeGilVicente from './PrimeiraLiga/GilVicente/GilVicente';
+import scrapeMoreirense from './PrimeiraLiga/Moreirense/Moreirense';
+import scrapeNacional from './PrimeiraLiga/Nacional/Nacional';
 import scrapePorto from './PrimeiraLiga/Porto/Porto';
+import scrapeRioAve from './PrimeiraLiga/RioAve/RioAve';
+import scrapeSantaClara from './PrimeiraLiga/SantaClara/SantaClara';
 import scrapeSpotingCP from './PrimeiraLiga/SportingCP/SportingCP';
+import scrapeVitóriaSC from './PrimeiraLiga/VitóriaSC/VitóriaSC';
 
 // — EFL Championship —
 import scrapeBirminghamCity from './EFL/BirminghamCity/BirminghamCity';
@@ -213,7 +262,6 @@ import scrapeJuventud from './LigaAUFUruguay/Juventud/Juventud';
 import scrapeLiverpoolUY from './LigaAUFUruguay/Liverpool/Liverpool';
 import scrapeMontevideoCityTorque from './LigaAUFUruguay/MontevideoCityTorque/MontevideoCityTorque';
 import scrapeMontevideoWanderers from './LigaAUFUruguay/MontevideoWanderers/MontevideoWanderers';
-import scrapeNacional from './LigaAUFUruguay/Nacional/Nacional';
 import scrapePenarol from './LigaAUFUruguay/Peñarol/Peñarol';
 import scrapeProgreso from './LigaAUFUruguay/Progreso/Progreso';
 import scrapeRacingClubUY from './LigaAUFUruguay/RacingClub/RacingClub';
@@ -297,15 +345,34 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   Vitória: scrapeVitoria,
 
   // Primera División
+  'Arsenal de Sarandí': scrapeArsenalDeSarandí,
+  'Atlético Tucumán': scrapeAtléticoTucumán,
+  Banfield: scrapeBanfield,
+  'Barracas Central': scrapeBarracasCentral,
+  Belgrano: scrapeBelgrano,
   'Boca Juniors': scrapeBocaJuniors,
-  'River Plate': scrapeRiverPlate,
-  'San Lorenzo': scrapeSanLorenzo,
-  Independiente: scrapeIndependiente,
+  'Central Córdoba': scrapeCentralCórdoba,
+  'Defensa y Justicia': scrapeDefensaYJusticia,
   Estudiantes: scrapeEstudiantes,
-  'Vélez Sarsfield': scrapeVélezSarsfield,
-  'Rosario Central': scrapeRosarioCentral,
-  'Racing Club': scrapeRacingClub,
+  'Gimnasia y Esgrima LP': scrapeGimnasiaYEsgrimaLP,
+  'Godoy Cruz': scrapeGodoyCruz,
   Huracán: scrapeHuracán,
+  Independiente: scrapeIndependiente,
+  Instituto: scrapeInstituto,
+  Lanús: scrapeLanús,
+  "Newell's Old Boys": scrapeNewellsOldBoys,
+  Patronato: scrapePatronato,
+  Platense: scrapePlatense,
+  'Racing Club': scrapeRacingClub,
+  'River Plate': scrapeRiverPlate,
+  'Rosario Central': scrapeRosarioCentral,
+  'San Lorenzo': scrapeSanLorenzo,
+  'San Martín Tucumán': scrapeSanMartínTucumán,
+  Sarmiento: scrapeSarmiento,
+  Talleres: scrapeTalleres,
+  Tigre: scrapeTigre,
+  Unión: scrapeUnión,
+  'Vélez Sarsfield': scrapeVélezSarsfield,
 
   // La Liga
   'Atlético Madrid': scrapeAtleticoMadrid,
@@ -388,14 +455,44 @@ export const SCRAPERS: Readonly<Record<string, ScraperFn>> = {
   'Paris Saint-Germain': scrapePSG,
 
   // Liga MX
+  'Atlas FC': scrapeAtlasFC,
+  'Atlético de San Luis': scrapeAtleticoSanLuis,
+  'CF Monterrey': scrapeCFMonterrey,
+  'CF Pachuca': scrapeCFPachuca,
   'Chivas Guadalajara': scrapeChivas,
   'Club América': scrapeClubAmerica,
+  'Club Puebla': scrapeClubPuebla,
+  'Club Tijuana': scrapeClubTijuana,
   'Cruz Azul': scrapeCruzAzul,
+  'Deportivo Toluca': scrapeDeportivoToluca,
+  'FC Juárez': scrapeFCJuarez,
+  'León FC': scrapeLeonFC,
+  'Mazatlán FC': scrapeMazatlanFC,
+  Necaxa: scrapeNecaxa,
+  'Pumas UNAM': scrapePumasUNAM,
+  'Querétaro FC': scrapeQueretaroFC,
+  'Santos Laguna': scrapeSantosLaguna,
+  'Tigres UNAM': scrapeTigresUNAM,
 
   // Primeira Liga
+  Arouca: scrapeArouca,
+  AVS: scrapeAVS,
   Benfica: scrapeBenfica,
+  Boavista: scrapeBoavista,
+  Braga: scrapeBraga,
+  'Casa Pia': scrapeCasaPia,
+  'Estrela da Amadora': scrapeEstrelaAmadora,
+  'Estoril Praia': scrapeEstorilPraia,
+  Famalicão: scrapeFamalicão,
+  Farense: scrapeFarense,
+  'Gil Vicente': scrapeGilVicente,
+  Moreirense: scrapeMoreirense,
+  Nacional: scrapeNacional,
   Porto: scrapePorto,
+  'Rio Ave': scrapeRioAve,
+  'Santa Clara': scrapeSantaClara,
   'Sporting CP': scrapeSpotingCP,
+  'Vitória SC': scrapeVitóriaSC,
 
   // EFL Championship
   'Blackburn Rovers': scrapeBlackburnRovers,
