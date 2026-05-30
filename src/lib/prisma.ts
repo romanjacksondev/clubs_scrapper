@@ -1,6 +1,11 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import 'dotenv/config';
 import { PrismaClient } from '../../prisma/generated/client';
+
+// Load .env only in local development; on Vercel env vars are injected directly.
+if (process.env.NODE_ENV !== 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config();
+}
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
