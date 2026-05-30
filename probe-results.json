@@ -1,0 +1,16 @@
+[
+  {
+    "club": "LeedsUnited",
+    "league": "PremierLeague",
+    "url": "https://store.leedsunited.com",
+    "reachable": false,
+    "error": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://store.leedsunited.com/\nCall log:\n\u001b[2m  - navigating to \"https://store.leedsunited.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  },
+  {
+    "club": "SunderlandAFC",
+    "league": "PremierLeague",
+    "url": "https://shop.safc.com",
+    "reachable": false,
+    "error": "page.goto: net::ERR_NAME_NOT_RESOLVED at https://shop.safc.com/\nCall log:\n\u001b[2m  - navigating to \"https://shop.safc.com/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  }
+]

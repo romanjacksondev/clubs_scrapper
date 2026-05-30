@@ -1,123 +1,83 @@
 // Bayer 04 Leverkusen official store (www.bayer04.de/de-de/shop/) — protected by Queue-it.
-// If Queue-it virtual waiting room or "staytuned" page is detected, returns an empty array.
-// Key: all browser.close() calls are fire-and-forget (.catch(() => {})) so the function never
-// hangs waiting for the browser to exit after a navigation error.
+// Playwright with de-DE locale + Europe/Berlin timezone bypasses Queue-it bot detection.
+// Products are SSR — grab page.content() immediately after domcontentloaded before Queue-it
+// JS can navigate away ("Execution context was destroyed" race condition).
+// Selectors: a[class*="c-product-box-link"] → [class*="c-product-box__title"] + last .price-value
 
+import * as cheerio from 'cheerio';
 import { Product } from '../../shared/Product';
-import { launchBrowser } from '../../shared/puppeteerUtils';
+import { launchPlaywright } from '../../shared/playwrightUtils';
 
-const JERSEYS_URL = 'https://www.bayer04.de/de-de/shop/trikots/';
-const SHOP_URL = 'https://www.bayer04.de/de-de/shop/';
+const STORE_BASE = 'https://www.bayer04.de';
+const JERSEYS_URL = `${STORE_BASE}/de-de/shop/trikots/`;
 
-const QUEUEIT_MARKERS = ['queue-it', 'queueit', 'staytuned'];
-const isQueueIt = (url: string) => QUEUEIT_MARKERS.some((m) => url.includes(m));
+const QUEUEIT_MARKERS = ['queue-it', 'queueit', 'staytuned', 'waitingroom'];
+const isQueueIt = (s: string) => QUEUEIT_MARKERS.some((m) => s.toLowerCase().includes(m));
 
 const scrapeBayerLeverkusen = async (): Promise<Product[]> => {
-  let browser: any;
-  try {
-    browser = await launchBrowser(true);
-
-    const page = await browser.newPage();
-    await page.setUserAgent(
+  const browser = await launchPlaywright();
+  const context = await browser.newContext({
+    userAgent:
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    );
-    await page.setExtraHTTPHeaders({ 'Accept-Language': 'de-DE,de;q=0.9' });
+    locale: 'de-DE',
+    timezoneId: 'Europe/Berlin',
+    viewport: { width: 1280, height: 800 },
+    extraHTTPHeaders: {
+      'Accept-Language': 'de-DE,de;q=0.9,en;q=0.8',
+      Accept:
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    },
+  });
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+  });
 
-    // Use domcontentloaded so we can check for the Queue-it redirect immediately
-    // (networkidle2 never fires because the staytuned page does continuous XHR polling)
+  try {
+    const page = await context.newPage();
+
+    let html = '';
     try {
-      await page.goto(JERSEYS_URL, { waitUntil: 'domcontentloaded', timeout: 20000 });
+      await page.goto(JERSEYS_URL, { waitUntil: 'domcontentloaded', timeout: 25000 });
+      // Capture HTML immediately — before Queue-it JS can navigate away
+      html = await page.content();
     } catch {
-      // timeout is expected on the staytuned waiting-room page — fall through to URL check
+      html = await page.content().catch(() => '');
     }
 
-    if (isQueueIt(page.url())) {
-      console.warn('scrapeBayerLeverkusen: Queue-it detected at JERSEYS_URL');
-      browser.close().catch(() => {});
+    if (isQueueIt(page.url()) || isQueueIt(html)) {
+      console.warn('scrapeBayerLeverkusen: Queue-it detected');
       return [];
     }
 
-    // If redirected away from bayer04.de, try shop home
-    if (!page.url().includes('bayer04.de')) {
-      try {
-        await page.goto(SHOP_URL, { waitUntil: 'domcontentloaded', timeout: 20000 });
-      } catch {
-        // ignore
-      }
-      if (isQueueIt(page.url())) {
-        console.warn('scrapeBayerLeverkusen: Queue-it detected at SHOP_URL');
-        browser.close().catch(() => {});
-        return [];
-      }
-    }
+    const $ = cheerio.load(html);
+    const products: Product[] = [];
+    const seen = new Set<string>();
 
-    // Wait 2 s — Queue-it JS may trigger a navigation after domcontentloaded
-    await new Promise((r) => setTimeout(r, 2000));
+    $('a[class*="c-product-box-link"]').each((_, el) => {
+      const rawHref = $(el).attr('href') || '';
+      if (!rawHref) return;
+      const productUrl = rawHref.startsWith('http') ? rawHref : `${STORE_BASE}${rawHref}`;
+      if (seen.has(productUrl)) return;
+      seen.add(productUrl);
 
-    if (isQueueIt(page.url())) {
-      console.warn('scrapeBayerLeverkusen: Queue-it detected after 2s wait');
-      browser.close().catch(() => {});
-      return [];
-    }
+      const name = $(el).find('[class*="c-product-box__title"]').first().text().trim();
+      if (!name || name.length < 3) return;
 
-    // Wait for product cards to render (best-effort — may not appear)
-    await page
-      .waitForSelector('article, [class*="product-item"], [class*="ProductItem"]', {
-        timeout: 8000,
-      })
-      .catch(() => {});
+      // Last price-value is the actual selling price (sale overrides regular)
+      const priceEls = $(el).find('[class*="price-value"]');
+      const priceText = priceEls.last().text().trim();
+      const price = parseFloat(priceText.replace(',', '.'));
+      if (price <= 0) return;
 
-    // Wrap evaluate in its own try/catch: if Queue-it navigates the page during evaluate,
-    // Puppeteer throws "Execution context was destroyed" and awaiting browser.close() can hang.
-    let products: Product[] = [];
-    try {
-      products = await page.evaluate(() => {
-        const results: { name: string; productUrl: string; price: number; currency: string }[] = [];
-        const seen = new Set<string>();
+      products.push({ name, productUrl, price, currency: 'EUR' });
+    });
 
-        const cards = Array.from(
-          document.querySelectorAll<HTMLElement>(
-            'article, [class*="product-item"], [class*="ProductItem"]',
-          ),
-        );
-
-        for (const card of cards) {
-          const link = card.querySelector<HTMLAnchorElement>('a[href]');
-          if (!link) continue;
-          const href = link.href;
-          if (!href || seen.has(href)) continue;
-          seen.add(href);
-
-          const nameEl = card.querySelector('[class*="name"], [class*="title"], h2, h3');
-          const name = (nameEl?.textContent || link.textContent || '').trim();
-          if (!name) continue;
-
-          const priceEl = card.querySelector('[class*="price"], [class*="Price"]');
-          const priceText = priceEl?.textContent || '';
-          const priceMatch = priceText.match(/([\d]+[,.][\d]+)/);
-          const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : 0;
-          if (price <= 0) continue;
-
-          results.push({ name, productUrl: href, price, currency: 'EUR' });
-        }
-        return results;
-      });
-    } catch (evalErr) {
-      // "Execution context was destroyed" — Queue-it redirected the page during evaluate
-      console.warn(
-        'scrapeBayerLeverkusen: page.evaluate failed (likely Queue-it redirect):',
-        evalErr,
-      );
-      browser.close().catch(() => {});
-      return [];
-    }
-
-    browser.close().catch(() => {});
     return products;
   } catch (e) {
     console.error('Error in scrapeBayerLeverkusen:', e);
-    if (browser) browser.close().catch(() => {});
     return [];
+  } finally {
+    await browser.close();
   }
 };
 
