@@ -22,17 +22,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const clubs = await prisma.club.findMany({
-    where: { deletedAt: null },
-    include: { league: true },
-  });
+  let clubs: Awaited<ReturnType<typeof prisma.club.findMany>>;
+  try {
+    clubs = await prisma.club.findMany({
+      where: { deletedAt: null },
+      include: { league: true },
+    });
+  } catch (e) {
+    console.error('Failed to fetch clubs from DB:', e);
+    return NextResponse.json({ error: 'Database error: could not load clubs' }, { status: 500 });
+  }
 
   type Result = { club: string; status: 'ok' | 'empty' | 'error'; count?: number; error?: string };
 
   const BATCH_SIZE = 3;
   const results: Result[] = [];
 
-  const run = await prisma.scrapeRun.create({ data: {} });
+  let run: Awaited<ReturnType<typeof prisma.scrapeRun.create>>;
+  try {
+    run = await prisma.scrapeRun.create({ data: {} });
+  } catch (e) {
+    console.error('Failed to create scrape run record:', e);
+    return NextResponse.json({ error: 'Database error: could not create scrape run' }, { status: 500 });
+  }
 
   for (let i = 0; i < clubs.length; i += BATCH_SIZE) {
     const batch = clubs.slice(i, i + BATCH_SIZE);
@@ -71,21 +83,25 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await purgeOldHistory();
+  try {
+    await purgeOldHistory();
 
-  await prisma.scrapeRunResult.createMany({
-    data: results.map((r) => ({
-      scrapeRunId: run.id,
-      clubName: r.club,
-      status: r.status,
-      count: r.count ?? null,
-      error: r.error ?? null,
-    })),
-  });
-  await prisma.scrapeRun.update({
-    where: { id: run.id },
-    data: { finishedAt: new Date() },
-  });
+    await prisma.scrapeRunResult.createMany({
+      data: results.map((r) => ({
+        scrapeRunId: run.id,
+        clubName: r.club,
+        status: r.status,
+        count: r.count ?? null,
+        error: r.error ?? null,
+      })),
+    });
+    await prisma.scrapeRun.update({
+      where: { id: run.id },
+      data: { finishedAt: new Date() },
+    });
+  } catch (e) {
+    console.error('Failed to persist scrape results:', e);
+  }
 
   return NextResponse.json({ results });
 }

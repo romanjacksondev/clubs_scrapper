@@ -31,10 +31,16 @@ export async function POST(request: NextRequest) {
   if (isNaN(parsedClubId)) {
     return NextResponse.json({ error: 'Invalid clubId' }, { status: 400 });
   }
-  const clubRecord = await prisma.club.findFirst({
-    where: { id: parsedClubId, deletedAt: null },
-    select: { id: true },
-  });
+  let clubRecord: { id: number } | null;
+  try {
+    clubRecord = await prisma.club.findFirst({
+      where: { id: parsedClubId, deletedAt: null },
+      select: { id: true },
+    });
+  } catch (e) {
+    console.error('DB error looking up club:', e);
+    return NextResponse.json({ error: 'Database error' }, { status: 500 });
+  }
   if (!clubRecord) {
     return NextResponse.json({ error: 'Club not found' }, { status: 404 });
   }

@@ -1,5 +1,4 @@
 // AZ Alkmaar official store (az.nl/webshop) — custom CMS with Playwright rendering.
-import { chromium } from 'playwright';
 import { Product } from '../../shared/Product';
 
 const STORE_BASE = 'https://az.nl';
@@ -21,6 +20,7 @@ const parsePrice = (text: string | null | undefined): number | null => {
 };
 
 const scrapeAZ = async (): Promise<Product[]> => {
+  const { chromium } = await import('playwright');
   const browser = await chromium.launch({ headless: true });
   const allProducts: Product[] = [];
   const seen = new Set<string>();
