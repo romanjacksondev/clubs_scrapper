@@ -9,8 +9,8 @@ import * as cheerio from 'cheerio';
 import type { AnyNode } from 'domhandler';
 import { Product } from '../../shared/Product';
 
-const BASE_URL = 'https://www.tiendapincha.com';
-const KITS_URL = `${BASE_URL}/camisetas`;
+const BASE_URL = 'https://tiendapincha.com';
+const CATEGORY_SLUG = 'indumentaria';
 
 const HEADERS: Record<string, string> = {
   'User-Agent':
@@ -36,27 +36,41 @@ function parseTiendanubePrice($el: cheerio.Cheerio<AnyNode>): number {
   return 0;
 }
 
+async function scrapePage(pageUrl: string): Promise<Product[]> {
+  const products: Product[] = [];
+  const res = await fetch(pageUrl, { headers: HEADERS });
+  if (!res.ok) return [];
+  const html = await res.text();
+  const $ = cheerio.load(html);
+
+  $('[data-product-id]').each((_, el) => {
+    const $el = $(el);
+    const id = $el.attr('data-product-id')!;
+    const name = $el.find(`[data-store="product-item-name-${id}"]`).text().trim();
+    const price = parseTiendanubePrice($el);
+    let url = $el.find('a').first().attr('href') ?? '';
+    if (url && !url.startsWith('http')) url = `${BASE_URL}${url}`;
+
+    if (name && price > 0 && url) {
+      products.push({ name, productUrl: url, price, currency: 'ARS' });
+    }
+  });
+  return products;
+}
+
 export default async function scrapeEstudiantes(): Promise<Product[]> {
   const products: Product[] = [];
 
   try {
-    const res = await fetch(KITS_URL, { headers: HEADERS });
-    if (!res.ok) return [];
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    $('[data-product-id]').each((_, el) => {
-      const $el = $(el);
-      const id = $el.attr('data-product-id')!;
-      const name = $el.find(`[data-store="product-item-name-${id}"]`).text().trim();
-      const price = parseTiendanubePrice($el);
-      let url = $el.find('a').first().attr('href') ?? '';
-      if (url && !url.startsWith('http')) url = `${BASE_URL}${url}`;
-
-      if (name && price > 0 && url) {
-        products.push({ name, productUrl: url, price, currency: 'ARS' });
-      }
-    });
+    let page = 1;
+    while (true) {
+      const url =
+        page === 1 ? `${BASE_URL}/${CATEGORY_SLUG}` : `${BASE_URL}/${CATEGORY_SLUG}?page=${page}`;
+      const pageProducts = await scrapePage(url);
+      if (pageProducts.length === 0) break;
+      products.push(...pageProducts);
+      page++;
+    }
   } catch (e) {
     console.error('Error scraping Estudiantes:', e);
   }

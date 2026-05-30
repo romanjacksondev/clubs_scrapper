@@ -10,7 +10,7 @@ import type { AnyNode } from 'domhandler';
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://tiendavelez.com.ar';
-const KITS_URL = `${BASE_URL}/camisetas`;
+const KITS_URL = `${BASE_URL}/productos`;
 
 const HEADERS: Record<string, string> = {
   'User-Agent':

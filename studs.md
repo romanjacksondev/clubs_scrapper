@@ -1,6 +1,6 @@
 # Stub Scrapers — Teams with No Functioning Scraper
 
-> Last updated: 30 May 2026 — **132 teams** across 12 leagues.
+> Last updated: 30 May 2026 — **125 teams** across 12 leagues.
 
 ---
 
@@ -163,33 +163,29 @@
 | Santa Clara     | CD Santa Clara official store: no accessible online store found. The official site (cdsantaclara.pt) does not expose a public product API.                                       |
 | Vitória SC      | Vitória SC (Guimarães) official store: loja.vitoriasc.pt The store is WooCommerce but the store/v1 API returns rest_no_route (disabled).                                         |
 
-## Primera División (Argentina) (23 teams)
+## Primera División (Argentina) (16 teams)
 
-| Team                  | Reason                                                                                                                                                           |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Arsenal De Sarandí    | Arsenal de Sarandí official store: no accessible online store found. All known domain candidates (arsenal-fc.com.ar, tienda.arsenal-fc.com.ar) are               |
-| Atlético Tucumán      | Atlético Tucumán official store: no accessible online store found. The official site (atleticotucuman.com) does not expose a public product API.                 |
-| Banfield              | Banfield official store: no accessible online store found. Domain candidates (tiendabanfield.com.ar, clubbanfield.com.ar) are not resolvable.                    |
-| Barracas Central      | Barracas Central official store: no accessible online store found. The official site (barracascentral.com) does not link to an online store.                     |
-| Belgrano              | Belgrano official store: no accessible online store found. The official site (cabelgrano.com.ar) has SSL issues and does not expose a product API.               |
-| Central Córdoba       | Central Córdoba (Santiago del Estero) official store: no accessible online store found. The official site (centralcordoba.com.ar) does not expose a product API. |
-| Defensa Y Justicia    | Defensa y Justicia official store: no accessible online store found. All known domain candidates are not resolvable from outside Argentina.                      |
-| Estudiantes           | Tiendanube store (tiendapincha.com — Estudiantes de La Plata). Products are rendered server-side; each item has data-product-id attribute.                       |
-| Gimnasia Y Esgrima LP | Gimnasia y Esgrima La Plata official store: no accessible online store found. Domain candidates (gimnasiaylp.com.ar, tiendaginmasia.com.ar) are not resolvable.  |
-| Godoy Cruz            | Godoy Cruz official store: no accessible online store found. Domain candidates (tiendagodoycruz.com.ar, godoycruztomba.com) are not resolvable.                  |
-| Huracán               | Huracán official store (tiendahuracan.com.ar). The store is currently unreachable (DNS / server offline).                                                        |
-| Independiente         | Tiendanube store (independientestore.com.ar). Products are rendered server-side; each item has data-product-id attribute.                                        |
-| Instituto             | Instituto (Córdoba) official store: tiendainstituto.com.ar The store uses the TiendaNube platform (mitiendanube.com CDN), which requires                         |
-| Lanús                 | Lanús official store: tiendagranate.clublanus.com The store does not respond to Shopify or other known product API endpoints.                                    |
-| Newells Old Boys      | Newell's Old Boys official store: no accessible online store found. Domain candidates (tiendanob.com.ar, tiendanewells.com.ar) are not resolvable.               |
-| Patronato             | Patronato (Paraná) official store: no accessible online store found. Domain candidates (patronato.com.ar, tiendapatronato.com.ar) are not resolvable.            |
-| Platense              | Platense official store: no accessible online store found. The official site (clubplatense.net) does not link to an online store.                                |
-| San Martín Tucumán    | San Martín de Tucumán official store: no accessible online store found. No public product API has been identified for this club.                                 |
-| Sarmiento             | Sarmiento (Junín) official store: no accessible online store found. Domain candidates (tiendasarmiento.com.ar, clubsarmiento.com) return 404.                    |
-| Talleres              | Talleres (Córdoba) official store: no accessible online store found. Domain candidates (tiendatalleres.com.ar, talleres.net) are not resolvable.                 |
-| Tigre                 | Tigre official store: tiendatigre.com.ar The store uses the TiendaNube platform (mitiendanube.com CDN), which requires                                           |
-| Unión                 | Unión (Santa Fe) official store: tiendaunion.com.ar The store uses a custom platform — not Shopify, TiendaNube, or WooCommerce.                                  |
-| Vélez Sarsfield       | Tiendanube store (tiendavelez.com.ar — Vélez Sarsfield). Products are rendered server-side; each item has data-product-id attribute.                             |
+> ✅ Implemented: Estudiantes (TiendaNube /indumentaria, 27 products), Instituto (TiendaNube /indumentaria, 62 products), Tigre (TiendaNube /indumentaria, 135 products), Vélez Sarsfield (TiendaNube /productos, 12 products), Lanús (WooCommerce store/v1, 371 products), Unión (custom PHP HTML scraper, 12 products)
+> ℹ️ Was already working: Independiente (TiendaNube /camisetas, 12 products)
+
+| Team                  | Reason                                                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Arsenal De Sarandí    | Arsenal de Sarandí official store: no accessible online store found. All known domain candidates (arsenal-fc.com.ar, tienda.arsenal-fc.com.ar) are not resolvable. |
+| Atlético Tucumán      | Atlético Tucumán official store: no accessible online store found. atleticotucuman.com is a parked domain for sale; no club store is accessible.                   |
+| Banfield              | Banfield official store: no accessible online store found. Domain candidates (tiendabanfield.com.ar, clubbanfield.com.ar) are not resolvable.                      |
+| Barracas Central      | Barracas Central official store: no accessible online store found. The official site (barracascentral.com) does not link to an online store.                       |
+| Belgrano              | Belgrano official store: no accessible online store found. The official site (cabelgrano.com.ar) has SSL issues and does not expose a product API.                 |
+| Central Córdoba       | Central Córdoba (Santiago del Estero) official store: no accessible online store found. The official site (centralcordoba.com.ar) does not expose a product API.   |
+| Defensa Y Justicia    | Defensa y Justicia official store: no accessible online store found. All known domain candidates are not resolvable from outside Argentina.                        |
+| Gimnasia Y Esgrima LP | Gimnasia y Esgrima La Plata official store: no accessible online store found. Domain candidates (gimnasiaylp.com.ar, tiendaginmasia.com.ar) are not resolvable.    |
+| Godoy Cruz            | Godoy Cruz official store: no accessible online store found. Domain candidates (tiendagodoycruz.com.ar, godoycruztomba.com) are not resolvable.                    |
+| Huracán               | Huracán official store (tiendahuracan.com.ar). The store is currently unreachable (DNS / server offline).                                                          |
+| Newells Old Boys      | Newell's Old Boys official store: no accessible online store found. Domain candidates (tiendanob.com.ar, tiendanewells.com.ar) are not resolvable.                 |
+| Patronato             | Patronato (Paraná) official store: no accessible online store found. Domain candidates (patronato.com.ar, tiendapatronato.com.ar) are not resolvable.              |
+| Platense              | Platense official store: no accessible online store found. The official site (clubplatense.net) does not link to an online store.                                  |
+| San Martín Tucumán    | San Martín de Tucumán official store: no accessible online store found. No public product API has been identified for this club.                                   |
+| Sarmiento             | Sarmiento (Junín) official store: no accessible online store found. Domain candidates (tiendasarmiento.com.ar, clubsarmiento.com) return 404.                      |
+| Talleres              | Talleres (Córdoba) official store: no accessible online store found. Domain candidates (tiendatalleres.com.ar, talleres.net) are not resolvable.                   |
 
 ## Serie A (Italy) (14 teams)
 
