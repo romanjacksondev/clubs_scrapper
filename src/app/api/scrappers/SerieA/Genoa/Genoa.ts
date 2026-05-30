@@ -41,7 +41,12 @@ const scrapeGenoa = async (): Promise<Product[]> => {
     const subCatRe = /href="(https:\/\/genoacfc\.it\/categoria-prodotto\/team\/kit-gara\/[^"]+)"/g;
     const subCategories = new Set<string>();
     let sm: RegExpExecArray | null;
-    while ((sm = subCatRe.exec(indexHtml)) !== null) subCategories.add(sm[1]);
+    while ((sm = subCatRe.exec(indexHtml)) !== null) {
+      const u = sm[1];
+      // Skip pagination, feed, and the main category URL
+      if (/\/page\/|\/feed\//.test(u)) continue;
+      subCategories.add(u);
+    }
 
     if (subCategories.size === 0) throw new Error('No sub-categories found');
 
@@ -60,7 +65,7 @@ const scrapeGenoa = async (): Promise<Product[]> => {
           const $ = cheerio.load(html);
 
           let found = 0;
-          $('.card-product').each((_, el) => {
+          $('li.product').each((_, el) => {
             const $el = $(el);
 
             // Product URL: first link pointing to genoacfc.it/prodotto/

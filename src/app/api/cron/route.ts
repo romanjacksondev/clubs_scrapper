@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
     run = await prisma.scrapeRun.create({ data: {} });
   } catch (e) {
     console.error('Failed to create scrape run record:', e);
-    return NextResponse.json({ error: 'Database error: could not create scrape run' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Database error: could not create scrape run' },
+      { status: 500 },
+    );
   }
 
   for (let i = 0; i < clubs.length; i += BATCH_SIZE) {

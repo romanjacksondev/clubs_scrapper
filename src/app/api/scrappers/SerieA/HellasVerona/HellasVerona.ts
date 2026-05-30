@@ -1,51 +1,61 @@
-// Shopify store (store.hellasverona.it) — Cloudflare-protected.
-// Uses the Shopify /products.json API with browser-like headers.
-// Returns [] if Cloudflare serves a challenge page instead of JSON.
+// Shopify store (store.hellasverona.it) — JS-rendered, Shopify API returns 401.
+// Uses Playwright to render the kit-gara collection page and scrape product cards.
 
 import { Product } from '../../shared/Product';
 
 const BASE_URL = 'https://store.hellasverona.it';
-const COLLECTION_SLUG = 'kit-gara';
-
-interface ShopifyVariant {
-  price: string;
-}
-interface ShopifyProduct {
-  title: string;
-  handle: string;
-  variants: ShopifyVariant[];
-}
-
-const HEADERS: Record<string, string> = {
-  'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  Accept: 'application/json, */*;q=0.8',
-  'Accept-Language': 'it-IT,it;q=0.9',
-  'Sec-Fetch-Dest': 'empty',
-  'Sec-Fetch-Mode': 'cors',
-  'Sec-Fetch-Site': 'same-origin',
-};
+const COLLECTION_URL = `${BASE_URL}/collections/kit-gara`;
 
 const scrapeHellasVerona = async (): Promise<Product[]> => {
+  let browser = null;
   try {
-    const res = await fetch(`${BASE_URL}/collections/${COLLECTION_SLUG}/products.json?limit=250`, {
-      headers: HEADERS,
+    const { launchAndNavigate } = await import('../../shared/playwrightUtils');
+    const { browser: b, page } = await launchAndNavigate(COLLECTION_URL, {
+      waitUntil: 'networkidle',
+      timeout: 30000,
     });
-    if (!res.ok) return [];
-    const text = await res.text();
-    if (text.trimStart().startsWith('<')) return []; // Cloudflare HTML challenge
-    const data = JSON.parse(text) as { products: ShopifyProduct[] };
+    browser = b;
+
+    // Wait for Shopify product cards to render
+    await page
+      .waitForSelector('.product-card, .product-item, .card--product, [data-product-id]', {
+        timeout: 10000,
+      })
+      .catch(() => {});
+
+    const items = await page.evaluate((baseUrl: string) => {
+      const results: Array<{ name: string; url: string; price: number }> = [];
+      const cards = document.querySelectorAll(
+        '.product-card, .product-item, .card--product, [data-product-id], .grid__item',
+      );
+      cards.forEach((card) => {
+        const link = card.querySelector('a[href*="/products/"]') as HTMLAnchorElement | null;
+        const titleEl = card.querySelector(
+          '.product-card__title, .card__heading, .product-item__title, h3, h2',
+        );
+        const priceEl = card.querySelector('.price, .price__regular, .money');
+        if (!link || !titleEl) return;
+        const name = titleEl.textContent?.trim() ?? '';
+        const href = link.getAttribute('href') ?? '';
+        const url = href.startsWith('http') ? href : baseUrl + href;
+        const priceText = priceEl?.textContent ?? '';
+        const price =
+          parseFloat(priceText.replace(/[^0-9,.]/g, '').replace(',', '.')) || 0;
+        if (name && url) results.push({ name, url, price });
+      });
+      return results;
+    }, BASE_URL);
+
     const seen = new Set<string>();
-    return (data.products ?? []).flatMap((p) => {
-      const productUrl = `${BASE_URL}/products/${p.handle}`;
-      if (seen.has(productUrl)) return [];
-      seen.add(productUrl);
-      const price = parseFloat(p.variants?.[0]?.price ?? '0');
-      if (!p.title || price <= 0) return [];
-      return [{ name: p.title, productUrl, price, currency: 'EUR' }];
+    return items.flatMap((p) => {
+      if (!p.name || !p.url || seen.has(p.url)) return [];
+      seen.add(p.url);
+      return [{ name: p.name, productUrl: p.url, price: p.price, currency: 'EUR' }];
     });
   } catch {
     return [];
+  } finally {
+    if (browser) await (browser as import('playwright').Browser).close();
   }
 };
 

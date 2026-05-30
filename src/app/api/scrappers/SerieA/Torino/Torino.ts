@@ -1,6 +1,7 @@
 // Torino FC official store (torinofcstore.com) — PrestaShop.
-// Product data is embedded in the page as a `wk_category_products` JS variable.
-// The kit-gara category page is at /it/18-kit-gara.
+// The kit-gara category page (/it/18-kit-gara) lists sub-category pages.
+// Each sub-category page contains product articles with data-id-product attributes
+// and a `wk_category_products` JS analytics variable with name/price data.
 
 import { Product } from '../../shared/Product';
 
@@ -13,38 +14,79 @@ const HEADERS: Record<string, string> = {
   'Accept-Language': 'it-IT,it;q=0.9',
 };
 
-interface PSProduct {
-  name?: string;
+interface WKProduct {
+  product_name?: string;
+  product_id?: string | number;
   price?: string | number;
-  link?: string;
-  url?: string;
-  id_product?: number;
 }
 
 const scrapeTorino = async (): Promise<Product[]> => {
   try {
-    const res = await fetch(KITS_URL, { headers: HEADERS });
-    if (!res.ok) return [];
-    const html = await res.text();
+    // Step 1: find sub-category pages from the main kit-gara page
+    const mainRes = await fetch(KITS_URL, { headers: HEADERS });
+    if (!mainRes.ok) return [];
+    const mainHtml = await mainRes.text();
 
-    const m = html.match(/wk_category_products\s*=\s*(\[[\s\S]*?\]);/);
-    if (!m) return [];
+    const subCatUrls = [
+      ...new Set(
+        [...mainHtml.matchAll(/href="(https:\/\/torinofcstore\.com\/it\/\d+-[^"]+)"/g)]
+          .map((m) => m[1])
+          .filter((u) => u !== KITS_URL),
+      ),
+    ];
+    if (subCatUrls.length === 0) return [];
 
-    const items = JSON.parse(m[1]) as PSProduct[];
+    const products: Product[] = [];
     const seen = new Set<string>();
-    return items.flatMap((p) => {
-      const name = p.name?.trim() ?? '';
-      if (!name) return [];
-      const productUrl = (p.link || p.url || '').trim();
-      if (!productUrl || seen.has(productUrl)) return [];
-      seen.add(productUrl);
-      const price =
-        typeof p.price === 'number'
-          ? p.price
-          : parseFloat(String(p.price ?? '0').replace(',', '.'));
-      if (price <= 0) return [];
-      return [{ name, productUrl, price, currency: 'EUR' }];
-    });
+
+    for (const catUrl of subCatUrls) {
+      try {
+        const res = await fetch(catUrl, { headers: HEADERS });
+        if (!res.ok) continue;
+        const html = await res.text();
+
+        // Build name+price map from the analytics data layer
+        const wkMatch = html.match(/wk_category_products\s*=\s*(\[[\s\S]*?\]);/);
+        const wkItems: WKProduct[] = wkMatch ? (JSON.parse(wkMatch[1]) as WKProduct[]) : [];
+        const wkMap = new Map(wkItems.map((it) => [String(it.product_id), it]));
+
+        // Strip HTML comments so commented-out hrefs are ignored
+        const cleanHtml = html.replace(/<!--[\s\S]*?-->/g, '');
+
+        // Extract each product article
+        const artRegex =
+          /<article[^>]*data-id-product="(\d+)"[^>]*>([\s\S]*?)<\/article>/g;
+        let artMatch: RegExpExecArray | null;
+        while ((artMatch = artRegex.exec(cleanHtml)) !== null) {
+          const productId = artMatch[1];
+          const artHtml = artMatch[2];
+
+          const hrefMatch = artHtml.match(
+            /href="(https:\/\/torinofcstore\.com\/it\/[^"]*\.html[^"]*)"/,
+          );
+          if (!hrefMatch) continue;
+          const productUrl = hrefMatch[1].split('#')[0];
+          if (seen.has(productUrl)) continue;
+
+          const wkItem = wkMap.get(productId);
+          if (!wkItem?.product_name) continue;
+
+          const name = wkItem.product_name.trim();
+          const price =
+            typeof wkItem.price === 'number'
+              ? wkItem.price
+              : parseFloat(String(wkItem.price ?? '0').replace(',', '.'));
+          if (!name || price <= 0) continue;
+
+          seen.add(productUrl);
+          products.push({ name, productUrl, price, currency: 'EUR' });
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    return products;
   } catch {
     return [];
   }
