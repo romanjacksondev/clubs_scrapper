@@ -1,77 +1,75 @@
-// PSV Eindhoven official store (psvfanshop.nl) — Shopify.
-// The store has an invalid/self-signed TLS certificate; Node's https module
-// with rejectUnauthorized: false is used to bypass the certificate error.
+// PSV Eindhoven official store: www.psvfanstore.nl — Nuxt 2 SSR + ASPOS platform.
+// The /wedstrijd category page is server-side rendered and embeds the full product
+// list in a __NUXT__ compressed state block that can be safely evaluated with
+// Node's vm module to extract product data (name, price, urlSlug).
 
-import https from 'https';
+import { runInNewContext } from 'vm';
 import { Product } from '../../shared/Product';
 
-const STORE_BASE = 'https://psvfanshop.nl';
+const STORE_BASE = 'https://www.psvfanstore.nl';
+const LISTING_URL = `${STORE_BASE}/wedstrijd`;
 
-const TLS_AGENT = new https.Agent({ rejectUnauthorized: false });
-
-const REQ_HEADERS: Record<string, string> = {
+const HEADERS: Record<string, string> = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
   'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 };
 
-function httpsGet(url: string, accept: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      { agent: TLS_AGENT, headers: { ...REQ_HEADERS, Accept: accept } },
-      (res) => {
-        let body = '';
-        res.on('data', (chunk: Buffer) => {
-          body += chunk.toString();
-        });
-        res.on('end', () => resolve(body));
-      },
-    );
-    req.on('error', reject);
-    req.setTimeout(20000, () => req.destroy(new Error('timeout')));
-  });
+interface AsposPrice {
+  inclTax: number;
 }
 
-interface ShopifyVariant {
-  price: string;
+interface AsposProduct {
+  name?: string;
+  urlSlug?: string;
+  price?: AsposPrice;
+  originalPrice?: AsposPrice;
 }
-interface ShopifyProduct {
-  title: string;
-  handle: string;
-  variants: ShopifyVariant[];
+
+interface NuxtState {
+  $sproductList_result?: {
+    products?: AsposProduct[];
+  };
 }
 
 const scrapePSVEindhoven = async (): Promise<Product[]> => {
   try {
-    const allProducts: Product[] = [];
-    const seen = new Set<string>();
-    let page = 1;
+    const res = await fetch(LISTING_URL, { headers: HEADERS });
+    if (!res.ok) return [];
+    const html = await res.text();
 
-    while (true) {
-      const jsonText = await httpsGet(
-        `${STORE_BASE}/products.json?limit=250&page=${page}`,
-        'application/json',
-      );
-      if (jsonText.trimStart().startsWith('<')) break;
-      const data = JSON.parse(jsonText) as { products: ShopifyProduct[] };
-      const products = data.products ?? [];
-      if (!products.length) break;
+    // Extract __NUXT__ block — a compressed Nuxt 2 state function
+    const match =
+      html.match(/<script>\s*window\.__NUXT__\s*=\s*([\s\S]+?)\s*<\/script>/) ||
+      html.match(/__NUXT__\s*=\s*([\s\S]+?)\s*<\/script>/);
+    if (!match) return [];
 
-      for (const p of products) {
-        const productUrl = `${STORE_BASE}/products/${p.handle}`;
-        if (seen.has(productUrl)) continue;
-        seen.add(productUrl);
-        const price = parseFloat(p.variants?.[0]?.price ?? '0');
-        if (!p.title || price <= 0) continue;
-        allProducts.push({ name: p.title, productUrl, price, currency: 'EUR' });
-      }
+    // Safely evaluate the Nuxt state in an isolated VM context
+    const nuxtData = runInNewContext('(' + match[1] + ')', {}) as {
+      state?: NuxtState;
+    };
 
-      if (products.length < 250) break;
-      page++;
+    const products: AsposProduct[] = nuxtData?.state?.['$sproductList_result']?.products ?? [];
+    const result: Product[] = [];
+
+    for (const p of products) {
+      const name = p.name?.trim();
+      const urlSlug = p.urlSlug?.trim();
+      if (!name || !urlSlug) continue;
+
+      const price = p.price?.inclTax ?? 0;
+      if (price <= 0) continue;
+
+      result.push({
+        name,
+        productUrl: `${STORE_BASE}/product/${urlSlug}`,
+        price,
+        currency: 'EUR',
+      });
     }
 
-    return allProducts;
+    return result;
   } catch {
     return [];
   }

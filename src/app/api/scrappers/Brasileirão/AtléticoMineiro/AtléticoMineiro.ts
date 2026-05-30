@@ -1,8 +1,7 @@
-import { Product } from '../../shared/Product';
+import { scrapeVtexStore } from '../../shared/vtexScraper';
 
-// Atlético Mineiro official store (loja.atletico.com.br)
-// TODO: Platform not identified — store unreachable from outside Brazil.
-// Likely VTEX; implement scrapeVtexStore once category ID is confirmed.
-export default async function scrapeAtleticoMineiro(): Promise<Product[]> {
-  return [];
+// Atlético Mineiro official store — Loja do Galo (lojadogalo.com.br — VTEX)
+// Category 42 = "Camisa de Jogo" (sub-categories: Jogo 1, Jogo 2, Jogo 3)
+export default function scrapeAtleticoMineiro() {
+  return scrapeVtexStore('https://www.lojadogalo.com.br', 42);
 }

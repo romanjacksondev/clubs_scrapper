@@ -1,6 +1,37 @@
+// Real Betis Balompié official store (shop.realbetisbalompie.es) — Shopify.
+// The 'equipaciones' collection covers all kit types.
 import { Product } from '../../shared/Product';
 
-// Store not accessible via public API (JS-rendered / WAF blocked) — stub
+const BASE_URL = 'https://shop.realbetisbalompie.es';
+const KITS_URL = `${BASE_URL}/collections/equipaciones/products.json?limit=250`;
+
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  Accept: 'application/json',
+  'Accept-Language': 'es-ES,es;q=0.9',
+};
+
 export default async function scrapeRealBetis(): Promise<Product[]> {
-  return [];
+  try {
+    const res = await fetch(KITS_URL, { headers: HEADERS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data = await res.json();
+    const products: Product[] = [];
+    const seen = new Set<string>();
+
+    for (const product of data.products ?? []) {
+      const price = parseFloat(product.variants?.[0]?.price ?? '0');
+      if (!product.title || !price) continue;
+      const productUrl = `${BASE_URL}/products/${product.handle}`;
+      if (seen.has(productUrl)) continue;
+      seen.add(productUrl);
+      products.push({ name: product.title as string, productUrl, price, currency: 'EUR' });
+    }
+
+    return products;
+  } catch {
+    return [];
+  }
 }

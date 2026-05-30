@@ -1,57 +1,72 @@
-// AZ Alkmaar official store (azshop.nl) — Shopify.
+// AZ Alkmaar official store (az.nl/webshop) — custom CMS with Playwright rendering.
+import { chromium } from 'playwright';
 import { Product } from '../../shared/Product';
 
-const STORE_BASE = 'https://azshop.nl';
+const STORE_BASE = 'https://az.nl';
 
-interface ShopifyVariant {
-  price: string;
-}
-interface ShopifyProduct {
-  title: string;
-  handle: string;
-  variants: ShopifyVariant[];
-}
+const CATEGORY_URLS = [
+  `${STORE_BASE}/webshop/c/wedstrijd/thuistenue`,
+  `${STORE_BASE}/webshop/c/wedstrijd/uittenue`,
+  `${STORE_BASE}/webshop/c/wedstrijd/derde-tenue`,
+  `${STORE_BASE}/webshop/c/wedstrijd/keepertenue`,
+];
 
-const HEADERS: Record<string, string> = {
-  'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  Accept: 'application/json',
-  'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8',
+const parsePrice = (text: string | null | undefined): number | null => {
+  if (!text) return null;
+  const m = text
+    .replace('.', '')
+    .replace(',', '.')
+    .match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : null;
 };
 
 const scrapeAZ = async (): Promise<Product[]> => {
+  const browser = await chromium.launch({ headless: true });
+  const allProducts: Product[] = [];
+  const seen = new Set<string>();
+
   try {
-    const seen = new Set<string>();
-    const allProducts: Product[] = [];
-    let page = 1;
+    for (const categoryUrl of CATEGORY_URLS) {
+      const page = await browser.newPage();
+      await page.goto(categoryUrl, { waitUntil: 'networkidle', timeout: 25000 }).catch(() => {});
 
-    while (true) {
-      const res = await fetch(`${STORE_BASE}/products.json?limit=250&page=${page}`, {
-        headers: HEADERS,
+      const cards = await page.evaluate(() => {
+        return [...document.querySelectorAll('.product-card')].map((card) => {
+          const salePriceEl = card.querySelector('.product-sale-price');
+          const basePriceEl = card.querySelector('.product-base-price');
+          const link = card.querySelector('a');
+          const lines = (card as HTMLElement).innerText
+            .split('\n')
+            .map((l) => l.trim())
+            .filter(Boolean);
+          return {
+            name: lines[0] ?? '',
+            salePriceText: salePriceEl?.textContent ?? null,
+            basePriceText: basePriceEl?.textContent ?? null,
+            pathname: (link as HTMLAnchorElement | null)?.pathname ?? '',
+          };
+        });
       });
-      if (!res.ok) break;
-      const text = await res.text();
-      if (text.trimStart().startsWith('<')) break; // bot-protection HTML
-      const data = JSON.parse(text) as { products: ShopifyProduct[] };
-      const products = data.products ?? [];
-      if (!products.length) break;
 
-      for (const p of products) {
-        const productUrl = `${STORE_BASE}/products/${p.handle}`;
+      await page.close();
+
+      for (const c of cards) {
+        if (!c.name || !c.pathname) continue;
+        const productUrl = `${STORE_BASE}${c.pathname}`;
         if (seen.has(productUrl)) continue;
         seen.add(productUrl);
-        const price = parseFloat(p.variants?.[0]?.price ?? '0');
-        if (!p.title || price <= 0) continue;
-        allProducts.push({ name: p.title, productUrl, price, currency: 'EUR' });
+
+        const price = parsePrice(c.salePriceText) ?? parsePrice(c.basePriceText);
+        if (!price || price <= 0) continue;
+
+        allProducts.push({ name: c.name, productUrl, price, currency: 'EUR' });
       }
-
-      if (products.length < 250) break;
-      page++;
     }
-
-    return allProducts;
-  } catch {
-    return [];
+  } finally {
+    await browser.close();
   }
+
+  return allProducts;
 };
+
 export default scrapeAZ;

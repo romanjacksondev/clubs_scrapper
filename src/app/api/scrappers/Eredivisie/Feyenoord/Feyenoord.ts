@@ -1,84 +1,65 @@
-// Feyenoord official store (www.feyenoordshop.nl).
-// The store has an invalid TLS certificate and the Shopify JSON API returns HTML
-// (likely Cloudflare). Node's https module with rejectUnauthorized: false is used
-// to bypass the certificate error; static HTML is parsed with cheerio.
+// Feyenoord official store moved to fanshop.feyenoord.nl (Shopify).
+// The old domain (www.feyenoordshop.nl) had TLS issues; the new domain has a
+// valid Let's Encrypt cert and an accessible products.json endpoint.
+// All products are fetched via /products.json?limit=250&page=N and filtered
+// client-side to product_type === 'Shirts'.
 
-import * as cheerio from 'cheerio';
-import type { AnyNode } from 'domhandler';
-import https from 'https';
 import { Product } from '../../shared/Product';
 
-const STORE_BASE = 'https://www.feyenoordshop.nl';
+const BASE = 'https://fanshop.feyenoord.nl';
+const PAGE_SIZE = 250;
 
-const TLS_AGENT = new https.Agent({ rejectUnauthorized: false });
-
-const REQ_HEADERS: Record<string, string> = {
+const HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept-Language': 'nl-NL,nl;q=0.9,en;q=0.8',
-  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'nl-NL,nl;q=0.9',
+  Accept: 'application/json',
 };
 
-function httpsGet(url: string, depth = 0): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = https.get(url, { agent: TLS_AGENT, headers: REQ_HEADERS }, (res) => {
-      if (
-        depth < 5 &&
-        res.statusCode &&
-        res.statusCode >= 300 &&
-        res.statusCode < 400 &&
-        res.headers.location
-      ) {
-        resolve(httpsGet(res.headers.location, depth + 1));
-        return;
-      }
-      let body = '';
-      res.on('data', (chunk: Buffer) => {
-        body += chunk.toString();
-      });
-      res.on('end', () => resolve(body));
-    });
-    req.on('error', reject);
-    req.setTimeout(20000, () => req.destroy(new Error('timeout')));
-  });
+interface ShopifyVariant {
+  price: string;
+}
+
+interface ShopifyProduct {
+  title: string;
+  handle: string;
+  product_type: string;
+  variants: ShopifyVariant[];
 }
 
 const scrapeFeyenoord = async (): Promise<Product[]> => {
+  const products: Product[] = [];
+  let page = 1;
+
   try {
-    const targetUrl = `${STORE_BASE}/collections/all`;
-    const collHtml = await httpsGet(targetUrl);
-    const $c = cheerio.load(collHtml);
-    const seen = new Set<string>();
-    const products: Product[] = [];
-    $c('a').each((_: number, el: AnyNode) => {
-      const href = $c(el).attr('href') || '';
-      if (!href.includes('product') || href.includes('?') || href.includes('#')) return;
-      const productUrl = href.startsWith('http') ? href : `${STORE_BASE}${href}`;
-      if (seen.has(productUrl)) return;
-      seen.add(productUrl);
+    while (true) {
+      const url = `${BASE}/products.json?limit=${PAGE_SIZE}&page=${page}`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) break;
+      const json = (await res.json()) as { products: ShopifyProduct[] };
+      const batch = json.products ?? [];
+      if (batch.length === 0) break;
 
-      let name = $c(el).find('img[alt]').first().attr('alt')?.trim() || '';
-      if (!name) {
-        name = $c(el).find('h2, h3, h4, [class*="title"], [class*="name"]').first().text().trim();
+      for (const p of batch) {
+        if (p.product_type !== 'Shirts') continue;
+        const price = parseFloat(p.variants?.[0]?.price ?? '0');
+        if (!price || price <= 0) continue;
+        products.push({
+          name: p.title,
+          productUrl: `${BASE}/products/${p.handle}`,
+          price,
+          currency: 'EUR',
+        });
       }
-      if (!name) name = $c(el).text().trim();
-      if (!name || name.length < 3) return;
 
-      const card = $c(el).closest(
-        '[class*="product-card"], [class*="product_card"], [class*="product-item"], [class*="ProductCard"]',
-      );
-      const priceText = (card.length ? card : $c(el).parent()).text();
-      const priceMatch = priceText.match(/€\s*([\d]+[.,][\d]+)/);
-      if (!priceMatch) return;
-      const price = parseFloat(priceMatch[1].replace(',', '.'));
-      if (price <= 0) return;
-
-      products.push({ name, productUrl, price, currency: 'EUR' });
-    });
-    return products;
-  } catch {
-    return [];
+      if (batch.length < PAGE_SIZE) break;
+      page++;
+    }
+  } catch (err) {
+    console.error('Feyenoord: error', err);
   }
+
+  return products;
 };
 
 export default scrapeFeyenoord;

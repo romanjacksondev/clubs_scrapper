@@ -1,8 +1,47 @@
 import { Product } from '../../shared/Product';
 
-// Internacional official store (loja.internacional.com.br)
-// TODO: Custom Next.js storefront — no public product API discovered.
-// Implement once an accessible API or scraping approach is found.
+// Internacional official store — Loja do Inter (lojadointer.com.br — Netshoes)
+// Uses the same Netshoes /api/friendly/{category}?page=N API as Corinthians/Cruzeiro/Vasco
+// salePrice is in cents (divide by 100)
+
+const BASE_URL = 'https://www.lojadointer.com.br';
+const CATEGORY = 'camisas';
+
+const HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  Accept: 'application/json',
+  'Accept-Language': 'pt-BR,pt;q=0.9',
+};
+
 export default async function scrapeInternacional(): Promise<Product[]> {
-  return [];
+  const products: Product[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const url = `${BASE_URL}/api/friendly/${CATEGORY}?page=${page}`;
+    const res = await fetch(url, { headers: HEADERS });
+    if (!res.ok) break;
+    const data: any = await res.json();
+
+    totalPages = data.totalPages ?? 1;
+
+    for (const item of data.parentSkus ?? []) {
+      const name: string = item.name?.trim();
+      const slug: string = item.productSlug?.trim();
+      const salePrice: number = item.salePrice;
+      if (!name || !slug || !salePrice) continue;
+      products.push({
+        name,
+        productUrl: `${BASE_URL}${slug}`,
+        price: salePrice / 100,
+        currency: 'BRL',
+      });
+    }
+
+    page++;
+  } while (page <= totalPages);
+
+  return products;
 }
