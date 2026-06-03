@@ -23,9 +23,7 @@ const scrapeEmpoli = async (): Promise<Product[]> => {
     const sitemapXml = await smRes.text();
 
     const productUrls = [
-      ...sitemapXml.matchAll(
-        /<loc>(https:\/\/shop\.empolifc\.it\/store\/[^<]*gara[^<]*)<\/loc>/gi,
-      ),
+      ...sitemapXml.matchAll(/<loc>(https:\/\/shop\.empolifc\.it\/store\/[^<]*gara[^<]*)<\/loc>/gi),
     ]
       .map((m) => m[1])
       // Exclude Wix store copy-artifacts (e.g. slug-copy, slug-copy-copy)
@@ -44,8 +42,7 @@ const scrapeEmpoli = async (): Promise<Product[]> => {
         const html = await res.text();
 
         // Product name from <title>, strip variant suffix after "–"
-        const rawTitle =
-          html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1]?.trim() ?? '';
+        const rawTitle = html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1]?.trim() ?? '';
         const name = rawTitle.replace(/\s*–\s.+$/, '').trim() || rawTitle;
         if (!name) continue;
 

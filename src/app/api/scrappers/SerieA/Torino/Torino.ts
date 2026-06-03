@@ -54,8 +54,7 @@ const scrapeTorino = async (): Promise<Product[]> => {
         const cleanHtml = html.replace(/<!--[\s\S]*?-->/g, '');
 
         // Extract each product article
-        const artRegex =
-          /<article[^>]*data-id-product="(\d+)"[^>]*>([\s\S]*?)<\/article>/g;
+        const artRegex = /<article[^>]*data-id-product="(\d+)"[^>]*>([\s\S]*?)<\/article>/g;
         let artMatch: RegExpExecArray | null;
         while ((artMatch = artRegex.exec(cleanHtml)) !== null) {
           const productId = artMatch[1];

@@ -39,8 +39,7 @@ const scrapeHellasVerona = async (): Promise<Product[]> => {
         const href = link.getAttribute('href') ?? '';
         const url = href.startsWith('http') ? href : baseUrl + href;
         const priceText = priceEl?.textContent ?? '';
-        const price =
-          parseFloat(priceText.replace(/[^0-9,.]/g, '').replace(',', '.')) || 0;
+        const price = parseFloat(priceText.replace(/[^0-9,.]/g, '').replace(',', '.')) || 0;
         if (name && url) results.push({ name, url, price });
       });
       return results;
