@@ -16,9 +16,9 @@ export async function getExchangeRates(): Promise<Map<string, number>> {
     return new Map(rows.map((r) => [r.currency, r.rateToUsd]));
   }
 
-  // Fetch latest rates from frankfurter.app (ECB data, no API key required).
+  // Fetch latest rates from open.er-api.com (supports 160+ currencies including UYU).
   // Base = USD: data.rates[X] means "1 USD = X units of currency X".
-  const res = await fetch('https://api.frankfurter.app/latest?base=USD');
+  const res = await fetch('https://open.er-api.com/v6/latest/USD');
   if (!res.ok) {
     // Fall back to stale DB data if fetch fails
     const rows = await prisma.exchangeRate.findMany();
@@ -26,7 +26,12 @@ export async function getExchangeRates(): Promise<Map<string, number>> {
     throw new Error('Exchange rate fetch failed and no cached data available');
   }
 
-  const data = (await res.json()) as { rates: Record<string, number> };
+  const data = (await res.json()) as { result: string; rates: Record<string, number> };
+  if (data.result !== 'success') {
+    const rows = await prisma.exchangeRate.findMany();
+    if (rows.length > 0) return new Map(rows.map((r) => [r.currency, r.rateToUsd]));
+    throw new Error('Exchange rate API returned non-success result');
+  }
   // rateToUsd = 1 / data.rates[currency]  →  "1 unit = ? USD"
   const rateMap: Record<string, number> = { USD: 1.0 };
   for (const [currency, unitsPerUsd] of Object.entries(data.rates)) {
