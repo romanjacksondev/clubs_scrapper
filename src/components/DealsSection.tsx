@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDiscountedProducts } from '../hooks/useDiscountedProducts';
 import { formatPrice } from '../lib/formatPrice';
 
-type SortCol = 'league' | 'club' | 'discount' | 'usd' | 'date';
-
 type ProductGroup = {
   key: string;
   clubName: string;
@@ -21,21 +19,6 @@ function formatFoundDate(value: string) {
   return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
 }
 
-function getGroupComparator(sortCol: SortCol | null, sortDir: 'asc' | 'desc') {
-  return (a: ProductGroup, b: ProductGroup) => {
-    let cmp = 0;
-
-    if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
-    else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
-    else if (sortCol === 'discount') cmp = a.bestDiscount - b.bestDiscount;
-    else if (sortCol === 'usd')
-      cmp = (a.lowestUsdPrice ?? Infinity) - (b.lowestUsdPrice ?? Infinity);
-    else cmp = new Date(a.latestFoundAt).getTime() - new Date(b.latestFoundAt).getTime();
-
-    return sortDir === 'asc' ? cmp : -cmp;
-  };
-}
-
 export default function DealsSection() {
   const [minDiscount, setMinDiscount] = useState(30);
   const [debouncedDiscount, setDebouncedDiscount] = useState(30);
@@ -45,8 +28,6 @@ export default function DealsSection() {
     return () => clearTimeout(t);
   }, [minDiscount]);
 
-  const [sortCol, setSortCol] = useState<SortCol | null>('date');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [selectedLeague, setSelectedLeague] = useState('');
   const [selectedClub, setSelectedClub] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -81,27 +62,6 @@ export default function DealsSection() {
     return [...new Set(source.map((p) => p.clubName))].sort();
   }, [discountedProducts, selectedLeague]);
 
-  function handleSort(col: SortCol) {
-    if (sortCol === col) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortCol(col);
-      setSortDir('asc');
-    }
-  }
-
-  function sortIndicator(col: SortCol) {
-    return sortCol === col ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
-  }
-
-  const sortOptions: { key: SortCol; label: string }[] = [
-    { key: 'date', label: 'Found' },
-    { key: 'discount', label: 'Discount' },
-    { key: 'usd', label: '~USD' },
-    { key: 'league', label: 'League' },
-    { key: 'club', label: 'Club' },
-  ];
-
   const controlBaseClass =
     'h-12 w-full rounded-xl border border-slate-600/70 bg-slate-800/90 pr-4 pl-11 text-slate-100 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
 
@@ -125,21 +85,8 @@ export default function DealsSection() {
         (p) => p.name.toLowerCase().includes(q) || p.clubName.toLowerCase().includes(q),
       );
     }
-    if (sortCol) {
-      list = [...list].sort((a, b) => {
-        let cmp = 0;
-        if (sortCol === 'league') cmp = a.leagueName.localeCompare(b.leagueName);
-        else if (sortCol === 'club') cmp = a.clubName.localeCompare(b.clubName);
-        else if (sortCol === 'discount') cmp = a.discountPercent - b.discountPercent;
-        else if (sortCol === 'usd')
-          cmp = (a.currentPriceUsd ?? Infinity) - (b.currentPriceUsd ?? Infinity);
-        else if (sortCol === 'date')
-          cmp = new Date(a.discountFoundAt).getTime() - new Date(b.discountFoundAt).getTime();
-        return sortDir === 'asc' ? cmp : -cmp;
-      });
-    }
     return list;
-  }, [discountedProducts, selectedLeague, selectedClub, searchQuery, sortCol, sortDir]);
+  }, [discountedProducts, selectedLeague, selectedClub, searchQuery]);
 
   const groupedProducts = useMemo(() => {
     const groups = new Map<string, ProductGroup>();
@@ -176,24 +123,20 @@ export default function DealsSection() {
       });
     });
 
-    return [...groups.values()].sort(getGroupComparator(sortCol, sortDir));
-  }, [filteredProducts, sortCol, sortDir]);
+    return [...groups.values()];
+  }, [filteredProducts]);
 
   return (
     <section>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-          🔥 Deals
-          {(loading || minDiscount !== debouncedDiscount) && (
-            <span className="ml-3 text-sm font-normal text-gray-400 dark:text-gray-500">
-              loading…
-            </span>
-          )}
-        </h2>
-
         <div className="rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-900/95 via-slate-900 to-slate-950 p-5 shadow-[0_10px_40px_rgba(2,6,23,0.45)]">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Filters</p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Filters</p>
+              {(loading || minDiscount !== debouncedDiscount) && (
+                <span className="text-xs font-medium text-slate-400">loading…</span>
+              )}
+            </div>
             <span
               className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${
                 activeFilterCount > 0
@@ -297,7 +240,7 @@ export default function DealsSection() {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(280px,420px)_1fr] lg:items-center">
+          <div className="mt-4">
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
                 🔎
@@ -309,31 +252,6 @@ export default function DealsSection() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={controlBaseClass}
               />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="mr-1 text-xs uppercase tracking-[0.12em] text-slate-400">
-                Sort groups by
-              </span>
-              {sortOptions.map((option) => {
-                const active = sortCol === option.key;
-
-                return (
-                  <button
-                    key={option.key}
-                    type="button"
-                    onClick={() => handleSort(option.key)}
-                    className={`h-11 rounded-full border px-5 text-sm font-semibold transition-all ${
-                      active
-                        ? 'border-blue-400 bg-blue-500/20 text-blue-100 shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
-                        : 'border-slate-600/70 bg-slate-800/90 text-slate-200 hover:border-blue-500/60'
-                    }`}
-                  >
-                    {option.label}
-                    {sortIndicator(option.key)}
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
