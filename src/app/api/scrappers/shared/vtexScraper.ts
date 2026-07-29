@@ -34,8 +34,9 @@ export async function scrapeVtexStore(
       const name: string = item.productName?.trim();
       const productUrl: string = item.link?.trim();
       const price = item.items?.[0]?.sellers?.[0]?.commertialOffer?.Price;
+      const imageUrl = item.items?.[0]?.images?.[0]?.imageUrl?.trim() ?? null;
       if (!name || !productUrl || !price) continue;
-      products.push({ name, productUrl, price: parseFloat(price), currency });
+      products.push({ name, productUrl, imageUrl, price: parseFloat(price), currency });
     }
 
     from += PAGE_SIZE;

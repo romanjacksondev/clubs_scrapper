@@ -80,6 +80,7 @@ interface DiscountRow {
   discountPercent: number;
   currency: string;
   productUrl: string;
+  imageUrl: string | null;
   clubName: string;
   leagueName: string;
   discountFoundAt: Date;
@@ -102,6 +103,7 @@ export async function GET(request: NextRequest) {
         ROUND(((ph_prev.price - p.price) / ph_prev.price)::numeric * 100)::int  AS "discountPercent",
         p.currency                                                               AS "currency",
         p."productUrl"                                                           AS "productUrl",
+        p."imageUrl"                                                             AS "imageUrl",
         c.name                                                                   AS "clubName",
         l.name                                                                   AS "leagueName",
         COALESCE(ph_curr."recordedAt", p."updatedAt")                           AS "discountFoundAt"

@@ -10,6 +10,7 @@ interface Product {
   price: number;
   currency: string;
   productUrl: string;
+  imageUrl: string | null;
   updatedAt: string;
 }
 
@@ -58,7 +59,7 @@ export default function ClubProductsPage() {
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 dark:text-gray-400">
-                  Name
+                  Product
                 </th>
                 <th className="px-4 py-3 text-right font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   Price
@@ -76,7 +77,22 @@ export default function ClubProductsPage() {
                   key={p.id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors"
                 >
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{p.name}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                    <div className="flex items-center gap-3">
+                      {p.imageUrl ? (
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="h-12 w-12 rounded-lg border border-gray-200 object-cover dark:border-gray-700"
+                        />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-dashed border-gray-300 text-[10px] uppercase tracking-wide text-gray-400 dark:border-gray-600 dark:text-gray-500">
+                          No img
+                        </div>
+                      )}
+                      <span>{p.name}</span>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-right tabular-nums whitespace-nowrap">
                     {p.price.toFixed(2)} {p.currency}
                   </td>

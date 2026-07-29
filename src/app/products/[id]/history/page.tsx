@@ -25,6 +25,7 @@ interface ProductDetail {
   currentPrice: number;
   currency: string;
   productUrl: string;
+  imageUrl: string | null;
   clubName: string;
   leagueName: string;
   updatedAt: string;
@@ -76,10 +77,20 @@ export default function ProductHistoryPage() {
         ← Back to Scrape
       </Link>
 
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{product.name}</h1>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        {product.leagueName} — {product.clubName}
-      </p>
+      <div className="mb-6 flex flex-col gap-5 md:flex-row md:items-start">
+        {product.imageUrl ? (
+          <div className="h-40 w-40 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+            <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+          </div>
+        ) : null}
+
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">{product.name}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {product.leagueName} — {product.clubName}
+          </p>
+        </div>
+      </div>
 
       <div className="flex items-center gap-6 mb-8">
         <div>

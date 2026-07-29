@@ -27,6 +27,7 @@ export async function processProducts(data: Product[], clubId: number) {
     price: number;
     currency: string;
     productUrl: string;
+    imageUrl: string | null;
     clubId: number;
   };
   const toCreate: NewProduct[] = [];
@@ -35,6 +36,7 @@ export async function processProducts(data: Product[], clubId: number) {
     price: number;
     currency: string;
     productUrl: string;
+    imageUrl?: string | null;
     priceChanged: boolean;
   }> = [];
 
@@ -47,6 +49,7 @@ export async function processProducts(data: Product[], clubId: number) {
         price: product.price,
         currency,
         productUrl: product.productUrl,
+        imageUrl: product.imageUrl,
         priceChanged: existing.price !== product.price,
       });
     } else {
@@ -55,6 +58,7 @@ export async function processProducts(data: Product[], clubId: number) {
         price: product.price,
         currency,
         productUrl: product.productUrl,
+        imageUrl: product.imageUrl ?? null,
         clubId,
       });
     }
@@ -77,7 +81,12 @@ export async function processProducts(data: Product[], clubId: number) {
     ...toUpdate.map((u) =>
       prisma.product.update({
         where: { id: u.id },
-        data: { price: u.price, currency: u.currency, productUrl: u.productUrl },
+        data: {
+          price: u.price,
+          currency: u.currency,
+          productUrl: u.productUrl,
+          ...(u.imageUrl !== undefined ? { imageUrl: u.imageUrl } : {}),
+        },
       }),
     ),
     ...(historyEntries.length > 0

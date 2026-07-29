@@ -56,12 +56,18 @@ export async function scrapeJonasShop(
   const docs: any[] = data?.results?.docs ?? [];
 
   return docs
-    .map((doc) => {
+    .map((doc): Product | null => {
       const name: string = doc.title?.trim();
       const price = parseFloat(doc.price?.rrp);
       const productUrl: string = doc.link?.trim();
+      const imageUrl =
+        doc.image_link?.trim() ||
+        doc.image?.trim() ||
+        doc.thumb?.trim() ||
+        doc.thumbnail?.trim() ||
+        null;
       if (!name || !price || !productUrl) return null;
-      return { name, productUrl, price, currency };
+      return { name, productUrl, imageUrl, price, currency };
     })
     .filter((p): p is Product => p !== null);
 }

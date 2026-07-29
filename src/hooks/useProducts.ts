@@ -6,6 +6,7 @@ export interface Product {
   price: number;
   currency: string;
   productUrl: string;
+  imageUrl: string | null;
   clubId: number;
   updatedAt: string;
 }

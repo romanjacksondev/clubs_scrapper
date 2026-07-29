@@ -8,6 +8,7 @@ export interface DiscountedProduct {
   discountPercent: number;
   currency: string;
   productUrl: string;
+  imageUrl: string | null;
   clubName: string;
   leagueName: string;
   currentPriceUsd: number | null;
