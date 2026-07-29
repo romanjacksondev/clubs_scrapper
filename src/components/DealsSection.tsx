@@ -102,6 +102,16 @@ export default function DealsSection() {
     { key: 'club', label: 'Club' },
   ];
 
+  const controlBaseClass =
+    'h-12 w-full rounded-xl border border-slate-600/70 bg-slate-800/90 pr-4 pl-11 text-slate-100 placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+
+  const activeFilterCount =
+    Number(minDiscount !== 30) +
+    Number(selectedLeague !== '') +
+    Number(selectedClub !== '') +
+    Number(searchQuery !== '') +
+    Number(adultMaleShirts);
+
   const filteredProducts = useMemo(() => {
     let list = selectedLeague
       ? discountedProducts.filter((p) => p.leagueName === selectedLeague)
@@ -181,103 +191,151 @@ export default function DealsSection() {
           )}
         </h2>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <span className="text-sm text-gray-500 dark:text-gray-400 shrink-0">Min. discount</span>
-          <input
-            type="range"
-            min="5"
-            max="70"
-            step="5"
-            value={minDiscount}
-            onChange={(e) => setMinDiscount(parseInt(e.target.value, 10))}
-            style={{
-              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((minDiscount - 5) / 65) * 100}%, #374151 ${((minDiscount - 5) / 65) * 100}%, #374151 100%)`,
-            }}
-            className="w-56 h-2 rounded-full cursor-pointer appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-500 [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-          />
-          <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 w-16">
-            {minDiscount}%
-          </span>
-
-          <select
-            value={selectedLeague}
-            onChange={(e) => {
-              setSelectedLeague(e.target.value);
-              setSelectedClub('');
-            }}
-            className="ml-4 px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">All leagues</option>
-            {leagues.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedClub}
-            onChange={(e) => setSelectedClub(e.target.value)}
-            className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">All clubs</option>
-            {clubs.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={() => setAdultMaleShirts((v) => !v)}
-            className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
-              adultMaleShirts
-                ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-500'
-                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:border-blue-500'
-            }`}
-          >
-            👕 Men&apos;s shirts
-          </button>
-
-          <input
-            type="search"
-            placeholder="Search product or club…"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-52"
-          />
-
-          {isFiltered && (
-            <button
-              onClick={resetFilters}
-              className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-500 dark:text-gray-400 hover:border-red-400 hover:text-red-500 transition-colors"
+        <div className="rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-900/95 via-slate-900 to-slate-950 p-5 shadow-[0_10px_40px_rgba(2,6,23,0.45)]">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Filters</p>
+            <span
+              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${
+                activeFilterCount > 0
+                  ? 'border-blue-400/40 bg-blue-500/20 text-blue-100'
+                  : 'border-slate-600/70 bg-slate-800/80 text-slate-300'
+              }`}
             >
-              ✕ Reset filters
-            </button>
-          )}
-        </div>
+              {activeFilterCount > 0 ? `${activeFilterCount} active` : 'All defaults'}
+            </span>
+          </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">Sort groups by</span>
-          {sortOptions.map((option) => {
-            const active = sortCol === option.key;
+          <div className="grid gap-4 lg:grid-cols-[minmax(260px,360px)_auto_1fr] lg:items-center">
+            <div className="space-y-2">
+              <span className="text-xs uppercase tracking-[0.12em] text-slate-400">
+                Min. discount
+              </span>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="5"
+                  max="70"
+                  step="5"
+                  value={minDiscount}
+                  onChange={(e) => setMinDiscount(parseInt(e.target.value, 10))}
+                  style={{
+                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((minDiscount - 5) / 65) * 100}%, #334155 ${((minDiscount - 5) / 65) * 100}%, #334155 100%)`,
+                  }}
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:h-6 [&::-moz-range-thumb]:w-6 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-blue-500"
+                />
+                <span className="w-16 text-right text-4xl font-bold leading-none text-blue-400">
+                  {minDiscount}%
+                </span>
+              </div>
+            </div>
 
-            return (
+            <div className="h-14 w-px justify-self-center bg-slate-700/80 hidden lg:block" />
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="relative">
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  🏆
+                </span>
+                <select
+                  value={selectedLeague}
+                  onChange={(e) => {
+                    setSelectedLeague(e.target.value);
+                    setSelectedClub('');
+                  }}
+                  className={controlBaseClass}
+                >
+                  <option value="">All leagues</option>
+                  {leagues.map((l) => (
+                    <option key={l} value={l}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative">
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                  🛡️
+                </span>
+                <select
+                  value={selectedClub}
+                  onChange={(e) => setSelectedClub(e.target.value)}
+                  className={controlBaseClass}
+                >
+                  <option value="">All clubs</option>
+                  {clubs.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <button
-                key={option.key}
-                type="button"
-                onClick={() => handleSort(option.key)}
-                className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
-                  active
-                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/40 dark:text-blue-300'
-                    : 'border-gray-300 bg-white text-gray-600 hover:border-blue-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'
+                onClick={() => setAdultMaleShirts((v) => !v)}
+                className={`h-12 rounded-xl border px-4 text-sm font-semibold transition-all ${
+                  adultMaleShirts
+                    ? 'border-blue-400 bg-blue-500/20 text-blue-100 shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
+                    : 'border-slate-600/70 bg-slate-800/90 text-slate-100 hover:border-blue-500/60'
                 }`}
               >
-                {option.label}
-                {sortIndicator(option.key)}
+                👕 Men&apos;s shirts
               </button>
-            );
-          })}
+
+              {isFiltered ? (
+                <button
+                  onClick={resetFilters}
+                  className="h-12 rounded-xl border border-rose-400/50 bg-rose-950/20 px-4 text-sm font-semibold text-rose-200 transition-colors hover:border-rose-300 hover:bg-rose-900/30"
+                >
+                  ✕ Reset filters
+                </button>
+              ) : (
+                <div className="h-12 rounded-xl border border-slate-700/70 bg-slate-800/60 px-4 text-sm font-medium text-slate-400 flex items-center">
+                  No active filters
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(280px,420px)_1fr] lg:items-center">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                🔎
+              </span>
+              <input
+                type="search"
+                placeholder="Search product or club…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={controlBaseClass}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-1 text-xs uppercase tracking-[0.12em] text-slate-400">
+                Sort groups by
+              </span>
+              {sortOptions.map((option) => {
+                const active = sortCol === option.key;
+
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => handleSort(option.key)}
+                    className={`h-11 rounded-full border px-5 text-sm font-semibold transition-all ${
+                      active
+                        ? 'border-blue-400 bg-blue-500/20 text-blue-100 shadow-[0_0_0_1px_rgba(96,165,250,0.35)]'
+                        : 'border-slate-600/70 bg-slate-800/90 text-slate-200 hover:border-blue-500/60'
+                    }`}
+                  >
+                    {option.label}
+                    {sortIndicator(option.key)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -353,15 +411,20 @@ export default function DealsSection() {
                       className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
                     >
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                        {product.imageUrl ? (
-                          <div className="h-24 w-full shrink-0 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 sm:h-24 sm:w-24 dark:border-gray-700 dark:bg-gray-800">
+                        <div className="h-24 w-full shrink-0 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 sm:h-24 sm:w-24 dark:border-gray-700 dark:bg-gray-800">
+                          {product.imageUrl ? (
                             <img
                               src={product.imageUrl}
                               alt={product.name}
                               className="h-full w-full object-cover"
                             />
-                          </div>
-                        ) : null}
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-[11px] font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                              <span className="text-base">📦</span>
+                              <span>No image</span>
+                            </div>
+                          )}
+                        </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-3">
@@ -378,7 +441,7 @@ export default function DealsSection() {
                             </span>
                           </div>
 
-                          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
                             <div>
                               <p className="text-gray-400 dark:text-gray-500">Was</p>
                               <p className="line-through text-gray-500 dark:text-gray-400">
@@ -397,12 +460,6 @@ export default function DealsSection() {
                                 {product.currentPriceUsd != null
                                   ? formatPrice(product.currentPriceUsd, 'USD')
                                   : '—'}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-gray-400 dark:text-gray-500">Club</p>
-                              <p className="font-medium text-gray-900 dark:text-white">
-                                {product.clubName}
                               </p>
                             </div>
                           </div>
