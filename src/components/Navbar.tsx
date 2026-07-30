@@ -5,6 +5,7 @@ import { signOut, useSession } from 'next-auth/react';
 
 export default function AppNavbar() {
   const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
 
   return (
     <Navbar fluid>
@@ -18,10 +19,10 @@ export default function AppNavbar() {
         <NavbarLink href="/" active>
           Home
         </NavbarLink>
-        {session && <NavbarLink href="/scrape">Scrape</NavbarLink>}
         {session && <NavbarLink href="/clubs">Clubs</NavbarLink>}
         {session && <NavbarLink href="/leagues">Leagues</NavbarLink>}
-        {session && <NavbarLink href="/scrapes">Scrape Runs</NavbarLink>}
+        {session && isAdmin && <NavbarLink href="/scrape">Scrape</NavbarLink>}
+        {session && isAdmin && <NavbarLink href="/scrapes">Scrape Runs</NavbarLink>}
         {session ? (
           <button
             onClick={() => signOut({ callbackUrl: '/' })}

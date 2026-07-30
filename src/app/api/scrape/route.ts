@@ -3,15 +3,15 @@ import { NextRequest, NextResponse } from 'next/server';
 // Puppeteer scrapers can take 20–60 s; Vercel default is 10 s.
 export const maxDuration = 300;
 
-import { auth } from '../../../auth';
+import { requireAdmin } from '@/lib/authz';
 import { prisma } from '../../../lib/prisma';
 import { processProducts } from './productsProcessor';
 import { launchScrapper } from './scrapperLauncher';
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authz = await requireAdmin();
+  if ('response' in authz) {
+    return authz.response;
   }
 
   let league: unknown, club: unknown, clubId: unknown;

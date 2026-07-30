@@ -11,10 +11,13 @@ import {
   TableRow,
   TextInput,
 } from 'flowbite-react';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import type { League } from '../hooks/useLeagues';
 
 export default function LeaguesManager() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState('');
@@ -55,6 +58,10 @@ export default function LeaguesManager() {
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     if (!newName.trim()) return;
     setAdding(true);
     setError('');
@@ -85,6 +92,10 @@ export default function LeaguesManager() {
   }
 
   async function handleSave(id: number) {
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     if (!editName.trim()) return;
     setSaving(true);
     setError('');
@@ -104,6 +115,10 @@ export default function LeaguesManager() {
   }
 
   async function handleDelete(id: number, name: string) {
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     if (!confirm(`Delete "${name}"? This will also delete all its clubs.`)) return;
     setError('');
     const res = await fetch(`/api/leagues/${id}`, { method: 'DELETE' });
@@ -116,31 +131,36 @@ export default function LeaguesManager() {
 
   return (
     <div className="space-y-6">
-      {/* Add form */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add League</h2>
-        <form onSubmit={handleAdd} className="flex gap-3 items-end">
-          <div className="flex-1">
-            <Label htmlFor="league-name" className="mb-1 block dark:text-gray-300">
-              Name
-            </Label>
-            <TextInput
-              id="league-name"
-              placeholder="League name"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              required
-            />
-          </div>
-          <Button
-            type="submit"
-            disabled={adding}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-semibold"
-          >
-            {adding ? 'Adding...' : 'Add'}
-          </Button>
-        </form>
-      </div>
+      {isAdmin ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add League</h2>
+          <form onSubmit={handleAdd} className="flex gap-3 items-end">
+            <div className="flex-1">
+              <Label htmlFor="league-name" className="mb-1 block dark:text-gray-300">
+                Name
+              </Label>
+              <TextInput
+                id="league-name"
+                placeholder="League name"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={adding}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-semibold"
+            >
+              {adding ? 'Adding...' : 'Add'}
+            </Button>
+          </form>
+        </div>
+      ) : (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          You have read-only access. League changes are only available for admin users.
+        </p>
+      )}
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -152,7 +172,9 @@ export default function LeaguesManager() {
             <TableHead>
               <TableRow>
                 <TableHeadCell>Name</TableHeadCell>
-                <TableHeadCell className="text-right">Actions</TableHeadCell>
+                <TableHeadCell className="text-right">
+                  {isAdmin ? 'Actions' : 'Access'}
+                </TableHeadCell>
               </TableRow>
             </TableHead>
             <TableBody className="divide-y">
@@ -198,18 +220,22 @@ export default function LeaguesManager() {
                         {league.name}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button size="xs" color="light" onClick={() => startEdit(league)}>
-                            Edit
-                          </Button>
-                          <Button
-                            size="xs"
-                            color="failure"
-                            onClick={() => handleDelete(league.id, league.name)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        {isAdmin ? (
+                          <div className="flex justify-end gap-2">
+                            <Button size="xs" color="light" onClick={() => startEdit(league)}>
+                              Edit
+                            </Button>
+                            <Button
+                              size="xs"
+                              color="failure"
+                              onClick={() => handleDelete(league.id, league.name)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">Read only</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ),

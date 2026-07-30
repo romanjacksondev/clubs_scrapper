@@ -1,4 +1,4 @@
-import { auth } from '@/auth';
+import { requireAdmin } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
@@ -11,8 +11,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authz = await requireAdmin();
+  if ('response' in authz) return authz.response;
   try {
     const { name } = await req.json();
     if (!name?.trim()) {

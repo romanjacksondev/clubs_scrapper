@@ -11,6 +11,7 @@ import {
   TableRow,
   TextInput,
 } from 'flowbite-react';
+import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import type { League } from '../hooks/useLeagues';
 
@@ -31,6 +32,8 @@ const emptyForm = () => ({
 });
 
 export default function ClubsManager() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
   const [clubs, setClubs] = useState<Club[]>([]);
   const [leagues, setLeagues] = useState<League[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +92,10 @@ export default function ClubsManager() {
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     setAdding(true);
     setError('');
     const res = await fetch('/api/clubs', {
@@ -123,6 +130,10 @@ export default function ClubsManager() {
   }
 
   async function handleSave(id: number) {
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     setSaving(true);
     setError('');
     const res = await fetch(`/api/clubs/${id}`, {
@@ -141,6 +152,10 @@ export default function ClubsManager() {
   }
 
   async function handleDelete(id: number, name: string) {
+    if (!isAdmin) {
+      setError('Admin access required');
+      return;
+    }
     if (!confirm(`Delete "${name}"? This will also delete all its products.`)) return;
     setError('');
     const res = await fetch(`/api/clubs/${id}`, { method: 'DELETE' });
@@ -160,74 +175,79 @@ export default function ClubsManager() {
 
   return (
     <div className="space-y-6">
-      {/* Add form */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Club</h2>
-        <form onSubmit={handleAdd} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="club-name" className="mb-1 block dark:text-gray-300">
-              Name
-            </Label>
-            <TextInput
-              id="club-name"
-              placeholder="Club name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="club-league" className="mb-1 block dark:text-gray-300">
-              League
-            </Label>
-            <select
-              id="club-league"
-              value={form.leagueId}
-              onChange={(e) => setForm({ ...form, leagueId: e.target.value })}
-              required
-              className={selectClass}
-            >
-              <option value="">-- Select league --</option>
-              {leagues.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <Label htmlFor="club-site" className="mb-1 block dark:text-gray-300">
-              Official Site URL
-            </Label>
-            <TextInput
-              id="club-site"
-              placeholder="https://..."
-              value={form.officialSiteUrl}
-              onChange={(e) => setForm({ ...form, officialSiteUrl: e.target.value })}
-            />
-          </div>
-          <div>
-            <Label htmlFor="club-store" className="mb-1 block dark:text-gray-300">
-              Official Store URL
-            </Label>
-            <TextInput
-              id="club-store"
-              placeholder="https://..."
-              value={form.officialStoreUrl}
-              onChange={(e) => setForm({ ...form, officialStoreUrl: e.target.value })}
-            />
-          </div>
-          <div className="sm:col-span-2 flex justify-end">
-            <Button
-              type="submit"
-              disabled={adding}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-semibold"
-            >
-              {adding ? 'Adding...' : 'Add Club'}
-            </Button>
-          </div>
-        </form>
-      </div>
+      {isAdmin ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Add Club</h2>
+          <form onSubmit={handleAdd} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="club-name" className="mb-1 block dark:text-gray-300">
+                Name
+              </Label>
+              <TextInput
+                id="club-name"
+                placeholder="Club name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="club-league" className="mb-1 block dark:text-gray-300">
+                League
+              </Label>
+              <select
+                id="club-league"
+                value={form.leagueId}
+                onChange={(e) => setForm({ ...form, leagueId: e.target.value })}
+                required
+                className={selectClass}
+              >
+                <option value="">-- Select league --</option>
+                {leagues.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="club-site" className="mb-1 block dark:text-gray-300">
+                Official Site URL
+              </Label>
+              <TextInput
+                id="club-site"
+                placeholder="https://..."
+                value={form.officialSiteUrl}
+                onChange={(e) => setForm({ ...form, officialSiteUrl: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="club-store" className="mb-1 block dark:text-gray-300">
+                Official Store URL
+              </Label>
+              <TextInput
+                id="club-store"
+                placeholder="https://..."
+                value={form.officialStoreUrl}
+                onChange={(e) => setForm({ ...form, officialStoreUrl: e.target.value })}
+              />
+            </div>
+            <div className="sm:col-span-2 flex justify-end">
+              <Button
+                type="submit"
+                disabled={adding}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-semibold"
+              >
+                {adding ? 'Adding...' : 'Add Club'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          You have read-only access. Club changes are only available for admin users.
+        </p>
+      )}
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -260,7 +280,9 @@ export default function ClubsManager() {
                 <TableHeadCell>League</TableHeadCell>
                 <TableHeadCell>Site</TableHeadCell>
                 <TableHeadCell>Store</TableHeadCell>
-                <TableHeadCell className="text-right">Actions</TableHeadCell>
+                <TableHeadCell className="text-right">
+                  {isAdmin ? 'Actions' : 'Access'}
+                </TableHeadCell>
               </TableRow>
             </TableHead>
             <TableBody className="divide-y">
@@ -370,18 +392,22 @@ export default function ClubsManager() {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button size="xs" color="light" onClick={() => startEdit(club)}>
-                            Edit
-                          </Button>
-                          <Button
-                            size="xs"
-                            color="failure"
-                            onClick={() => handleDelete(club.id, club.name)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                        {isAdmin ? (
+                          <div className="flex justify-end gap-2">
+                            <Button size="xs" color="light" onClick={() => startEdit(club)}>
+                              Edit
+                            </Button>
+                            <Button
+                              size="xs"
+                              color="failure"
+                              onClick={() => handleDelete(club.id, club.name)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">Read only</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ),

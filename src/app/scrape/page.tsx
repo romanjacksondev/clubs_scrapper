@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -18,6 +19,8 @@ type ScrapeStatus =
   | { status: 'error'; error: string };
 
 export default function ScrapePage() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin';
   const [clubs, setClubs] = useState<ClubStat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -49,6 +52,7 @@ export default function ScrapePage() {
   }, []);
 
   async function handleScrape(club: ClubStat) {
+    if (!isAdmin) return;
     setScrapeStates((prev) => ({ ...prev, [club.id]: { status: 'scraping' } }));
     try {
       const res = await fetch('/api/scrape', {
@@ -82,6 +86,7 @@ export default function ScrapePage() {
   }
 
   async function handleScrapeAll() {
+    if (!isAdmin) return;
     setScrapingAll(true);
     for (const club of clubs) {
       await handleScrape(club);
@@ -100,12 +105,18 @@ export default function ScrapePage() {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Scrape Products</h1>
         <button
           onClick={handleScrapeAll}
-          disabled={loading || scrapingAll}
+          disabled={loading || scrapingAll || !isAdmin}
           className="px-4 py-2 text-sm font-semibold rounded-lg bg-green-600 hover:bg-green-700 text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
         >
           {scrapingAll ? 'Scraping all…' : 'Scrape All'}
         </button>
       </div>
+
+      {!isAdmin && (
+        <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Scraping actions are only available for admin users.
+        </p>
+      )}
 
       {error && <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>}
 
@@ -173,13 +184,17 @@ export default function ScrapePage() {
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() => handleScrape(club)}
-                          disabled={state?.status === 'scraping'}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
-                        >
-                          {state?.status === 'scraping' ? 'Scraping…' : 'Scrape'}
-                        </button>
+                        {isAdmin ? (
+                          <button
+                            onClick={() => handleScrape(club)}
+                            disabled={state?.status === 'scraping'}
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {state?.status === 'scraping' ? 'Scraping…' : 'Scrape'}
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-400">Admin only</span>
+                        )}
                       </td>
                     </tr>
                   );

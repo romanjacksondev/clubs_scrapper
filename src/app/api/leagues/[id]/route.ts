@@ -1,10 +1,10 @@
-import { auth } from '@/auth';
+import { requireAdmin } from '@/lib/authz';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authz = await requireAdmin();
+  if ('response' in authz) return authz.response;
   const { id } = await params;
   const leagueId = parseInt(id, 10);
   if (isNaN(leagueId)) {
@@ -33,8 +33,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const session = await auth();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const authz = await requireAdmin();
+  if ('response' in authz) return authz.response;
   const { id } = await params;
   const leagueId = parseInt(id, 10);
   if (isNaN(leagueId)) {
